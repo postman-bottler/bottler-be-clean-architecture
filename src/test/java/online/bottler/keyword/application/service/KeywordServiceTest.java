@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.application.dto.response.KeywordResponseDTO;
 import online.bottler.letter.application.dto.response.KeywordResponseDTO.CategoryKeywordsDTO;
-import online.bottler.letter.application.repository.KeywordRepository;
+import online.bottler.letter.application.port.out.KeywordRepository;
 import online.bottler.letter.domain.Keyword;
 import online.bottler.letter.application.KeywordService;
 

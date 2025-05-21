@@ -15,9 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.domain.LetterKeyword;
-import online.bottler.letter.infra.entity.LetterKeywordEntity;
-import online.bottler.letter.infra.LetterKeywordQueryDslRepository;
-import online.bottler.letter.infra.LetterKeywordRepositoryImpl;
+import online.bottler.letter.adapter.out.persistence.entity.LetterKeywordEntity;
+import online.bottler.letter.adapter.out.persistence.repository.LetterKeywordQueryDslRepository;
+import online.bottler.letter.adapter.out.persistence.LetterKeywordRepositoryImpl;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import online.bottler.letter.adapter.out.persistence.repository.ReplyLetterJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.domain.ReplyLetter;
-import online.bottler.letter.infra.entity.ReplyLetterEntity;
+import online.bottler.letter.adapter.out.persistence.entity.ReplyLetterEntity;
 
 @DataJpaTest
 @ActiveProfiles("test")

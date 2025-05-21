@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,9 +24,9 @@ import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.ReplyLetter;
-import online.bottler.letter.infra.entity.LetterBoxEntity;
-import online.bottler.letter.infra.entity.LetterEntity;
-import online.bottler.letter.infra.entity.ReplyLetterEntity;
+import online.bottler.letter.adapter.out.persistence.entity.LetterBoxEntity;
+import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
+import online.bottler.letter.adapter.out.persistence.entity.ReplyLetterEntity;
 
 @DataJpaTest
 @ActiveProfiles("test")

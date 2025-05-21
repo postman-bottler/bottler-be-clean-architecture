@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.domain.UserKeyword;
-import online.bottler.letter.infra.UserKeywordJdbcRepository;
+import online.bottler.letter.adapter.out.persistence.repository.UserKeywordJdbcRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")

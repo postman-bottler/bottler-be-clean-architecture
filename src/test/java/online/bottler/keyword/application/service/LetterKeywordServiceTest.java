@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.application.dto.response.FrequentKeywordsDTO;
-import online.bottler.letter.application.repository.LetterKeywordRepository;
+import online.bottler.letter.application.port.out.LetterKeywordRepository;
 import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.application.LetterKeywordService;
 import online.bottler.letter.application.LetterService;

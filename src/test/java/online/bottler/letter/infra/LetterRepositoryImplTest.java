@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import online.bottler.letter.adapter.out.persistence.LetterRepositoryImpl;
+import online.bottler.letter.adapter.out.persistence.repository.LetterJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.letter.domain.Letter;
-import online.bottler.letter.infra.entity.LetterEntity;
+import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")

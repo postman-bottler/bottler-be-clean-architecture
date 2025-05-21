@@ -4,8 +4,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import online.bottler.letter.application.repository.LetterKeywordRepository;
-import online.bottler.letter.application.repository.LetterRepository;
+import online.bottler.letter.application.port.out.LetterKeywordRepository;
+import online.bottler.letter.application.port.out.LetterRepository;
 
 @Service
 @RequiredArgsConstructor

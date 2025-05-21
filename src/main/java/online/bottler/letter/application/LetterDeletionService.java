@@ -8,9 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.dto.LetterDeleteDTO;
 import online.bottler.letter.application.dto.LetterDeleteRequests;
-import online.bottler.letter.application.service.deleter.BoxTypeDeleter;
-import online.bottler.letter.application.service.deleter.LetterDeletionContext;
-import online.bottler.letter.application.service.deleter.LetterTypeDeleter;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 

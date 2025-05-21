@@ -16,9 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.request.UserKeywordRequestDTO;
+import online.bottler.letter.adapter.in.web.dto.request.UserKeywordRequestDTO;
 import online.bottler.letter.application.dto.response.UserKeywordResponseDTO;
-import online.bottler.letter.application.repository.UserKeywordRepository;
+import online.bottler.letter.application.port.out.UserKeywordRepository;
 import online.bottler.letter.domain.UserKeyword;
 import online.bottler.letter.application.UserKeywordService;
 

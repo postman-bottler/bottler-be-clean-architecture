@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.dto.request.UserKeywordRequestDTO;
+import online.bottler.letter.adapter.in.web.dto.request.UserKeywordRequestDTO;
 import online.bottler.letter.application.dto.response.UserKeywordResponseDTO;
-import online.bottler.letter.application.repository.UserKeywordRepository;
+import online.bottler.letter.application.port.out.UserKeywordRepository;
 import online.bottler.letter.domain.UserKeyword;
 
 @Service
