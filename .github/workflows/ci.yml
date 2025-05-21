@@ -1,0 +1,100 @@
+name: Develop Branch CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # 데이터베이스 환경변수 (RDS)
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      # FCM 환경변수
+      BOTTLER_FCM_BASE64: ${{ secrets.BOTTLER_FCM_BASE64 }}
+
+      # AWS 환경변수
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      # Email 인증
+      EMAIL_USER_NAME: ${{ secrets.EMAIL_USER_NAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+
+      # JWT
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+
+      # ECR 환경변수
+      ECR_URI: ${{ secrets.ECR_URI }}
+
+      # S3 환경변수
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      BASE_URL: ${{ secrets.BASE_URL }}
+
+      # gpt 환경변수
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      # Kakao 환경변수
+      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+      KAKAO_REDIRECT_URL: ${{ secrets.KAKAO_REDIRECT_URL }}
+
+      # Slack 환경변수
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
+      # 스케쥴러 환경변수
+      BATCH_SIZE: ${{ secrets.BATCH_SIZE }}
+      BATCH_PARALLELISM: ${{ secrets.BATCH_PARALLELISM }}
+
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: JDK 17 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Gradle 의존성 캐싱
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/caches/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: application.yml 및 application-test.yml 생성
+        run: |
+          mkdir -p src/main/resources
+          mkdir -p src/test/resources
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_TEST_YML }}" > src/test/resources/application-test.yml
+
+      - name: Gradle 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: Gradle로 테스트 및 커버리지 리포트 생성
+        run: ./gradlew clean build -x test
+
+      - name: SonarCloud 패키지 캐싱
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud 분석
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube
