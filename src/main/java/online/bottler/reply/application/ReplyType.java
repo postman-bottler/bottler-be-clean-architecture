@@ -1,4 +1,4 @@
-package online.bottler.reply.application.dto;
+package online.bottler.reply.application;
 
 public enum ReplyType {
     MAP,

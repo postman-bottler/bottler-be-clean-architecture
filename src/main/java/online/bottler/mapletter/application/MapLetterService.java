@@ -50,7 +50,7 @@ import online.bottler.mapletter.domain.MapLetterType;
 import online.bottler.mapletter.domain.ReplyMapLetter;
 import online.bottler.notification.application.dto.request.NotificationLabelRequestDTO;
 import online.bottler.notification.application.NotificationService;
-import online.bottler.reply.application.dto.ReplyType;
+import online.bottler.reply.application.ReplyType;
 import online.bottler.user.application.UserService;
 import org.springframework.transaction.annotation.Transactional;
 

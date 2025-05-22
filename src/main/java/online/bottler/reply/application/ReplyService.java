@@ -3,23 +3,23 @@ package online.bottler.reply.application;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import online.bottler.reply.application.port.in.ReplyUseCase;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import online.bottler.mapletter.application.ReplyFetchService;
-import online.bottler.reply.application.dto.ReplyType;
-import online.bottler.reply.application.dto.response.ReplyResponseDTO;
+import online.bottler.reply.application.response.ReplyResponse;
 
 @Service
 @RequiredArgsConstructor
-public class ReplyService {
+public class ReplyService implements ReplyUseCase {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ReplyFetchService replyFetchService;
-    private static final int REDIS_SAVED_REPLY = 6;
 
+    @Override
     @Transactional(readOnly = true)
-    public List<ReplyResponseDTO> findRecentReplyLetters(Long userId) {
+    public List<ReplyResponse> findRecentReplyLetters(Long userId) {
         String key = "REPLY:" + userId;
         List<Object> values = redisTemplate.opsForList().range(key, 0, 2);
 
@@ -32,7 +32,7 @@ public class ReplyService {
         return values.stream()
                 .map(value -> {
                     String[] parts = value.toString().split(":");
-                    return ReplyResponseDTO.from(ReplyType.valueOf(parts[0]), parts[2], Long.parseLong(parts[1]));
+                    return ReplyResponse.from(ReplyType.valueOf(parts[0]), parts[2], Long.parseLong(parts[1]));
                 })
                 .collect(Collectors.toList());
     }
