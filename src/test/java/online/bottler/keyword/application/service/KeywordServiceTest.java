@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import online.bottler.letter.application.response.KeywordResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.response.KeywordResponseDTO;
-import online.bottler.letter.application.response.KeywordResponseDTO.CategoryKeywordsDTO;
+import online.bottler.letter.application.response.KeywordResponse.CategoryKeywordsDTO;
 import online.bottler.letter.application.port.out.KeywordRepository;
 import online.bottler.letter.domain.Keyword;
 import online.bottler.letter.application.KeywordService;
@@ -44,7 +44,7 @@ class KeywordServiceTest extends TestBase {
         when(keywordRepository.getKeywords()).thenReturn(mockKeywords);
 
         // when
-        KeywordResponseDTO result = keywordService.getKeywords();
+        KeywordResponse result = keywordService.getKeywords();
 
         // then
         assertThat(result).isNotNull();
@@ -65,7 +65,7 @@ class KeywordServiceTest extends TestBase {
         verify(keywordRepository, times(1)).getKeywords();
     }
 
-    private CategoryKeywordsDTO findCategory(KeywordResponseDTO result, String category) {
+    private CategoryKeywordsDTO findCategory(KeywordResponse result, String category) {
         return result.categories().stream()
                 .filter(c -> c.category().equals(category))
                 .findFirst()

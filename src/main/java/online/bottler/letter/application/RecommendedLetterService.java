@@ -3,7 +3,7 @@ package online.bottler.letter.application;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.port.in.GetRecommendedLettersUseCase;
-import online.bottler.letter.application.response.LetterRecommendSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
 import org.springframework.stereotype.Service;
 import online.bottler.letter.application.command.RecommendedLetterDTO;
 import online.bottler.letter.application.port.out.RecommendedLetterRepository;
@@ -23,7 +23,7 @@ public class RecommendedLetterService implements GetRecommendedLettersUseCase {
     }
 
     @Override
-    public List<LetterRecommendSummaryResponseDTO> getRecommended(Long userId) {
+    public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
         return List.of();
     }
 }

@@ -2,13 +2,13 @@ package online.bottler.letter.application.response;
 
 import online.bottler.letter.domain.Letter;
 
-public record LetterRecommendSummaryResponseDTO(
+public record LetterRecommendSummaryResponse(
         Long letterId,
         String title,
         String label
 ) {
-    public static LetterRecommendSummaryResponseDTO from(Letter letter) {
-        return new LetterRecommendSummaryResponseDTO(
+    public static LetterRecommendSummaryResponse from(Letter letter) {
+        return new LetterRecommendSummaryResponse(
                 letter.getId(),
                 letter.getTitle(),
                 letter.getLabel()

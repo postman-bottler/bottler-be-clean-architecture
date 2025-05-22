@@ -25,8 +25,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.application.command.LetterBoxDTO;
-import online.bottler.letter.adapter.in.web.request.PageRequestDTO;
-import online.bottler.letter.application.response.LetterSummaryResponseDTO;
+import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
@@ -44,18 +44,18 @@ class LetterBoxServiceTest extends TestBase {
     @Mock
     private LetterBoxRepository letterBoxRepository;
 
-    private PageRequestDTO pageRequestDTO;
-    private Page<LetterSummaryResponseDTO> mockPage;
+    private PageRequest pageRequestDTO;
+    private Page<LetterSummaryResponse> mockPage;
 
     @BeforeEach
     void setUp() {
-        pageRequestDTO = new PageRequestDTO(1, 10, "createdAt");
+        pageRequestDTO = new PageRequest(1, 10, "createdAt");
 
         mockPage = new PageImpl<>(
                 List.of(
-                        new LetterSummaryResponseDTO(101L, "Title1", "Label1", LetterType.LETTER, BoxType.RECEIVE,
+                        new LetterSummaryResponse(101L, "Title1", "Label1", LetterType.LETTER, BoxType.RECEIVE,
                                 LocalDateTime.now()),
-                        new LetterSummaryResponseDTO(102L, "Title2", "Label2", LetterType.LETTER, BoxType.RECEIVE,
+                        new LetterSummaryResponse(102L, "Title2", "Label2", LetterType.LETTER, BoxType.RECEIVE,
                                 LocalDateTime.now())
                 )
         );
@@ -109,7 +109,7 @@ class LetterBoxServiceTest extends TestBase {
                     mockPage);
 
             // when
-            Page<LetterSummaryResponseDTO> result = letterBoxService.findAllLetterSummaries(pageRequestDTO, 1L);
+            Page<LetterSummaryResponse> result = letterBoxService.findAllLetterSummaries(pageRequestDTO, 1L);
 
             // then
             assertThat(result).isNotNull();
@@ -124,7 +124,7 @@ class LetterBoxServiceTest extends TestBase {
                     Page.empty());
 
             // when
-            Page<LetterSummaryResponseDTO> result = letterBoxService.findReceivedLetterSummaries(pageRequestDTO, 1L);
+            Page<LetterSummaryResponse> result = letterBoxService.findReceivedLetterSummaries(pageRequestDTO, 1L);
 
             // then
             assertThat(result.getContent()).isEmpty();

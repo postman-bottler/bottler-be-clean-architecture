@@ -3,7 +3,7 @@ package online.bottler.letter.application.response;
 import java.time.LocalDateTime;
 import online.bottler.letter.domain.ReplyLetter;
 
-public record ReplyLetterDetailResponseDTO(
+public record ReplyLetterDetailResponse(
         Long replyLetterId,
         String content,
         String font,
@@ -12,8 +12,8 @@ public record ReplyLetterDetailResponseDTO(
         boolean isReplied,
         LocalDateTime createdAt
 ) {
-    public static ReplyLetterDetailResponseDTO from(ReplyLetter replyLetter, boolean isReplied) {
-        return new ReplyLetterDetailResponseDTO(
+    public static ReplyLetterDetailResponse from(ReplyLetter replyLetter, boolean isReplied) {
+        return new ReplyLetterDetailResponse(
                 replyLetter.getId(),
                 replyLetter.getContent(),
                 replyLetter.getFont(),

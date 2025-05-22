@@ -3,20 +3,16 @@ package online.bottler.letter.application.response;
 import java.time.LocalDateTime;
 import online.bottler.letter.domain.ReplyLetter;
 
-public record ReplyLetterResponseDTO(
+public record ReplyLetterSummaryResponse(
         Long replyLetterId,
-        String content,
-        String font,
-        String paper,
+        String title,
         String label,
         LocalDateTime createdAt
 ) {
-    public static ReplyLetterResponseDTO from(ReplyLetter replyLetter) {
-        return new ReplyLetterResponseDTO(
+    public static ReplyLetterSummaryResponse from(ReplyLetter replyLetter) {
+        return new ReplyLetterSummaryResponse(
                 replyLetter.getId(),
-                replyLetter.getContent(),
-                replyLetter.getFont(),
-                replyLetter.getPaper(),
+                replyLetter.getTitle(),
                 replyLetter.getLabel(),
                 replyLetter.getCreatedAt()
         );

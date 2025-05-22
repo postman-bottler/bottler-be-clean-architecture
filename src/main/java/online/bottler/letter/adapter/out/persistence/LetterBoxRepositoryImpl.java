@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import online.bottler.letter.application.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
@@ -35,11 +35,11 @@ public class LetterBoxRepositoryImpl implements LetterBoxRepository {
     }
 
     @Override
-    public Page<LetterSummaryResponseDTO> findLetters(Long userId, Pageable pageable, BoxType boxType) {
-        List<LetterSummaryResponseDTO> letterSummaryResponseDTOS = letterBoxQueryRepository.fetchLetters(userId,
+    public Page<LetterSummaryResponse> findLetters(Long userId, Pageable pageable, BoxType boxType) {
+        List<LetterSummaryResponse> letterSummaryResponses = letterBoxQueryRepository.fetchLetters(userId,
                 boxType, pageable);
         long total = countLetters(userId, boxType);
-        return new PageImpl<>(letterSummaryResponseDTOS, pageable, total);
+        return new PageImpl<>(letterSummaryResponses, pageable, total);
     }
 
     @Override

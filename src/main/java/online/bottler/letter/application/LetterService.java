@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.port.out.LetterKeywordRepository;
 import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.application.command.LetterBoxDTO;
-import online.bottler.letter.adapter.in.web.request.LetterRequestDTO;
-import online.bottler.letter.application.response.LetterDetailResponseDTO;
-import online.bottler.letter.application.response.LetterRecommendSummaryResponseDTO;
-import online.bottler.letter.application.response.LetterResponseDTO;
+import online.bottler.letter.adapter.in.web.request.LetterRequest;
+import online.bottler.letter.application.response.LetterDetailResponse;
+import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
+import online.bottler.letter.application.response.LetterResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
 import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.application.port.out.ReplyLetterRepository;
@@ -36,12 +36,12 @@ public class LetterService {
     private final RedisLetterService redisLetterService;
 
     @Transactional
-    public LetterResponseDTO createLetter(LetterRequestDTO letterRequestDTO, Long userId) {
-        Letter letter = letterRequestDTO.toDomain(userId);
+    public LetterResponse createLetter(LetterRequest letterRequest, Long userId) {
+        Letter letter = letterRequest.toDomain(userId);
         Letter savedLetter = letterRepository.save(letter);
         Long letterId = savedLetter.getId();
 
-        List<String> keywords = letterRequestDTO.keywords();
+        List<String> keywords = letterRequest.keywords();
         List<LetterKeyword> letterKeywords = keywords.stream().map(keyword -> LetterKeyword.create(letterId, keyword))
                 .toList();
         letterKeywordRepository.saveAll(letterKeywords);
@@ -49,7 +49,7 @@ public class LetterService {
         letterBoxRepository.save(LetterBoxDTO.of(userId, letterId, LetterType.LETTER, BoxType.SEND,
                 savedLetter.getCreatedAt()).toDomain());
 
-        return LetterResponseDTO.from(letter, letterKeywords);
+        return LetterResponse.from(letter, letterKeywords);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +58,7 @@ public class LetterService {
     }
 
     @Transactional(readOnly = true)
-    public LetterDetailResponseDTO findLetterDetail(Long userId, Long letterId) {
+    public LetterDetailResponse findLetterDetail(Long userId, Long letterId) {
         boolean isLetterInUserBox = letterBoxRepository.existsByUserIdAndLetterId(userId, letterId);
         if (!isLetterInUserBox) {
             throw new UnauthorizedLetterAccessException();
@@ -70,14 +70,14 @@ public class LetterService {
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
 
-        return LetterDetailResponseDTO.from(letter, keywords, userId, profile, isReplied);
+        return LetterDetailResponse.from(letter, keywords, userId, profile, isReplied);
     }
 
     @Transactional(readOnly = true)
-    public List<LetterRecommendSummaryResponseDTO> findRecommendHeaders(Long userId) {
+    public List<LetterRecommendSummaryResponse> findRecommendHeaders(Long userId) {
         List<Long> letterIds = redisLetterService.fetchActiveRecommendations(userId);
         List<Letter> letters = letterRepository.findAllByIds(letterIds);
-        return letters.stream().map(LetterRecommendSummaryResponseDTO::from).toList();
+        return letters.stream().map(LetterRecommendSummaryResponse::from).toList();
     }
 
     @Transactional(readOnly = true)

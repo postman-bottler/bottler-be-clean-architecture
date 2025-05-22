@@ -21,9 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
 
 @ActiveProfiles("test")
@@ -39,7 +38,7 @@ class LetterBoxRepositoryImplTest extends TestBase {
     @Mock
 //    private LetterBoxJdbcRepository jdbcRepository;
 
-    private LetterSummaryResponseDTO summaryResponseDTO;
+    private LetterSummaryResponse summaryResponseDTO;
     private Pageable pageable;
 
     @BeforeEach
@@ -54,7 +53,7 @@ class LetterBoxRepositoryImplTest extends TestBase {
                 .createdAt(LocalDateTime.now())
                 .build();
 */
-        summaryResponseDTO = new LetterSummaryResponseDTO(
+        summaryResponseDTO = new LetterSummaryResponse(
                 101L,
                 "Test Title",
                 "Test Label",
@@ -72,7 +71,7 @@ class LetterBoxRepositoryImplTest extends TestBase {
         when(queryRepository.countLetters(1L, null)).thenReturn(1L);
 
         // when
-        Page<LetterSummaryResponseDTO> result = repository.findLetters(1L, pageable, BoxType.NONE);
+        Page<LetterSummaryResponse> result = repository.findLetters(1L, pageable, BoxType.NONE);
 
         // then
         assertThat(result).isNotEmpty();
@@ -87,7 +86,7 @@ class LetterBoxRepositoryImplTest extends TestBase {
         when(queryRepository.countLetters(1L, BoxType.SEND)).thenReturn(1L);
 
         // when
-        Page<LetterSummaryResponseDTO> result = repository.findLetters(1L, pageable, BoxType.SEND);
+        Page<LetterSummaryResponse> result = repository.findLetters(1L, pageable, BoxType.SEND);
 
         // then
         assertThat(result).isNotEmpty();
@@ -98,7 +97,7 @@ class LetterBoxRepositoryImplTest extends TestBase {
     @DisplayName("사용자가 받은 편지를 조회")
     void findReceivedLettersForUser() {
         // given
-        summaryResponseDTO = new LetterSummaryResponseDTO(
+        summaryResponseDTO = new LetterSummaryResponse(
                 101L,
                 "Test Title",
                 "Test Label",
@@ -110,7 +109,7 @@ class LetterBoxRepositoryImplTest extends TestBase {
         when(queryRepository.countLetters(1L, BoxType.RECEIVE)).thenReturn(1L);
 
         // when
-        Page<LetterSummaryResponseDTO> result = repository.findLetters(1L, pageable, BoxType.RECEIVE);
+        Page<LetterSummaryResponse> result = repository.findLetters(1L, pageable, BoxType.RECEIVE);
 
         // then
         assertThat(result).isNotEmpty();

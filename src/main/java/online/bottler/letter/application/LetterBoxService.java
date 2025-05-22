@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.command.LetterBoxDTO;
-import online.bottler.letter.adapter.in.web.request.PageRequestDTO;
-import online.bottler.letter.application.response.LetterSummaryResponseDTO;
+import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
@@ -29,17 +29,17 @@ public class LetterBoxService {
     }
 
     @Transactional(readOnly = true)
-    public Page<LetterSummaryResponseDTO> findAllLetterSummaries(PageRequestDTO pageRequestDTO, Long userId) {
+    public Page<LetterSummaryResponse> findAllLetterSummaries(PageRequest pageRequestDTO, Long userId) {
         return findLetters(userId, pageRequestDTO.toPageable(), BoxType.NONE);
     }
 
     @Transactional(readOnly = true)
-    public Page<LetterSummaryResponseDTO> findSentLetterSummaries(PageRequestDTO pageRequestDTO, Long userId) {
+    public Page<LetterSummaryResponse> findSentLetterSummaries(PageRequest pageRequestDTO, Long userId) {
         return findLetters(userId, pageRequestDTO.toPageable(), BoxType.SEND);
     }
 
     @Transactional(readOnly = true)
-    public Page<LetterSummaryResponseDTO> findReceivedLetterSummaries(PageRequestDTO pageRequestDTO, Long userId) {
+    public Page<LetterSummaryResponse> findReceivedLetterSummaries(PageRequest pageRequestDTO, Long userId) {
         return findLetters(userId, pageRequestDTO.toPageable(), BoxType.RECEIVE);
     }
 
@@ -80,7 +80,7 @@ public class LetterBoxService {
         }
     }
 
-    private Page<LetterSummaryResponseDTO> findLetters(Long userId, Pageable pageable, BoxType boxType) {
+    private Page<LetterSummaryResponse> findLetters(Long userId, Pageable pageable, BoxType boxType) {
         return letterBoxRepository.findLetters(userId, pageable, boxType);
     }
 

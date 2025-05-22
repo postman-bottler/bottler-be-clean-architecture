@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
+import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -21,13 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.letter.application.command.LetterDeleteDTO;
-import online.bottler.letter.adapter.in.web.request.PageRequestDTO;
-import online.bottler.letter.adapter.in.web.request.ReplyLetterDeleteRequestDTO;
-import online.bottler.letter.adapter.in.web.request.ReplyLetterRequestDTO;
-import online.bottler.letter.application.response.PageResponseDTO;
-import online.bottler.letter.application.response.ReplyLetterDetailResponseDTO;
-import online.bottler.letter.application.response.ReplyLetterResponseDTO;
-import online.bottler.letter.application.response.ReplyLetterSummaryResponseDTO;
+import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.adapter.in.web.request.ReplyLetterDeleteRequest;
+import online.bottler.letter.application.response.PageResponse;
+import online.bottler.letter.application.response.ReplyLetterDetailResponse;
+import online.bottler.letter.application.response.ReplyLetterResponse;
+import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.LetterDeletionService;
 import online.bottler.letter.application.ReplyLetterService;
@@ -47,10 +47,10 @@ public class ReplyLetterController {
     @Operation(summary = "키워드 편지 생성", description = "지정된 편지 ID에 대한 답장을 생성합니다.")
     @PostMapping("/{letterId}")
     @LetterValidationMetaData(message = "키워드 답장 편지 유효성 검사 실패", errorStatus = REPLY_LETTER_VALIDATION_ERROR)
-    public ApiResponse<ReplyLetterResponseDTO> createReplyLetter(@PathVariable Long letterId,
-                                                                 @RequestBody @Valid ReplyLetterRequestDTO letterReplyRequestDTO,
-                                                                 BindingResult bindingResult,
-                                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<ReplyLetterResponse> createReplyLetter(@PathVariable Long letterId,
+                                                              @RequestBody @Valid ReplyLetterRequest letterReplyRequestDTO,
+                                                              BindingResult bindingResult,
+                                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(
                 letterReplyService.createReplyLetter(letterId, letterReplyRequestDTO, userDetails.getUserId()));
     }
@@ -59,21 +59,21 @@ public class ReplyLetterController {
             + "\nPage Default: page(1) size(9) sort(createAt)")
     @GetMapping("/{letterId}")
     @LetterValidationMetaData(message = "페이지네이션 유효성 검사 실패", errorStatus = PAGINATION_VALIDATION_ERROR)
-    public ApiResponse<PageResponseDTO<ReplyLetterSummaryResponseDTO>> getRepliesForLetter(@PathVariable Long letterId,
-                                                                                           @Valid PageRequestDTO pageRequestDTO,
-                                                                                           BindingResult bindingResult,
-                                                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<PageResponse<ReplyLetterSummaryResponse>> getRepliesForLetter(@PathVariable Long letterId,
+                                                                                     @Valid PageRequest pageRequestDTO,
+                                                                                     BindingResult bindingResult,
+                                                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         letterBoxService.validateLetterInUserBox(userId, letterId);
-        Page<ReplyLetterSummaryResponseDTO> result = letterReplyService.findReplyLetterSummaries(letterId,
+        Page<ReplyLetterSummaryResponse> result = letterReplyService.findReplyLetterSummaries(letterId,
                 pageRequestDTO, userId);
-        return ApiResponse.onSuccess(PageResponseDTO.from(result));
+        return ApiResponse.onSuccess(PageResponse.from(result));
     }
 
     @Operation(summary = "답장 편지 상세 조회", description = "지정된 답장 편지의 ID에 대한 상세 정보를 반환합니다.")
     @GetMapping("/detail/{replyLetterId}")
-    public ApiResponse<ReplyLetterDetailResponseDTO> getReplyLetter(@PathVariable Long replyLetterId,
-                                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<ReplyLetterDetailResponse> getReplyLetter(@PathVariable Long replyLetterId,
+                                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         letterBoxService.validateLetterInUserBox(userId, replyLetterId);
         return ApiResponse.onSuccess(letterReplyService.findReplyLetterDetail(replyLetterId, userId));
@@ -82,9 +82,9 @@ public class ReplyLetterController {
     @Operation(summary = "답장 편지 삭제", description = "답장 편지ID, 송수신 타입(SEND, RECEIVE)을 기반으로 답장 편지를 삭제합니다.")
     @DeleteMapping
     public ApiResponse<String> deleteReplyLetter(
-            @RequestBody @Valid ReplyLetterDeleteRequestDTO replyLetterDeleteRequestDTO,
+            @RequestBody @Valid ReplyLetterDeleteRequest replyLetterDeleteRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        LetterDeleteDTO letterDeleteDTO = LetterDeleteDTO.fromReplyLetter(replyLetterDeleteRequestDTO);
+        LetterDeleteDTO letterDeleteDTO = LetterDeleteDTO.fromReplyLetter(replyLetterDeleteRequest);
         letterDeletionService.deleteLetter(letterDeleteDTO, userDetails.getUserId());
         return ApiResponse.onSuccess("답장 편지가 성공적으로 삭제되었습니다.");
     }

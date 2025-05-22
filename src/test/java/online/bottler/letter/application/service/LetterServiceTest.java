@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.application.command.LetterBoxDTO;
-import online.bottler.letter.adapter.in.web.request.LetterRequestDTO;
+import online.bottler.letter.adapter.in.web.request.LetterRequest;
 import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
@@ -60,7 +60,7 @@ class LetterServiceTest extends TestBase {
     @DisplayName("새로운 편지 생성")
     void createLetter() {
         // given
-        LetterRequestDTO requestDTO = new LetterRequestDTO("테스트 제목", "테스트 내용", List.of("키워드1"), "폰트", "편지지", "라벨");
+        LetterRequest requestDTO = new LetterRequest("테스트 제목", "테스트 내용", List.of("키워드1"), "폰트", "편지지", "라벨");
         Long userId = 100L;
 
         when(letterRepository.save(any(Letter.class))).thenReturn(mockLetter);

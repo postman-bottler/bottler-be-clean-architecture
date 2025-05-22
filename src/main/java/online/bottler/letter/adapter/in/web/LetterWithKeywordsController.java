@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.letter.application.command.LetterDeleteDTO;
-import online.bottler.letter.adapter.in.web.request.LetterDeleteRequestDTO;
-import online.bottler.letter.application.response.LetterDetailResponseDTO;
-import online.bottler.letter.application.response.LetterRecommendSummaryResponseDTO;
-import online.bottler.letter.application.response.LetterResponseDTO;
+import online.bottler.letter.adapter.in.web.request.LetterDeleteRequest;
+import online.bottler.letter.application.response.LetterDetailResponse;
+import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
+import online.bottler.letter.application.response.LetterResponse;
 import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
-@RequestMapping("/letters")
+@RequestMapping("/v2/letters")
 @RequiredArgsConstructor
 @Tag(name = "키워드 편지", description = "키워드 편지 API")
 public class LetterWithKeywordsController {
@@ -44,31 +44,31 @@ public class LetterWithKeywordsController {
     @Operation(summary = "키워드 편지 생성", description = "새로운 키워드 편지를 생성합니다.")
     @PostMapping
     @LetterValidationMetaData(message = "키워드 편지 유효성 검사 실패", errorStatus = LETTER_VALIDATION_ERROR)
-    public ApiResponse<LetterResponseDTO> createLetter(@RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
-                                                       BindingResult bindingResult,
-                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<LetterResponse> createLetter(@RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
+                                                    BindingResult bindingResult,
+                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(createLetterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
     }
 
     @Operation(summary = "키워드 편지 상세 조회", description = "편지 ID로 키워드 편지의 상세 정보를 조회합니다.")
     @GetMapping("/detail/{letterId}")
-    public ApiResponse<LetterDetailResponseDTO> getLetterDetail(@PathVariable Long letterId,
-                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<LetterDetailResponse> getLetterDetail(@PathVariable Long letterId,
+                                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(getLetterWithKeywordsDetailUseCase.getDetail(userDetails.getUserId(), letterId));
     }
 
     @Operation(summary = "추천 키워드 편지 조회", description = "사용자에게 현재 추천된 키워드 편지들의 정보를 제공합니다.")
     @GetMapping("/recommend")
-    public ApiResponse<List<LetterRecommendSummaryResponseDTO>> getRecommendLetters(
+    public ApiResponse<List<LetterRecommendSummaryResponse>> getRecommendLetters(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(getRecommendedLettersUseCase.getRecommended(userDetails.getUserId()));
     }
 
     @Operation(summary = "키워드 편지 삭제", description = "키워드 편지ID, BoxType 송수신(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")
     @DeleteMapping
-    public ApiResponse<String> deleteLetter(@RequestBody @Valid LetterDeleteRequestDTO letterDeleteRequestDTO,
+    public ApiResponse<String> deleteLetter(@RequestBody @Valid LetterDeleteRequest letterDeleteRequest,
                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        LetterDeleteDTO letterDeleteDTO = LetterDeleteDTO.fromLetter(letterDeleteRequestDTO);
+        LetterDeleteDTO letterDeleteDTO = LetterDeleteDTO.fromLetter(letterDeleteRequest);
         deleteLetterWithKeywordsUseCase.delete(letterDeleteDTO, userDetails.getUserId());
         return ApiResponse.onSuccess("키워드 편지를 삭제했습니다.");
     }

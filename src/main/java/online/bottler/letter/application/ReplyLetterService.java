@@ -5,16 +5,16 @@ import static online.bottler.notification.domain.NotificationType.KEYWORD_REPLY;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.command.LetterBoxDTO;
 import online.bottler.letter.application.command.ReceiverDTO;
-import online.bottler.letter.adapter.in.web.request.PageRequestDTO;
-import online.bottler.letter.adapter.in.web.request.ReplyLetterRequestDTO;
-import online.bottler.letter.application.response.ReplyLetterDetailResponseDTO;
-import online.bottler.letter.application.response.ReplyLetterResponseDTO;
-import online.bottler.letter.application.response.ReplyLetterSummaryResponseDTO;
+import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.application.response.ReplyLetterDetailResponse;
+import online.bottler.letter.application.response.ReplyLetterResponse;
+import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
 import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.application.port.out.ReplyLetterRepository;
@@ -40,7 +40,7 @@ public class ReplyLetterService {
     private final RedisLetterService redisLetterService;
 
     @Transactional
-    public ReplyLetterResponseDTO createReplyLetter(Long letterId, ReplyLetterRequestDTO requestDTO, Long senderId) {
+    public ReplyLetterResponse createReplyLetter(Long letterId, ReplyLetterRequest requestDTO, Long senderId) {
         log.info("답장 생성 요청: senderId={}, letterId={}", senderId, letterId);
 
         if (checkIsReplied(letterId, senderId)) {
@@ -50,21 +50,21 @@ public class ReplyLetterService {
         ReplyLetter replyLetter = saveReplyLetter(letterId, requestDTO, senderId);
         handleReplyPostProcessing(replyLetter, requestDTO.label());
 
-        return ReplyLetterResponseDTO.from(replyLetter);
+        return ReplyLetterResponse.from(replyLetter);
     }
 
     @Transactional(readOnly = true)
-    public Page<ReplyLetterSummaryResponseDTO> findReplyLetterSummaries(Long letterId, PageRequestDTO pageRequestDTO,
-                                                                        Long receiverId) {
+    public Page<ReplyLetterSummaryResponse> findReplyLetterSummaries(Long letterId, PageRequest pageRequestDTO,
+                                                                     Long receiverId) {
         return replyLetterRepository.findAllByLetterIdAndReceiverId(letterId, receiverId, pageRequestDTO.toPageable())
-                .map(ReplyLetterSummaryResponseDTO::from);
+                .map(ReplyLetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public ReplyLetterDetailResponseDTO findReplyLetterDetail(Long replyLetterId, Long userId) {
+    public ReplyLetterDetailResponse findReplyLetterDetail(Long replyLetterId, Long userId) {
         boolean isReplied = checkIsReplied(replyLetterId, userId);
         ReplyLetter replyLetter = findReplyLetter(replyLetterId);
-        return ReplyLetterDetailResponseDTO.from(replyLetter, isReplied);
+        return ReplyLetterDetailResponse.from(replyLetter, isReplied);
     }
 
     @Transactional
@@ -102,7 +102,7 @@ public class ReplyLetterService {
         return replyLetterRepository.existsByLetterIdAndSenderId(letterId, senderId);
     }
 
-    private ReplyLetter saveReplyLetter(Long letterId, ReplyLetterRequestDTO requestDTO, Long senderId) {
+    private ReplyLetter saveReplyLetter(Long letterId, ReplyLetterRequest requestDTO, Long senderId) {
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
         ReceiverDTO receiverInfo = ReceiverDTO.from(letter);

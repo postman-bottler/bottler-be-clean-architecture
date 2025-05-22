@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.letter.application.command.LetterDeleteDTO;
-import online.bottler.letter.adapter.in.web.request.PageRequestDTO;
-import online.bottler.letter.application.response.LetterSummaryResponseDTO;
-import online.bottler.letter.application.response.PageResponseDTO;
+import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.application.response.LetterSummaryResponse;
+import online.bottler.letter.application.response.PageResponse;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.LetterDeletionService;
 import online.bottler.user.auth.CustomUserDetails;
@@ -39,21 +39,21 @@ public class LetterBoxController {
             + "\nPage Default: page(1) size(9) sort(createAt)")
     @GetMapping
     @LetterValidationMetaData(message = "페이지네이션 유효성 검사 실패", errorStatus = PAGINATION_VALIDATION_ERROR)
-    public ApiResponse<PageResponseDTO<LetterSummaryResponseDTO>> getAllLetters(@Valid PageRequestDTO pageRequestDTO,
-                                                                                BindingResult bindingResult,
-                                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<PageResponse<LetterSummaryResponse>> getAllLetters(@Valid PageRequest pageRequestDTO,
+                                                                          BindingResult bindingResult,
+                                                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(
-                PageResponseDTO.from(letterBoxService.findAllLetterSummaries(pageRequestDTO, userDetails.getUserId())));
+                PageResponse.from(letterBoxService.findAllLetterSummaries(pageRequestDTO, userDetails.getUserId())));
     }
 
     @Operation(summary = "보낸 편지 조회", description = "페이지네이션을 사용하여 보관된 보낸 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
             + "\nPage Default: page(1) size(9) sort(createAt)")
     @GetMapping("/sent")
     @LetterValidationMetaData(message = "페이지네이션 유효성 검사 실패", errorStatus = PAGINATION_VALIDATION_ERROR)
-    public ApiResponse<PageResponseDTO<LetterSummaryResponseDTO>> getSentLetters(@Valid PageRequestDTO pageRequestDTO,
-                                                                                 BindingResult bindingResult,
-                                                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(PageResponseDTO.from(
+    public ApiResponse<PageResponse<LetterSummaryResponse>> getSentLetters(@Valid PageRequest pageRequestDTO,
+                                                                           BindingResult bindingResult,
+                                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.onSuccess(PageResponse.from(
                 letterBoxService.findSentLetterSummaries(pageRequestDTO, userDetails.getUserId())));
     }
 
@@ -61,11 +61,11 @@ public class LetterBoxController {
             + "\nPage Default: page(1) size(9) sort(createAt)")
     @GetMapping("/received")
     @LetterValidationMetaData(message = "페이지네이션 유효성 검사 실패", errorStatus = PAGINATION_VALIDATION_ERROR)
-    public ApiResponse<PageResponseDTO<LetterSummaryResponseDTO>> getReceivedLetters(
-            @Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult,
+    public ApiResponse<PageResponse<LetterSummaryResponse>> getReceivedLetters(
+            @Valid PageRequest pageRequest, BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(PageResponseDTO.from(
-                letterBoxService.findReceivedLetterSummaries(pageRequestDTO, userDetails.getUserId())));
+        return ApiResponse.onSuccess(PageResponse.from(
+                letterBoxService.findReceivedLetterSummaries(pageRequest, userDetails.getUserId())));
     }
 
     @Operation(summary = "보관된 편지 삭제", description = "편지ID, 편지타입(LETTER, REPLY_LETTER), 송수신 타입(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")

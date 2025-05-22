@@ -6,8 +6,8 @@ import online.bottler.letter.application.command.LetterWithKeywordsCommand;
 import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
-import online.bottler.letter.application.response.LetterDetailResponseDTO;
-import online.bottler.letter.application.response.LetterResponseDTO;
+import online.bottler.letter.application.response.LetterDetailResponse;
+import online.bottler.letter.application.response.LetterResponse;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCase, GetLetterWithKeywordsDetailUseCase,
         DeleteLetterWithKeywordsUseCase {
     @Override
-    public LetterResponseDTO create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
+    public LetterResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
         return null;
     }
 
     @Override
-    public LetterDetailResponseDTO getDetail(Long userId, Long letterId) {
+    public LetterDetailResponse getDetail(Long userId, Long letterId) {
         return null;
     }
 
