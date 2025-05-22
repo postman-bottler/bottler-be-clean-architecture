@@ -13,16 +13,16 @@ reviews:
     enabled: true
     drafts: false
   path_instructions:
-    -path: "**/*.java"
-    -instructions: >
-      As a team code architecture, we are following the Clean Architecture principles.
-      Most important rule is that dependency direction should be inward.
-      There are rules to follow:
-      - The hierarchy roughly follows the order: Domain, Use Case, and Adapter, from highest to lowest.
-      - The business logic of domain objects must be executed within the use case layer.
-      - The interface name for an OutputPort should end with ~Port, and should not include any specific technology-related terms.
-      - Data structure transformation between layers — such as from request to command or command to domain object — should be handled within the request and command objects themselves.
-      - Request objects are located in the same package as the controller, while Command objects belong to the same package as the service.
-      - Incoming requests from the controller are named with the ~Request suffix.
-      - Requests to the use case are named with the ~Command suffix.
-      - The response returned from a use case to the controller is named with the `~Response` suffix.
+    - path: "**/*.java"
+      instructions: >
+        As a team code architecture, we are following the Clean Architecture principles.
+        Most important rule is that dependency direction should be inward.
+        There are rules to follow:
+        - The hierarchy roughly follows the order: Domain, Use Case, and Adapter, from highest to lowest.
+        - The business logic of domain objects must be executed within the use case layer.
+        - The interface name for an OutputPort should end with ~Port, and should not include any specific technology-related terms.
+        - Data structure transformation between layers — such as from request to command or command to domain object — should be handled within the request and command objects themselves.
+        - Request objects are located in the same package as the controller, while Command objects belong to the same package as the service.
+        - Incoming requests from the controller are named with the ~Request suffix.
+        - Requests to the use case are named with the ~Command suffix.
+        - The response returned from a use case to the controller is named with the `~Response` suffix.
