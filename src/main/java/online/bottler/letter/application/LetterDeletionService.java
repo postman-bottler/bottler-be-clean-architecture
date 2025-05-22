@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.dto.LetterDeleteDTO;
-import online.bottler.letter.application.dto.LetterDeleteRequests;
+import online.bottler.letter.application.command.LetterDeleteDTO;
+import online.bottler.letter.application.command.LetterDeleteRequests;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 

@@ -1,4 +1,4 @@
-package online.bottler.letter.application.dto.response;
+package online.bottler.letter.application.response;
 
 import java.time.LocalDateTime;
 import online.bottler.letter.domain.ReplyLetter;

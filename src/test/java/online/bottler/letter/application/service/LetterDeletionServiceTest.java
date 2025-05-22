@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import online.bottler.letter.application.dto.LetterDeleteDTO;
+import online.bottler.letter.application.command.LetterDeleteDTO;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 

@@ -1,4 +1,4 @@
-package online.bottler.letter.application.dto;
+package online.bottler.letter.application.command;
 
 import online.bottler.letter.domain.RecommendedLetter;
 

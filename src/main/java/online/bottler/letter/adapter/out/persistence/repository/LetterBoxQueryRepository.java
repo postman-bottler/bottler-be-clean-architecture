@@ -13,7 +13,7 @@ import online.bottler.letter.adapter.out.persistence.entity.QLetterEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QReplyLetterEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import online.bottler.letter.application.dto.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponseDTO;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 

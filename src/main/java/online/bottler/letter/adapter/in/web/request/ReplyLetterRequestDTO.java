@@ -1,4 +1,4 @@
-package online.bottler.letter.adapter.in.web.dto.request;
+package online.bottler.letter.adapter.in.web.request;
 
 import jakarta.validation.constraints.NotBlank;
 import online.bottler.letter.domain.LetterContent;

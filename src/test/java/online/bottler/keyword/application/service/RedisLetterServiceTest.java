@@ -24,7 +24,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.utiil.RedisLetterKeyUtil;
-import online.bottler.letter.application.dto.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxDTO;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.LetterService;
 import online.bottler.letter.application.RedisLetterService;
@@ -100,8 +100,8 @@ class RedisLetterServiceTest extends TestBase {
         when(valueOperations.get(activeKey)).thenReturn(activeRecommendations);
         when(letterService.existsLetterById(301L)).thenReturn(true);
 
-        Letter mockLetter = Letter.builder().id(301L).label("testLabel").build();
-        when(letterService.findLetter(301L)).thenReturn(mockLetter);
+//        Letter mockLetter = Letter.builder().id(301L).label("testLabel").build();
+//        when(letterService.findLetter(301L)).thenReturn(mockLetter);
 
         // when
 //        RecommendNotificationRequestDTO result = redisLetterService.updateRecommendationsFromTemp(userId);

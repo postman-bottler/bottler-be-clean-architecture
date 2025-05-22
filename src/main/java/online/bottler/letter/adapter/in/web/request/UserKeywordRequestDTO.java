@@ -1,4 +1,4 @@
-package online.bottler.letter.adapter.in.web.dto.request;
+package online.bottler.letter.adapter.in.web.request;
 
 import java.util.List;
 import online.bottler.letter.domain.UserKeyword;

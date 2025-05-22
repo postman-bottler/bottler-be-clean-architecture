@@ -3,7 +3,7 @@ package online.bottler.letter.application;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import online.bottler.letter.application.dto.RecommendedLetterDTO;
+import online.bottler.letter.application.command.RecommendedLetterDTO;
 import online.bottler.letter.application.port.out.RecommendedLetterRepository;
 
 @Service

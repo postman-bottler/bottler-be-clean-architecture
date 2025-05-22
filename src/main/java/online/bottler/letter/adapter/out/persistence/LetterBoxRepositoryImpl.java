@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import online.bottler.letter.application.dto.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponseDTO;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;

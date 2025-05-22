@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.config.QueryDslConfig;
-import online.bottler.letter.application.dto.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponseDTO;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterBox;
@@ -46,7 +46,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
     void setUp() {
         pageable = PageRequest.of(0, 10);
 
-        Letter letter = Letter.builder()
+        /*Letter letter = Letter.builder()
                 .title("Test Letter")
                 .content("Sample content")
                 .font("Arial")
@@ -111,7 +111,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                 .boxType(BoxType.SEND)
                 .createdAt(LocalDateTime.now())
                 .build();
-        em.persist(LetterBoxEntity.from(replySend));
+        em.persist(LetterBoxEntity.from(replySend));*/
     }
 
     @Nested

@@ -26,9 +26,9 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.ReceiverDTO;
-import online.bottler.letter.adapter.in.web.dto.request.ReplyLetterRequestDTO;
-import online.bottler.letter.application.dto.response.ReplyLetterResponseDTO;
+import online.bottler.letter.application.command.ReceiverDTO;
+import online.bottler.letter.adapter.in.web.request.ReplyLetterRequestDTO;
+import online.bottler.letter.application.response.ReplyLetterResponseDTO;
 import online.bottler.letter.application.port.out.ReplyLetterRepository;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.DuplicateReplyLetterException;
@@ -155,7 +155,7 @@ class ReplyLetterServiceTest extends TestBase {
             Long replyLetterId = 1L;
             Long userId = 100L;
 
-            ReplyLetter mockReplyLetter = ReplyLetter.builder()
+            /*ReplyLetter mockReplyLetter = ReplyLetter.builder()
                     .id(replyLetterId)
                     .title("RE: 제목")
                     .content("내용")
@@ -163,7 +163,7 @@ class ReplyLetterServiceTest extends TestBase {
 
             when(replyLetterRepository.existsByIdAndSenderId(replyLetterId, userId)).thenReturn(true);
             when(replyLetterRepository.findById(replyLetterId)).thenReturn(Optional.of(mockReplyLetter));
-
+*/
             // when
             var result = replyLetterService.findReplyLetterDetail(replyLetterId, userId);
 

@@ -1,4 +1,4 @@
-package online.bottler.letter.adapter.in.web.dto.request;
+package online.bottler.letter.adapter.in.web.request;
 
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.PageRequest;

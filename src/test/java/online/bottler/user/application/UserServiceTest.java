@@ -21,7 +21,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import online.bottler.letter.application.RedisLetterService;
-import online.bottler.letter.application.dto.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxDTO;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.slack.SlackConstant;

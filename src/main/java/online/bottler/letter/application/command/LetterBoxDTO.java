@@ -1,4 +1,4 @@
-package online.bottler.letter.application.dto;
+package online.bottler.letter.application.command;
 
 import java.time.LocalDateTime;
 import online.bottler.letter.domain.BoxType;

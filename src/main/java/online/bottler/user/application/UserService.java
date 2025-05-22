@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.RedisLetterService;
 import online.bottler.label.application.repository.LabelRepository;
 import online.bottler.label.domain.Label;
-import online.bottler.letter.application.dto.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxDTO;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;

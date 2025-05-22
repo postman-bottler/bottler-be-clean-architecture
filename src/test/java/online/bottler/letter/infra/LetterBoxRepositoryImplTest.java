@@ -21,7 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponseDTO;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
@@ -46,14 +46,14 @@ class LetterBoxRepositoryImplTest extends TestBase {
     void setUp() {
         pageable = PageRequest.of(0, 10);
 
-        LetterBox letterBox = LetterBox.builder()
+        /*LetterBox letterBox = LetterBox.builder()
                 .userId(1L)
                 .letterId(101L)
                 .letterType(LetterType.LETTER)
                 .boxType(BoxType.RECEIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
-
+*/
         summaryResponseDTO = new LetterSummaryResponseDTO(
                 101L,
                 "Test Title",

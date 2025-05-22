@@ -1,4 +1,4 @@
-package online.bottler.letter.application.dto.response;
+package online.bottler.letter.application.response;
 
 import java.util.List;
 import java.util.Map;
