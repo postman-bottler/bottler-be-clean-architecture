@@ -23,8 +23,8 @@ reviews:
         - The interface name for an OutputPort should end with '~Port', and should not include any specific technology-related terms.
         - Data structure transformation between layers — such as from request to command or command to domain object — should be handled within the request and command objects themselves.
         - Request objects are located in the same package as the controller, while Command objects belong to the same package as the service.
-        - Requests coming into the controller are named with the '~Request' suffix.        
+        - Requests coming into the controller are named with the '~Request' suffix.
           - '~Request' suffix means that the object is a request to the controller.
         - Requests coming to the use case are named with the '~Command' suffix.
           - '~Command' suffix means that the object is a request to the use case.
-        - The response returned from a use case to the controller is named with the `~Response` suffix.
+        - The response returned from a use case to the controller is named with the '~Response' suffix.
