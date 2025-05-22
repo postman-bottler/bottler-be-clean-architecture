@@ -44,10 +44,6 @@ public class UserKeywordEntity {
     }
 
     public UserKeyword toDomain() {
-        return UserKeyword.builder()
-                .id(id)
-                .userId(userId)
-                .keyword(keyword)
-                .build();
+        return UserKeyword.of(id, userId, keyword);
     }
 }

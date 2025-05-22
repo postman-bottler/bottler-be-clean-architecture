@@ -14,12 +14,6 @@ public record LetterBoxDTO(Long userId, Long letterId, LetterType letterType, Bo
     }
 
     public LetterBox toDomain() {
-        return LetterBox.builder()
-                .userId(userId)
-                .letterId(letterId)
-                .letterType(letterType)
-                .boxType(boxType)
-                .createdAt(createdAt)
-                .build();
+        return LetterBox.create(userId, letterId, letterType, boxType, createdAt);
     }
 }

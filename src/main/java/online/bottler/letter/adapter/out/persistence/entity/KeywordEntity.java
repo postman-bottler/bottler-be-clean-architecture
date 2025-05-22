@@ -29,10 +29,6 @@ public class KeywordEntity {
     }
 
     public Keyword toDomain() {
-        return Keyword.builder()
-                .id(id)
-                .keyword(keyword)
-                .category(category)
-                .build();
+        return Keyword.of(id, keyword, category);
     }
 }

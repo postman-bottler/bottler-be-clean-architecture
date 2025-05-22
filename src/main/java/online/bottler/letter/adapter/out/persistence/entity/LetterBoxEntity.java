@@ -68,13 +68,6 @@ public class LetterBoxEntity {
     }
 
     public LetterBox toDomain() {
-        return LetterBox.builder()
-                .id(id)
-                .userId(userId)
-                .letterId(letterId)
-                .letterType(letterType)
-                .boxType(boxType)
-                .createdAt(createdAt)
-                .build();
+        return LetterBox.of(id, userId, letterId, letterType, boxType, createdAt);
     }
 }

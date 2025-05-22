@@ -35,10 +35,10 @@ class KeywordServiceTest extends TestBase {
     void getKeywords() {
         // given
         List<Keyword> mockKeywords = List.of(
-                Keyword.builder().id(1L).keyword("사랑").category("감정").build(),
-                Keyword.builder().id(2L).keyword("행복").category("감정").build(),
-                Keyword.builder().id(3L).keyword("우정").category("사회").build(),
-                Keyword.builder().id(4L).keyword("성공").category("자기계발").build()
+                Keyword.of(1L, "사랑", "감정"),
+                Keyword.of(2L, "행복", "감정"),
+                Keyword.of(3L, "우정", "사회"),
+                Keyword.of(4L, "성공", "자기계발")
         );
 
         when(keywordRepository.getKeywords()).thenReturn(mockKeywords);

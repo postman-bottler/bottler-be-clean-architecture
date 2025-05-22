@@ -8,9 +8,6 @@ public record RecommendedLetterDTO(Long userId, Long letterId) {
     }
 
     public RecommendedLetter toDomain() {
-        return RecommendedLetter.builder()
-                .userId(userId)
-                .letterId(letterId)
-                .build();
+        return RecommendedLetter.create(userId, letterId);
     }
 }

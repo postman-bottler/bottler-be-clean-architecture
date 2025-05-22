@@ -7,7 +7,7 @@ public record UserKeywordRequestDTO(List<String> keywords) {
     public List<UserKeyword> toDomain(Long userId) {
         return keywords.stream()
                 .map(keyword ->
-                        UserKeyword.builder().userId(userId).keyword(keyword).build())
+                        UserKeyword.create(userId, keyword))
                 .toList();
     }
 }

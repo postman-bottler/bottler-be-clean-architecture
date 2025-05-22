@@ -42,7 +42,7 @@ public class LetterService {
         Long letterId = savedLetter.getId();
 
         List<String> keywords = letterRequestDTO.keywords();
-        List<LetterKeyword> letterKeywords = keywords.stream().map(keyword -> LetterKeyword.from(letterId, keyword))
+        List<LetterKeyword> letterKeywords = keywords.stream().map(keyword -> LetterKeyword.create(letterId, keyword))
                 .toList();
         letterKeywordRepository.saveAll(letterKeywords);
 

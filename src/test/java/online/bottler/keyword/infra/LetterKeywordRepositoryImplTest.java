@@ -33,8 +33,8 @@ class LetterKeywordRepositoryImplTest extends TestBase {
 //    private LetterKeywordJdbcRepository jdbcRepository;
 
     private static final List<LetterKeyword> MOCK_KEYWORDS = List.of(
-            LetterKeyword.from(1L, "keyword1"),
-            LetterKeyword.from(1L, "keyword2")
+            LetterKeyword.create(1L, "keyword1"),
+            LetterKeyword.create(1L, "keyword2")
     );
 
     private static final List<Long> MOCK_MATCHED_LETTER_IDS = List.of(1L, 2L);

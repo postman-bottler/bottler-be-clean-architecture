@@ -44,10 +44,10 @@ public class RecommendedLetterEntity {
     }
 
     public RecommendedLetter toDomain() {
-        return RecommendedLetter.builder()
-                .id(id)
-                .userId(userId)
-                .letterId(letterId)
-                .build();
+        return RecommendedLetter.of(
+                id,
+                userId,
+                letterId
+        );
     }
 }

@@ -17,7 +17,7 @@ import online.bottler.letter.domain.LetterKeyword;
 @Table(
         name = "letter_keyword",
         indexes = @Index(name = "idx_letterkeyword_keyword_isdeleted_letter",
-        columnList = "keyword, isDeleted, letterId"),
+                columnList = "keyword, isDeleted, letterId"),
         uniqueConstraints = @UniqueConstraint(name = "uq_letter_keyword", columnNames = {"letterId", "keyword"})
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -52,11 +52,6 @@ public class LetterKeywordEntity {
     }
 
     public LetterKeyword toDomain() {
-        return LetterKeyword.builder()
-                .id(id)
-                .letterId(letterId)
-                .keyword(keyword)
-                .isDeleted(isDeleted)
-                .build();
+        return LetterKeyword.of(id, letterId, keyword, isDeleted);
     }
 }
