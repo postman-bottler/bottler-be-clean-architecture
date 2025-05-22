@@ -1,27 +1,26 @@
 package online.bottler.letter.domain;
 
+
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-public class ReplyLetter {
-    private Long id;
-    private String title;
-    private String content;
-    private String font;
-    private String paper;
-    private String label;
-    private Long letterId;
-    private Long receiverId;
-    private Long senderId;
-    private boolean isDeleted;
-    private boolean isBlocked;
-    private LocalDateTime createdAt;
+public class ReplyLetter extends BaseLetter {
+    private final Long letterId;
+    private final Long receiverId;
+
+    public ReplyLetter(Long id, Long userId, LetterContent letterContent, boolean isDeleted, boolean isBlocked,
+                       Long letterId, Long receiverId, LocalDateTime createdAt) {
+        super(id, userId, letterContent, isDeleted, isBlocked, createdAt);
+        this.letterId = letterId;
+        this.receiverId = receiverId;
+    }
+
+    public static ReplyLetter of(Long id, Long userId, LetterContent letterContent, boolean isDeleted, boolean isBlocked, Long letterId, Long receiverId, LocalDateTime createdAt) {
+        return new ReplyLetter(id, userId, letterContent, isDeleted, isBlocked, letterId, receiverId, createdAt);
+    }
+
+    public static ReplyLetter create(Long userId, LetterContent letterContent, Long letterId, Long receiverId) {
+        return new ReplyLetter(null, userId, letterContent, false, false, letterId, receiverId, LocalDateTime.now());
+    }
 }

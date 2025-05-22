@@ -77,7 +77,7 @@ public class ReplyLetterService {
 
         List<ReplyLetter> replyLetters = replyLetterRepository.findAllByIds(replyLetterIds);
 
-        if (replyLetters.stream().anyMatch(replyLetter -> !replyLetter.getSenderId().equals(senderId))) {
+        if (replyLetters.stream().anyMatch(replyLetter -> !replyLetter.getUserId().equals(senderId))) {
             throw new LetterAuthorMismatchException();
         }
 
@@ -95,7 +95,7 @@ public class ReplyLetterService {
         ReplyLetter replyLetter = findReplyLetter(replyLetterId);
         replyLetterRepository.softBlockById(replyLetterId);
 
-        return replyLetter.getSenderId();
+        return replyLetter.getUserId();
     }
 
     public boolean checkIsReplied(Long letterId, Long senderId) {
@@ -123,7 +123,7 @@ public class ReplyLetterService {
     }
 
     private void saveReplyLetterToBox(ReplyLetter replyLetter) {
-        saveLetterToBox(replyLetter.getSenderId(), replyLetter, BoxType.SEND);
+        saveLetterToBox(replyLetter.getUserId(), replyLetter, BoxType.SEND);
         saveLetterToBox(replyLetter.getReceiverId(), replyLetter, BoxType.RECEIVE);
     }
 

@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterContent;
 
 @Entity
 @Table(
@@ -65,18 +66,20 @@ public class LetterEntity {
     }
 
     public Letter toDomain() {
-        return Letter.builder()
-                .id(id)
-                .title(title)
-                .content(content)
-                .font(font)
-                .paper(paper)
-                .label(label)
-                .userId(userId)
-                .isDeleted(isDeleted)
-                .isBlocked(isBlocked)
-                .createdAt(createdAt)
-                .build();
+        return Letter.of(
+                id,
+                userId,
+                LetterContent.of(
+                        title,
+                        content,
+                        font,
+                        paper,
+                        label
+                ),
+                isDeleted,
+                isBlocked,
+                createdAt
+        );
     }
 
 }

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import online.bottler.letter.domain.LetterContent;
 import online.bottler.letter.domain.ReplyLetter;
 
 @Entity
@@ -66,7 +67,7 @@ public class ReplyLetterEntity {
                 .label(replyLetter.getLabel())
                 .letterId(replyLetter.getLetterId())
                 .receiverId(replyLetter.getReceiverId())
-                .senderId(replyLetter.getSenderId())
+                .senderId(replyLetter.getUserId())
                 .isDeleted(replyLetter.isDeleted())
                 .isBlocked(replyLetter.isBlocked())
                 .createdAt(replyLetter.getCreatedAt())
@@ -74,19 +75,21 @@ public class ReplyLetterEntity {
     }
 
     public ReplyLetter toDomain() {
-        return ReplyLetter.builder()
-                .id(id)
-                .title(title)
-                .content(content)
-                .font(font)
-                .paper(paper)
-                .label(label)
-                .letterId(letterId)
-                .receiverId(receiverId)
-                .senderId(senderId)
-                .isDeleted(isDeleted)
-                .isBlocked(isBlocked)
-                .createdAt(createdAt)
-                .build();
+        return ReplyLetter.of(
+                id,
+                senderId,
+                LetterContent.of(
+                        title,
+                        content,
+                        font,
+                        paper,
+                        label
+                ),
+                isDeleted,
+                isBlocked,
+                letterId,
+                receiverId,
+                createdAt
+        );
     }
 }
