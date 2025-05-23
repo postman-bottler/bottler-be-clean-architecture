@@ -1,13 +1,14 @@
 package online.bottler.complaint.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import online.bottler.global.exception.DomainException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import online.bottler.complaint.exception.DuplicateComplainException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("신고 일급 컬렉션 테스트")
 public class ComplaintsTest {
@@ -38,7 +39,7 @@ public class ComplaintsTest {
 
         // WHEN -  THEN
         assertThatThrownBy(() -> complaints.add(duplicate))
-                .isInstanceOf(DuplicateComplainException.class);
+                .isInstanceOf(DomainException.class);
     }
 
     @DisplayName("신고 개수가 경고 조건 미만일 경우, 경고가 불필요함을 알린다.")
