@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.LetterWithKeywordsCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
+import online.bottler.letter.application.port.in.BlockLetterUseCase;
 import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
+import online.bottler.letter.application.port.in.GetLetterUseCase;
 import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
 import online.bottler.letter.application.port.out.CheckLetterBoxPort;
 import online.bottler.letter.application.port.out.CheckReplyLetterPort;
@@ -34,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCase, GetLetterWithKeywordsDetailUseCase,
-        DeleteLetterWithKeywordsUseCase {
+        DeleteLetterWithKeywordsUseCase, GetLetterUseCase, BlockLetterUseCase {
 
     private final CreateLetterPort createLetterPort;
     private final CreateLetterKeywordPort createLetterKeywordPort;
@@ -84,5 +86,15 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
         deleteLetterPort.softDelete(command.letterId(), command.userId(), command.boxType());
         deleteLetterKeywordPort.softDelete(command.letterId());
         deleteLetterBoxPort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
+    }
+
+    @Override
+    public Letter getLetter(String letterId) {
+        return null;
+    }
+
+    @Override
+    public Long softBlock(String letter) {
+        return 0L;
     }
 }
