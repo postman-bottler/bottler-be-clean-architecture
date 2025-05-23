@@ -14,5 +14,5 @@ public interface LetterKeywordJpaRepository extends JpaRepository<LetterKeywordE
 
     @Modifying
     @Query(value = "UPDATE letter_keyword SET is_deleted = false WHERE letter_id = :letterId", nativeQuery = true)
-    void softDeleteById(@Param("letterIds") Long letterId);
+    void softDeleteById(@Param("letterId") Long letterId);
 }
