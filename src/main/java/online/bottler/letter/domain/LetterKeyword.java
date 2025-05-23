@@ -1,5 +1,7 @@
 package online.bottler.letter.domain;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -23,5 +25,9 @@ public class LetterKeyword {
 
     public static LetterKeyword create(Long letterId, String keyword) {
         return new LetterKeyword(null, letterId, keyword, false);
+    }
+
+    public static List<LetterKeyword> createList(Long letterId, List<String> keywords) {
+        return keywords.stream().map(keyword -> create(letterId, keyword)).collect(Collectors.toList());
     }
 }

@@ -42,20 +42,19 @@ public class LetterWithKeywords {
         return letter.getLabel();
     }
 
-    public boolean getIsDeleted() {
-        return letter.isDeleted;
+    public boolean isDeleted() {
+        return letter.isDeleted();
     }
 
-    public boolean getIsBlocked() {
-        return letter.isBlocked;
+    public boolean isBlocked() {
+        return letter.isBlocked();
     }
 
     public LocalDateTime getCreatedAt() {
         return letter.getCreatedAt();
     }
 
-    public static LetterWithKeywords from(Letter letter, List<LetterKeyword> letterKeywords) {
-        List<String> keywords = letterKeywords.stream().map(LetterKeyword::toString).toList();
+    public static LetterWithKeywords create(Letter letter, List<String> keywords) {
         return new LetterWithKeywords(letter, keywords);
     }
 }

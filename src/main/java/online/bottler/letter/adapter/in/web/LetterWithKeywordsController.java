@@ -13,6 +13,7 @@ import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase
 import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
 import online.bottler.letter.application.port.in.GetRecommendedLettersUseCase;
+import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +28,6 @@ import online.bottler.letter.application.command.LetterDeleteDTO;
 import online.bottler.letter.adapter.in.web.request.LetterDeleteRequest;
 import online.bottler.letter.application.response.LetterDetailResponse;
 import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
-import online.bottler.letter.application.response.LetterResponse;
 import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
@@ -44,9 +44,9 @@ public class LetterWithKeywordsController {
     @Operation(summary = "키워드 편지 생성", description = "새로운 키워드 편지를 생성합니다.")
     @PostMapping
     @LetterValidationMetaData(message = "키워드 편지 유효성 검사 실패", errorStatus = LETTER_VALIDATION_ERROR)
-    public ApiResponse<LetterResponse> createLetter(@RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
-                                                    BindingResult bindingResult,
-                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<LetterWithKeywordsResponse> createLetter(@RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
+                                                                BindingResult bindingResult,
+                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(createLetterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
     }
 

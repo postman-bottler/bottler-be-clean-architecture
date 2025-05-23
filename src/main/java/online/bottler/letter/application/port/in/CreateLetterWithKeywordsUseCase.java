@@ -1,8 +1,8 @@
 package online.bottler.letter.application.port.in;
 
 import online.bottler.letter.application.command.LetterWithKeywordsCommand;
-import online.bottler.letter.application.response.LetterResponse;
+import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 
 public interface CreateLetterWithKeywordsUseCase {
-    LetterResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand);
+    LetterWithKeywordsResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand);
 }

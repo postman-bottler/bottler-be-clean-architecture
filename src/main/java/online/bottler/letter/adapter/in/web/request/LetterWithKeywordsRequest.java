@@ -12,6 +12,6 @@ public record LetterWithKeywordsRequest(@NotNull(message = "편지 제목은 Nul
                                         @NotBlank(message = "편지지는 필수입니다.") String paper,
                                         @NotBlank(message = "라벨은 필수입니다.") String label) {
     public LetterWithKeywordsCommand toCommand(Long userId) {
-        return new LetterWithKeywordsCommand();
+        return LetterWithKeywordsCommand.of(userId, title, content, font, paper, label, keywords);
     }
 }
