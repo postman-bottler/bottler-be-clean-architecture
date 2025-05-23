@@ -2,15 +2,13 @@ package online.bottler.letter.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.application.port.in.GetRecommendedLettersUseCase;
-import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
 import org.springframework.stereotype.Service;
 import online.bottler.letter.application.command.RecommendedLetterDTO;
 import online.bottler.letter.application.port.out.RecommendedLetterRepository;
 
 @Service
 @RequiredArgsConstructor
-public class RecommendedLetterService implements GetRecommendedLettersUseCase {
+public class RecommendedLetterService {
 
     private final RecommendedLetterRepository recommendedLetterRepository;
 
@@ -20,10 +18,5 @@ public class RecommendedLetterService implements GetRecommendedLettersUseCase {
 
     public List<Long> findRecommendedLetterIdsByUserId(Long userId) {
         return recommendedLetterRepository.findRecommendedLettersByUserId(userId);
-    }
-
-    @Override
-    public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
-        return List.of();
     }
 }

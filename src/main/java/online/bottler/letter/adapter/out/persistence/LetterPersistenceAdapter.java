@@ -1,5 +1,6 @@
 package online.bottler.letter.adapter.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
@@ -17,12 +18,16 @@ public class LetterPersistenceAdapter implements CreateLetterPort, LoadLetterPor
 
     @Override
     public Letter create(Letter letter) {
-        LetterEntity letterEntity = letterJpaRepository.save(LetterEntity.from(letter));
-        return letterEntity.toDomain();
+        return letterJpaRepository.save(LetterEntity.from(letter)).toDomain();
     }
 
     @Override
     public Optional<Letter> loadById(Long letterId) {
         return letterJpaRepository.findById(letterId).map(LetterEntity::toDomain);
+    }
+
+    @Override
+    public List<Letter> loadAllByIds(List<Long> letterIds) {
+        return LetterEntity.toDomainList(letterJpaRepository.findAllByIds(letterIds));
     }
 }

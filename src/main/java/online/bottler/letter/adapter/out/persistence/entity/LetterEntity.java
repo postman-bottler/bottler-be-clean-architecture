@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -68,6 +69,10 @@ public class LetterEntity {
     public Letter toDomain() {
         return Letter.of(id, userId, LetterContent.of(title, content, font, paper, label), isDeleted, isBlocked,
                 createdAt);
+    }
+
+    public static List<Letter> toDomainList(List<LetterEntity> letterEntities) {
+        return letterEntities.stream().map(LetterEntity::toDomain).toList();
     }
 
 }

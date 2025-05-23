@@ -1,5 +1,6 @@
 package online.bottler.letter.application.response;
 
+import java.util.List;
 import online.bottler.letter.domain.Letter;
 
 public record LetterRecommendSummaryResponse(
@@ -13,5 +14,9 @@ public record LetterRecommendSummaryResponse(
                 letter.getTitle(),
                 letter.getLabel()
         );
+    }
+
+    public static List<LetterRecommendSummaryResponse> fromList(List<Letter> letters) {
+        return letters.stream().map(LetterRecommendSummaryResponse::from).toList();
     }
 }
