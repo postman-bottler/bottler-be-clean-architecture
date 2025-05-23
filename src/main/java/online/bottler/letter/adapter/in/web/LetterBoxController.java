@@ -9,6 +9,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
+import online.bottler.letter.application.port.in.GetAllLettersUseCase;
+import online.bottler.letter.application.port.in.GetReceivedLettersUseCase;
+import online.bottler.letter.application.port.in.GetSentLettersUseCase;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +24,6 @@ import online.bottler.letter.application.command.LetterDeleteDTO;
 import online.bottler.letter.adapter.in.web.request.PageRequest;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.response.PageResponse;
-import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.LetterDeletionService;
 import online.bottler.user.auth.CustomUserDetails;
 
@@ -32,8 +34,11 @@ import online.bottler.user.auth.CustomUserDetails;
 @Tag(name = "Letter Box", description = "보관된(saved) 편지 관리 API")
 public class LetterBoxController {
 
-    private final LetterBoxService letterBoxService;
     private final LetterDeletionService letterDeletionService;
+
+    private final GetAllLettersUseCase getAllLettersUseCase;
+    private final GetSentLettersUseCase getSentLettersUseCase;
+    private final GetReceivedLettersUseCase getReceivedLettersUseCase;
 
     @Operation(summary = "보관된 모든 편지 조회", description = "페이지네이션을 사용하여 보관된 모든 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
             + "\nPage Default: page(1) size(9) sort(createAt)")
@@ -43,7 +48,7 @@ public class LetterBoxController {
                                                                           BindingResult bindingResult,
                                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(
-                PageResponse.from(letterBoxService.findAllLetterSummaries(pageRequestDTO, userDetails.getUserId())));
+                PageResponse.from(getAllLettersUseCase.getAllLetters(pageRequestDTO, userDetails.getUserId())));
     }
 
     @Operation(summary = "보낸 편지 조회", description = "페이지네이션을 사용하여 보관된 보낸 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
@@ -54,7 +59,7 @@ public class LetterBoxController {
                                                                            BindingResult bindingResult,
                                                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(PageResponse.from(
-                letterBoxService.findSentLetterSummaries(pageRequestDTO, userDetails.getUserId())));
+                getSentLettersUseCase.getSentLetters(pageRequestDTO, userDetails.getUserId())));
     }
 
     @Operation(summary = "받은 편지 조회", description = "페이지네이션을 사용하여 보관된 받은 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
@@ -65,7 +70,7 @@ public class LetterBoxController {
             @Valid PageRequest pageRequest, BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(PageResponse.from(
-                letterBoxService.findReceivedLetterSummaries(pageRequest, userDetails.getUserId())));
+                getReceivedLettersUseCase.getReceivedLetters(pageRequest, userDetails.getUserId())));
     }
 
     @Operation(summary = "보관된 편지 삭제", description = "편지ID, 편지타입(LETTER, REPLY_LETTER), 송수신 타입(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")
@@ -93,5 +98,4 @@ public class LetterBoxController {
         letterDeletionService.deleteAllSavedSentLetters(userDetails.getUserId());
         return ApiResponse.onSuccess("보낸 편지를 모두 삭제했습니다.");
     }
-
 }
