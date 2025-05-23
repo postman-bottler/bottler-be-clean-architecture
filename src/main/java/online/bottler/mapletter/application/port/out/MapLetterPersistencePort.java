@@ -9,9 +9,7 @@ import online.bottler.mapletter.domain.MapLetter;
 import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
 import online.bottler.mapletter.application.dto.FindSentMapLetter;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface MapLetterPersistencePort {
     MapLetter save(MapLetter mapLetter);
 

@@ -5,9 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import online.bottler.mapletter.domain.MapLetterArchive;
 import online.bottler.mapletter.application.dto.FindAllArchiveLettersDTO;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface MapLetterArchivePersistencePort {
     MapLetterArchive save(MapLetterArchive archive);
 

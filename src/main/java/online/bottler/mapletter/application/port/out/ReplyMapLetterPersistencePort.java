@@ -6,9 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import online.bottler.mapletter.domain.ReplyMapLetter;
 import online.bottler.mapletter.application.dto.ReplyProjectDTO;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface ReplyMapLetterPersistencePort {
     ReplyMapLetter save(ReplyMapLetter replyMapLetter);
 
