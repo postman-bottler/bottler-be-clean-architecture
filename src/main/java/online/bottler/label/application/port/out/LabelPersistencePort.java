@@ -1,11 +1,11 @@
-package online.bottler.label.application.repository;
+package online.bottler.label.application.port.out;
 
 import java.util.List;
 import online.bottler.label.domain.Label;
 import online.bottler.label.domain.LabelType;
 import online.bottler.user.domain.User;
 
-public interface LabelRepository {
+public interface LabelPersistencePort {
     void save(Label label);
 
     List<Label> findAllLabels();
