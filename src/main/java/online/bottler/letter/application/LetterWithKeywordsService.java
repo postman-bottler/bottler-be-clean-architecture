@@ -10,16 +10,16 @@ import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase
 import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.GetLetterUseCase;
 import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
-import online.bottler.letter.application.port.out.CheckLetterBoxPort;
-import online.bottler.letter.application.port.out.CheckReplyLetterPort;
-import online.bottler.letter.application.port.out.CreateLetterBoxPort;
-import online.bottler.letter.application.port.out.CreateLetterKeywordPort;
-import online.bottler.letter.application.port.out.CreateLetterPort;
-import online.bottler.letter.application.port.out.DeleteLetterBoxPort;
-import online.bottler.letter.application.port.out.DeleteLetterKeywordPort;
-import online.bottler.letter.application.port.out.DeleteLetterPort;
-import online.bottler.letter.application.port.out.LoadLetterKeywordPort;
-import online.bottler.letter.application.port.out.LoadLetterPort;
+import online.bottler.letter.application.port.out.CheckLetterBoxPersistencePort;
+import online.bottler.letter.application.port.out.CheckReplyLetterPersistencePort;
+import online.bottler.letter.application.port.out.CreateLetterBoxPersistencePort;
+import online.bottler.letter.application.port.out.CreateLetterKeywordPersistencePort;
+import online.bottler.letter.application.port.out.CreateLetterPersistencePort;
+import online.bottler.letter.application.port.out.DeleteLetterBoxPersistencePort;
+import online.bottler.letter.application.port.out.DeleteLetterKeywordPersistencePort;
+import online.bottler.letter.application.port.out.DeleteLetterPersistencePort;
+import online.bottler.letter.application.port.out.LoadLetterKeywordPersistencePort;
+import online.bottler.letter.application.port.out.LoadLetterPersistencePort;
 import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import online.bottler.letter.domain.BoxType;
@@ -38,28 +38,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCase, GetLetterWithKeywordsDetailUseCase,
         DeleteLetterWithKeywordsUseCase, GetLetterUseCase, BlockLetterUseCase {
 
-    private final CreateLetterPort createLetterPort;
-    private final CreateLetterKeywordPort createLetterKeywordPort;
-    private final CreateLetterBoxPort createLetterBoxPort;
-    private final CheckLetterBoxPort checkLetterBoxPort;
-    private final CheckReplyLetterPort checkReplyLetterPort;
-    private final LoadLetterKeywordPort loadLetterKeywordPort;
-    private final LoadLetterPort loadLetterPort;
-    private final DeleteLetterPort deleteLetterPort;
-    private final DeleteLetterKeywordPort deleteLetterKeywordPort;
-    private final DeleteLetterBoxPort deleteLetterBoxPort;
+    private final CreateLetterPersistencePort createLetterPersistencePort;
+    private final CreateLetterKeywordPersistencePort createLetterKeywordPersistencePort;
+    private final CreateLetterBoxPersistencePort createLetterBoxPersistencePort;
+    private final CheckLetterBoxPersistencePort checkLetterBoxPersistencePort;
+    private final CheckReplyLetterPersistencePort checkReplyLetterPersistencePort;
+    private final LoadLetterKeywordPersistencePort loadLetterKeywordPersistencePort;
+    private final LoadLetterPersistencePort loadLetterPersistencePort;
+    private final DeleteLetterPersistencePort deleteLetterPersistencePort;
+    private final DeleteLetterKeywordPersistencePort deleteLetterKeywordPersistencePort;
+    private final DeleteLetterBoxPersistencePort deleteLetterBoxPersistencePort;
     private final UserRepository userRepository;
 
     @Override
     @Transactional
     public LetterWithKeywordsResponse create(LetterWithKeywordsCommand command) {
-        Letter letter = createLetterPort.create(command.toLetter());
+        Letter letter = createLetterPersistencePort.create(command.toLetter());
 
         List<LetterKeyword> letterKeywords = LetterKeyword.createList(letter.getId(),
                 command.toKeywords());
-        createLetterKeywordPort.createAll(letterKeywords);
+        createLetterKeywordPersistencePort.createAll(letterKeywords);
 
-        createLetterBoxPort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
+        createLetterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
 
         return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, command.keywords()));
     }
@@ -67,14 +67,14 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     @Override
     @Transactional(readOnly = true)
     public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery query) {
-        if (!checkLetterBoxPort.existsByLetterIdAndUserId(query.letterId(), query.userId())) {
+        if (!checkLetterBoxPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId())) {
             throw new UnauthorizedLetterAccessException();
         }
 
-        boolean isReplied = checkReplyLetterPort.existsByLetterIdAndUserId(query.letterId(), query.userId());
-        List<LetterKeyword> keywords = loadLetterKeywordPort.loadKeywordsByLetterId(query.letterId());
+        boolean isReplied = checkReplyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
+        List<LetterKeyword> keywords = loadLetterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
         String profile = userRepository.findById(query.userId()).getImageUrl();
-        Letter letter = loadLetterPort.loadById(query.letterId())
+        Letter letter = loadLetterPersistencePort.loadById(query.letterId())
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
 
         return LetterWithKeywordsDetailResponse.of(letter, keywords, query.userId(), profile, isReplied);
@@ -83,9 +83,9 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     @Override
     @Transactional
     public void delete(LetterWithKeywordsDeleteCommand command) {
-        deleteLetterPort.softDelete(command.letterId(), command.userId(), command.boxType());
-        deleteLetterKeywordPort.softDelete(command.letterId());
-        deleteLetterBoxPort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
+        deleteLetterPersistencePort.softDelete(command.letterId(), command.userId(), command.boxType());
+        deleteLetterKeywordPersistencePort.softDelete(command.letterId());
+        deleteLetterBoxPersistencePort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
     }
 
     @Override

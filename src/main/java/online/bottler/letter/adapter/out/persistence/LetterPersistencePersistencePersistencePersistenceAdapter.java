@@ -5,16 +5,18 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterJpaRepository;
-import online.bottler.letter.application.port.out.CreateLetterPort;
-import online.bottler.letter.application.port.out.DeleteLetterPort;
-import online.bottler.letter.application.port.out.LoadLetterPort;
+import online.bottler.letter.application.port.out.CreateLetterPersistencePort;
+import online.bottler.letter.application.port.out.DeleteLetterPersistencePort;
+import online.bottler.letter.application.port.out.LoadLetterPersistencePort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class LetterPersistenceAdapter implements CreateLetterPort, LoadLetterPort, DeleteLetterPort {
+public class LetterPersistencePersistencePersistencePersistenceAdapter implements CreateLetterPersistencePort,
+        LoadLetterPersistencePort,
+        DeleteLetterPersistencePort {
 
     private final LetterJpaRepository letterJpaRepository;
 

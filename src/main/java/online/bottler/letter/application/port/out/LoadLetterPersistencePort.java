@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import online.bottler.letter.domain.Letter;
 
-public interface LoadLetterPort {
+public interface LoadLetterPersistencePort {
     Optional<Letter> loadById(Long letterId);
 
     List<Letter> loadAllByIds(List<Long> letterIds);

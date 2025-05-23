@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterBoxEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterBoxJpaRepository;
 import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRepository;
-import online.bottler.letter.application.port.out.CheckLetterBoxPort;
-import online.bottler.letter.application.port.out.CreateLetterBoxPort;
-import online.bottler.letter.application.port.out.DeleteLetterBoxPort;
+import online.bottler.letter.application.port.out.CheckLetterBoxPersistencePort;
+import online.bottler.letter.application.port.out.CreateLetterBoxPersistencePort;
+import online.bottler.letter.application.port.out.DeleteLetterBoxPersistencePort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
@@ -17,7 +17,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class LetterBoxPersistenceAdapter implements CreateLetterBoxPort, CheckLetterBoxPort, DeleteLetterBoxPort {
+public class LetterBoxPersistencePersistencePersistencePersistenceAdapter implements CreateLetterBoxPersistencePort, CheckLetterBoxPersistencePort,
+        DeleteLetterBoxPersistencePort {
 
     private final LetterBoxJpaRepository letterBoxJpaRepository;
     private final LetterBoxQueryRepository letterBoxQueryRepository;

@@ -5,16 +5,17 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterKeywordEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterKeywordJpaRepository;
 import online.bottler.letter.adapter.out.persistence.repository.LetterKeywordQueryDslRepository;
-import online.bottler.letter.application.port.out.CreateLetterKeywordPort;
-import online.bottler.letter.application.port.out.DeleteLetterKeywordPort;
-import online.bottler.letter.application.port.out.LoadLetterKeywordPort;
+import online.bottler.letter.application.port.out.CreateLetterKeywordPersistencePort;
+import online.bottler.letter.application.port.out.DeleteLetterKeywordPersistencePort;
+import online.bottler.letter.application.port.out.LoadLetterKeywordPersistencePort;
 import online.bottler.letter.domain.LetterKeyword;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class LetterKeywordPersistenceAdapter implements CreateLetterKeywordPort, LoadLetterKeywordPort,
-        DeleteLetterKeywordPort {
+public class LetterKeywordPersistencePersistencePersistencePersistenceAdapter implements CreateLetterKeywordPersistencePort,
+        LoadLetterKeywordPersistencePort,
+        DeleteLetterKeywordPersistencePort {
 
     private final LetterKeywordQueryDslRepository queryDslRepository;
     private final LetterKeywordJpaRepository jpaRepository;

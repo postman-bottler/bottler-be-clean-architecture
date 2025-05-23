@@ -1,5 +1,5 @@
 package online.bottler.letter.application.port.out;
 
-public interface DeleteLetterKeywordPort {
+public interface DeleteLetterKeywordPersistencePort {
     void softDelete(Long letterId);
 }

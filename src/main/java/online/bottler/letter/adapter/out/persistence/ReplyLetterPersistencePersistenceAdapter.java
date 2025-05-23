@@ -2,12 +2,12 @@ package online.bottler.letter.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.repository.ReplyLetterJpaRepository;
-import online.bottler.letter.application.port.out.CheckReplyLetterPort;
+import online.bottler.letter.application.port.out.CheckReplyLetterPersistencePort;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ReplyLetterPersistenceAdapter implements CheckReplyLetterPort {
+public class ReplyLetterPersistencePersistenceAdapter implements CheckReplyLetterPersistencePort {
 
     private final ReplyLetterJpaRepository replyLetterJpaRepository;
 
