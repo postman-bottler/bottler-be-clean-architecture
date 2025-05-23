@@ -31,7 +31,7 @@ import online.bottler.letter.application.response.LetterRecommendSummaryResponse
 import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
-@RequestMapping("/v2/letters")
+@RequestMapping("/letters")
 @RequiredArgsConstructor
 @Tag(name = "키워드 편지", description = "키워드 편지 API")
 public class LetterWithKeywordsController {
