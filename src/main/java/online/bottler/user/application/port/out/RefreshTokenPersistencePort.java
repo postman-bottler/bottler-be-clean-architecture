@@ -1,8 +1,9 @@
-package online.bottler.user.application.repository;
+package online.bottler.user.application.port.out;
+
 
 import online.bottler.user.domain.RefreshToken;
 
-public interface RefreshTokenRepository {
+public interface RefreshTokenPersistencePort {
     void createRefreshToken(RefreshToken refreshToken);
 
     String findEmailByRefreshToken(String refreshToken);

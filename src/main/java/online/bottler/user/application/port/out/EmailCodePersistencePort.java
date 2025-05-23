@@ -1,8 +1,9 @@
-package online.bottler.user.application.repository;
+package online.bottler.user.application.port.out;
+
 
 import online.bottler.user.domain.EmailCode;
 
-public interface EmailCodeRepository {
+public interface EmailCodePersistencePort {
     void save(EmailCode emailCode);
 
     EmailCode findEmailCode(String email, String code);

@@ -1,17 +1,18 @@
-package online.bottler.user.application.dto.response;
+package online.bottler.user.application.response;
+
 
 import online.bottler.user.domain.Provider;
 import online.bottler.user.domain.User;
 
-public record UserResponseDTO(
+public record UserResponse(
         String email,
         String nickname,
         String profileImageUrl,
         Provider provider,
         int warningCount
 ) {
-    public static UserResponseDTO from(User user) {
-        return new UserResponseDTO(user.getEmail(), user.getNickname(), user.getImageUrl(), user.getProvider(),
+    public static UserResponse from(User user) {
+        return new UserResponse(user.getEmail(), user.getNickname(), user.getImageUrl(), user.getProvider(),
                 user.getWarningCount());
     }
 }

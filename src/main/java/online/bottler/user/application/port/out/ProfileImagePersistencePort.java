@@ -1,8 +1,9 @@
-package online.bottler.user.application.repository;
+package online.bottler.user.application.port.out;
+
 
 import online.bottler.user.domain.ProfileImage;
 
-public interface ProfileImageRepository {
+public interface ProfileImagePersistencePort {
     void save(ProfileImage profileImage);
 
     boolean existsByUrl(String newProfileImage);

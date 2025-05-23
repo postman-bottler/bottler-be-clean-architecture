@@ -1,11 +1,11 @@
-package online.bottler.user.application.repository;
+package online.bottler.user.application.port.out;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import online.bottler.user.domain.Ban;
 
-public interface BanRepository {
+public interface BanPersistencePort {
     Ban save(Ban ban);
 
     Optional<Ban> findByUserId(Long userId);

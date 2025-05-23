@@ -1,10 +1,10 @@
-package online.bottler.user.application.repository;
+package online.bottler.user.application.port.out;
 
 import java.util.List;
 import online.bottler.user.domain.Ban;
 import online.bottler.user.domain.User;
 
-public interface UserRepository {
+public interface UserPersistencePort {
     User save(User user);
 
     boolean existsByEmail(String email);

@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import online.bottler.global.exception.ApplicationException;
+import online.bottler.user.application.port.in.KakaoUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,10 +22,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import online.bottler.user.exception.KakaoException;
 
 @Service
-public class KakaoService {
+public class KakaoService implements KakaoUseCase {
     @Value("${kakao.client.id}")
     private String KAKAO_CLIENT_ID;
 
@@ -63,7 +64,7 @@ public class KakaoService {
             );
 
             if (accessTokenResponse.getBody() == null) {
-                throw new KakaoException("Kakao 서버로부터 응답을 받을 수 없습니다.");
+                throw new ApplicationException("Kakao 서버로부터 응답을 받을 수 없습니다.");
             }
 
             JsonElement element = JsonParser.parseString(accessTokenResponse.getBody());
@@ -71,9 +72,9 @@ public class KakaoService {
 
             return jsonObject.get("access_token").getAsString();
         } catch (HttpClientErrorException.BadRequest e) {
-            throw new KakaoException("잘못된 인증 토큰입니다.");
+            throw new ApplicationException("잘못된 인증 토큰입니다.");
         } catch (Exception e) {
-            throw new KakaoException("카카오 인증 과정에서 오류가 발생했습니다.");
+            throw new ApplicationException("카카오 인증 과정에서 오류가 발생했습니다.");
         }
     }
 
@@ -106,7 +107,7 @@ public class KakaoService {
             }
 
         } catch (IOException e) {
-            throw new KakaoException("카카오 서버에서 사용자 정보를 받아올 수 없습니다.");
+            throw new ApplicationException("카카오 서버에서 사용자 정보를 받아올 수 없습니다.");
         }
         return userInfo;
     }
