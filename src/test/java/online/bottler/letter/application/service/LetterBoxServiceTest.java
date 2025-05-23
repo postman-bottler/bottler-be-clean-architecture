@@ -24,7 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.adapter.in.web.request.PageRequest;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
@@ -69,29 +69,29 @@ class LetterBoxServiceTest extends TestBase {
         @DisplayName("정상적으로 편지를 저장한다")
         void saveLetter() {
             // given
-            LetterBoxDTO letterBoxDTO = LetterBoxDTO.of(1L, 101L, LetterType.LETTER, BoxType.RECEIVE,
+            LetterBoxCommand letterBoxCommand = LetterBoxCommand.of(1L, 101L, LetterType.LETTER, BoxType.RECEIVE,
                     LocalDateTime.now());
 
             // when
-            letterBoxService.saveLetter(letterBoxDTO);
+            letterBoxService.saveLetter(letterBoxCommand);
 
             // then
             ArgumentCaptor<LetterBox> captor = ArgumentCaptor.forClass(LetterBox.class);
             verify(letterBoxRepository, times(1)).save(captor.capture());
 
             LetterBox captured = captor.getValue();
-            assertThat(captured.getUserId()).isEqualTo(letterBoxDTO.userId());
-            assertThat(captured.getLetterId()).isEqualTo(letterBoxDTO.letterId());
+            assertThat(captured.getUserId()).isEqualTo(letterBoxCommand.userId());
+            assertThat(captured.getLetterId()).isEqualTo(letterBoxCommand.letterId());
         }
 
         @Test
         @DisplayName("편지 저장 실패 시 InvalidInputException 발생")
         void saveLetterWithNullValues() {
             // given
-            LetterBoxDTO invalidLetterBoxDTO = LetterBoxDTO.of(null, null, null, null, null);
+            LetterBoxCommand invalidLetterBoxCommand = LetterBoxCommand.of(null, null, null, null, null);
 
             // then
-            assertThatThrownBy(() -> letterBoxService.saveLetter(invalidLetterBoxDTO))
+            assertThatThrownBy(() -> letterBoxService.saveLetter(invalidLetterBoxCommand))
                     .isInstanceOf(InvalidInputException.class)
                     .hasMessageContaining("LetterBoxDTO 또는 필수 값이 null입니다.");
         }

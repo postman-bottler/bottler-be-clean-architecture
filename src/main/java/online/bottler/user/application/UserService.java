@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.RedisLetterService;
 import online.bottler.label.application.repository.LabelRepository;
 import online.bottler.label.domain.Label;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
@@ -83,7 +83,7 @@ public class UserService {
         redisLetterService.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
         randomDevelopLetter.forEach(
                 letterId -> letterBoxService.saveLetter(
-                        LetterBoxDTO.of(
+                        LetterBoxCommand.of(
                                 storedUser.getUserId(), letterId, LetterType.LETTER,
                                 BoxType.RECEIVE, LocalDateTime.now()
                         )

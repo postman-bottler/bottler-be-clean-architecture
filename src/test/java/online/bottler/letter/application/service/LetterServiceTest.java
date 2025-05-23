@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.adapter.in.web.request.LetterRequest;
 import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.domain.Letter;
@@ -64,7 +64,7 @@ class LetterServiceTest extends TestBase {
         Long userId = 100L;
 
         when(letterRepository.save(any(Letter.class))).thenReturn(mockLetter);
-        doNothing().when(letterBoxService).saveLetter(any(LetterBoxDTO.class));
+        doNothing().when(letterBoxService).saveLetter(any(LetterBoxCommand.class));
 
         // when
 //        Letter result = letterService.createLetter(requestDTO, userId);
@@ -73,7 +73,7 @@ class LetterServiceTest extends TestBase {
 //        assertThat(result).isNotNull();
 //        assertThat(result.getId()).isEqualTo(1L);
         verify(letterRepository, times(1)).save(any(Letter.class));
-        verify(letterBoxService, times(1)).saveLetter(any(LetterBoxDTO.class));
+        verify(letterBoxService, times(1)).saveLetter(any(LetterBoxCommand.class));
     }
 
     @Nested

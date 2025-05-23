@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.adapter.in.web.request.PageRequest;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.port.out.LetterBoxRepository;
@@ -24,8 +24,8 @@ public class LetterBoxService {
     private final LetterBoxRepository letterBoxRepository;
 
     @Transactional
-    public void saveLetter(LetterBoxDTO letterBoxDTO) {
-        letterBoxRepository.save(letterBoxDTO.toDomain());
+    public void saveLetter(LetterBoxCommand letterBoxCommand) {
+        letterBoxRepository.save(letterBoxCommand.toDomain());
     }
 
     @Transactional(readOnly = true)

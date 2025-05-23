@@ -21,7 +21,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import online.bottler.letter.application.RedisLetterService;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.slack.SlackConstant;
@@ -134,7 +134,7 @@ class UserServiceTest {
         verify(passwordEncoder, times(1)).encode(password);
         verify(userRepository, times(1)).save(any(User.class));
         verify(redisLetterService, times(1)).saveDeveloperLetter(eq(1L), anyList());
-        verify(letterBoxService, times(3)).saveLetter(any(LetterBoxDTO.class));
+        verify(letterBoxService, times(3)).saveLetter(any(LetterBoxCommand.class));
     }
 
     @Test

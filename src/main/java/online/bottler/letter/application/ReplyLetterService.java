@@ -9,7 +9,7 @@ import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.application.command.ReceiverDTO;
 import online.bottler.letter.adapter.in.web.request.PageRequest;
 import online.bottler.letter.application.response.ReplyLetterDetailResponse;
@@ -128,7 +128,7 @@ public class ReplyLetterService {
     }
 
     private void saveLetterToBox(Long userId, ReplyLetter replyLetter, BoxType boxType) {
-        letterBoxRepository.save(LetterBoxDTO.of(userId, replyLetter.getId(), LetterType.REPLY_LETTER, boxType,
+        letterBoxRepository.save(LetterBoxCommand.of(userId, replyLetter.getId(), LetterType.REPLY_LETTER, boxType,
                 replyLetter.getCreatedAt()).toDomain());
     }
 

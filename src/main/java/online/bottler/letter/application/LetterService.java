@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.port.out.LetterKeywordRepository;
 import online.bottler.letter.domain.LetterKeyword;
-import online.bottler.letter.application.command.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.adapter.in.web.request.LetterRequest;
 import online.bottler.letter.application.response.LetterDetailResponse;
 import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
@@ -47,7 +47,7 @@ public class LetterService {
                 .toList();
         letterKeywordRepository.saveAll(letterKeywords);
 
-        letterBoxRepository.save(LetterBoxDTO.of(userId, letterId, LetterType.LETTER, BoxType.SEND,
+        letterBoxRepository.save(LetterBoxCommand.of(userId, letterId, LetterType.LETTER, BoxType.SEND,
                 savedLetter.getCreatedAt()).toDomain());
 
         return LetterResponse.from(letter, letterKeywords);
