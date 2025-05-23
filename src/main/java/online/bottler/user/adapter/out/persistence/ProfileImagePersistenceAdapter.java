@@ -1,7 +1,7 @@
 package online.bottler.user.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
-import online.bottler.user.exception.ProfileImageException;
+import online.bottler.global.exception.AdaptorException;
 import online.bottler.user.adapter.out.persistence.entity.ProfileImageEntity;
 import online.bottler.user.adapter.out.persistence.repository.ProfileImageJpaRepository;
 import online.bottler.user.application.port.out.ProfileImagePersistencePort;
@@ -27,7 +27,7 @@ public class ProfileImagePersistenceAdapter implements ProfileImagePersistencePo
     public String findProfileImage() {
         String profileImageUrl = profileImageJpaRepository.findRandomProfileImage();
         if (profileImageUrl == null) {
-            throw new ProfileImageException("프로필 이미지를 찾을 수 없습니다.");
+            throw new AdaptorException("프로필 이미지를 찾을 수 없습니다.");
         }
         return profileImageUrl;
     }

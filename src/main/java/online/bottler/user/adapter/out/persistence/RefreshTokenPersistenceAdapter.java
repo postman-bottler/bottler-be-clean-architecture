@@ -2,7 +2,7 @@ package online.bottler.user.adapter.out.persistence;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import online.bottler.user.exception.TokenException;
+import online.bottler.global.exception.AdaptorException;
 import online.bottler.user.adapter.out.persistence.entity.RefreshTokenEntity;
 import online.bottler.user.adapter.out.persistence.repository.RefreshTokenJpaRepository;
 import online.bottler.user.application.port.out.RefreshTokenPersistencePort;
@@ -31,7 +31,7 @@ public class RefreshTokenPersistenceAdapter implements RefreshTokenPersistencePo
     @Override
     public String findEmailByRefreshToken(String refreshToken) {
         RefreshTokenEntity refreshTokenEntity = refreshTokenJpaRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new TokenException("유효하지 않은 jwt 토큰입니다."));
+                .orElseThrow(() -> new AdaptorException("유효하지 않은 jwt 토큰입니다."));
         return refreshTokenEntity.getEmail();
     }
 
