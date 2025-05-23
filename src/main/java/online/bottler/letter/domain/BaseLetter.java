@@ -5,16 +5,16 @@ import lombok.Getter;
 
 public abstract class BaseLetter {
     @Getter
-    protected Long id;
+    private Long id;
     @Getter
-    protected final Long userId;
-    protected final LetterContent letterContent;
+    private final Long userId;
+    private final LetterContent letterContent;
     @Getter
-    protected final boolean isDeleted;
+    private final boolean isDeleted;
     @Getter
-    protected final boolean isBlocked;
+    private final boolean isBlocked;
     @Getter
-    protected final LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     protected BaseLetter(Long id, Long userId, LetterContent letterContent, boolean isDeleted, boolean isBlocked, LocalDateTime createdAt) {
         this.id = id;
