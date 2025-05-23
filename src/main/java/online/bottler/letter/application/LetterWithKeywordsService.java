@@ -29,6 +29,7 @@ import online.bottler.letter.exception.LetterNotFoundException;
 import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import online.bottler.user.application.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,7 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public LetterWithKeywordsResponse create(LetterWithKeywordsCommand command) {
         Letter letter = createLetterPort.create(command.toLetter());
 
@@ -61,6 +63,7 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery query) {
         if (!checkLetterBoxPort.existsByLetterIdAndUserId(query.letterId(), query.userId())) {
             throw new UnauthorizedLetterAccessException();
@@ -76,6 +79,7 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     }
 
     @Override
+    @Transactional
     public void delete(LetterWithKeywordsDeleteCommand command) {
         deleteLetterPort.softDelete(command.letterId(), command.userId(), command.boxType());
         deleteLetterKeywordPort.softDelete(command.letterId());
