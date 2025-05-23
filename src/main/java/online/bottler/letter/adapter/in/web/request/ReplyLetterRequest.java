@@ -1,6 +1,7 @@
 package online.bottler.letter.adapter.in.web.request;
 
 import jakarta.validation.constraints.NotBlank;
+import online.bottler.letter.application.command.ReplyLetterCommand;
 import online.bottler.letter.domain.LetterContent;
 import online.bottler.letter.domain.ReplyLetter;
 
@@ -10,5 +11,9 @@ public record ReplyLetterRequest(@NotBlank(message = "편지 내용은 필수입
                                  @NotBlank(message = "라벨은 필수입니다.") String label) {
     public ReplyLetter toDomain(String title, Long letterId, Long receiverId, Long senderId) {
         return ReplyLetter.create(senderId, LetterContent.of(title, content, font, paper, label), letterId, receiverId);
+    }
+
+    public ReplyLetterCommand toCommand(Long letterId, Long userId) {
+        return ReplyLetterCommand.of(letterId, userId, LetterContent.of(null, content, font, paper, label));
     }
 }
