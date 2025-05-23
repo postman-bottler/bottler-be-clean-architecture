@@ -1,16 +1,16 @@
-package online.bottler.complaint.infra;
+package online.bottler.complaint.adaptor.out.persistence;
 
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import online.bottler.complaint.application.repository.KeywordComplaintRepository;
+import online.bottler.complaint.application.port.KeywordComplaintPersistencePort;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.Complaints;
-import online.bottler.complaint.infra.entity.KeywordComplaintEntity;
+import online.bottler.complaint.adaptor.out.persistence.entity.KeywordComplaintEntity;
 
 @Repository
 @RequiredArgsConstructor
-public class KeywordComplaintRepositoryImpl implements KeywordComplaintRepository {
+public class KeywordComplaintPersistenceAdaptor implements KeywordComplaintPersistencePort {
     private final KeywordComplaintJpaRepository repository;
 
     @Override

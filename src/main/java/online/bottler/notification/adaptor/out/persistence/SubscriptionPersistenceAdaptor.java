@@ -1,16 +1,16 @@
-package online.bottler.notification.infra;
+package online.bottler.notification.adaptor.out.persistence;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-import online.bottler.notification.application.repository.SubscriptionRepository;
+import online.bottler.notification.application.port.SubscriptionPersistencePort;
 import online.bottler.notification.domain.Subscription;
 import online.bottler.notification.domain.Subscriptions;
-import online.bottler.notification.infra.entity.SubscriptionEntity;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class SubscriptionRepositoryImpl implements SubscriptionRepository {
+public class SubscriptionPersistenceAdaptor implements SubscriptionPersistencePort {
     private final SubscriptionJpaRepository repository;
 
     @Override

@@ -1,4 +1,4 @@
-package online.bottler.notification.infra;
+package online.bottler.notification.adaptor.out.push;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -8,13 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import online.bottler.notification.application.PushNotificationProvider;
+import online.bottler.notification.application.PushNotificationPort;
 import online.bottler.notification.domain.PushMessages;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FirebasePushProvider implements PushNotificationProvider {
+public class FirebasePushAdaptor implements PushNotificationPort {
     private final FirebaseMessageMapper messageMapper;
 
     @Override

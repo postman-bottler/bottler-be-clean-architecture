@@ -1,8 +1,7 @@
-package online.bottler.notification.infra;
+package online.bottler.notification.adaptor.out.persistence;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import online.bottler.notification.infra.entity.SubscriptionEntity;
 
 public interface SubscriptionJpaRepository extends JpaRepository<SubscriptionEntity, Long> {
     List<SubscriptionEntity> findByUserId(Long userId);

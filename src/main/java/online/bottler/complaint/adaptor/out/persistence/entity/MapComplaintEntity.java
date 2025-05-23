@@ -1,4 +1,4 @@
-package online.bottler.complaint.infra.entity;
+package online.bottler.complaint.adaptor.out.persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 import online.bottler.complaint.domain.Complaint;
 
 @Entity
-@Table(name = "keyword_complaint")
+@Table(name = "map_complaint")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class KeywordComplaintEntity {
+public class MapComplaintEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,8 +32,8 @@ public class KeywordComplaintEntity {
 
     private LocalDateTime createdAt;
 
-    public static KeywordComplaintEntity from(Complaint complaint) {
-        return KeywordComplaintEntity.builder()
+    public static MapComplaintEntity from(Complaint complaint) {
+        return MapComplaintEntity.builder()
                 .id(complaint.getId())
                 .letterId(complaint.getLetterId())
                 .reporterId(complaint.getReporterId())

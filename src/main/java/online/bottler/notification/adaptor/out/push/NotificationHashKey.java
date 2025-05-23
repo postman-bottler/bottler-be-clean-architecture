@@ -1,4 +1,4 @@
-package online.bottler.notification.infra;
+package online.bottler.notification.adaptor.out.push;
 
 import lombok.Getter;
 

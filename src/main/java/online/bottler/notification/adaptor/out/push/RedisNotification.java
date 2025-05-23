@@ -1,12 +1,12 @@
-package online.bottler.notification.infra;
+package online.bottler.notification.adaptor.out.push;
 
-import static online.bottler.notification.infra.NotificationHashKey.CREATED_AT;
-import static online.bottler.notification.infra.NotificationHashKey.ID;
-import static online.bottler.notification.infra.NotificationHashKey.IS_READ;
-import static online.bottler.notification.infra.NotificationHashKey.LABEL;
-import static online.bottler.notification.infra.NotificationHashKey.LETTER_ID;
-import static online.bottler.notification.infra.NotificationHashKey.RECEIVER;
-import static online.bottler.notification.infra.NotificationHashKey.TYPE;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.CREATED_AT;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.ID;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.IS_READ;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.LABEL;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.LETTER_ID;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.RECEIVER;
+import static online.bottler.notification.adaptor.out.push.NotificationHashKey.TYPE;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

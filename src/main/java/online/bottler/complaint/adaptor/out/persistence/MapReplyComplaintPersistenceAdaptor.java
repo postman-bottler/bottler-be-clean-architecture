@@ -1,17 +1,17 @@
-package online.bottler.complaint.infra;
+package online.bottler.complaint.adaptor.out.persistence;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import online.bottler.complaint.application.repository.MapReplyComplaintRepository;
+import online.bottler.complaint.application.port.MapReplyComplaintPersistencePort;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.Complaints;
-import online.bottler.complaint.infra.entity.MapReplyComplaintEntity;
+import online.bottler.complaint.adaptor.out.persistence.entity.MapReplyComplaintEntity;
 
 @Repository
 @RequiredArgsConstructor
-public class MapReplyComplaintRepositoryImpl implements MapReplyComplaintRepository {
+public class MapReplyComplaintPersistenceAdaptor implements MapReplyComplaintPersistencePort {
     private final MapReplyComplaintJpaRepository repository;
 
     @Override

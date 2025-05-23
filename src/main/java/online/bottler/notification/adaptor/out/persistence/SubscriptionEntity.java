@@ -1,4 +1,4 @@
-package online.bottler.notification.infra.entity;
+package online.bottler.notification.adaptor.out.persistence;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
