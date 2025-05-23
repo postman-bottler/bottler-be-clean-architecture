@@ -1,9 +1,9 @@
 package online.bottler.mapletter.adaptor.out.persistence;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.AdaptorException;
 import online.bottler.mapletter.adaptor.out.persistence.repository.ReplyMapLetterJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +46,7 @@ public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersisten
     @Override
     public ReplyMapLetter findById(Long letterId) {
         ReplyMapLetterEntity replyMapLetterEntity = replyMapLetterJpaRepository.findById(letterId)
-                .orElseThrow(() -> new PersistenceException("해당 편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("해당 편지를 찾을 수 없습니다."));
 
         return ReplyMapLetterEntity.toDomain(replyMapLetterEntity);
     }
@@ -65,7 +65,7 @@ public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersisten
     @Override
     public void softDelete(Long letterId) {
         ReplyMapLetterEntity letter = replyMapLetterJpaRepository.findById(letterId)
-                .orElseThrow(() -> new PersistenceException("해당 편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("해당 편지를 찾을 수 없습니다."));
 
         ReplyMapLetterEntity replyMapLetter = em.find(ReplyMapLetterEntity.class, letterId);
         replyMapLetter.updateDelete(true);
@@ -87,7 +87,7 @@ public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersisten
         List<ReplyMapLetterEntity> letters = replyMapLetterJpaRepository.findAllByCreateUserId(userId);
 
         if (letters.isEmpty()) {
-            throw new PersistenceException("삭제할 편지가 없습니다.");
+            throw new AdaptorException("삭제할 편지가 없습니다.");
         }
 
         letters.forEach(letter -> letter.updateDelete(true));
@@ -96,7 +96,7 @@ public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersisten
     @Override
     public void softDeleteForRecipient(Long letterId) {
         ReplyMapLetterEntity letter = replyMapLetterJpaRepository.findById(letterId)
-                .orElseThrow(() -> new PersistenceException("편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("편지를 찾을 수 없습니다."));
 
         letter.updateRecipientDeleted(true);
     }
@@ -106,7 +106,7 @@ public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersisten
         List<ReplyMapLetterEntity> letters = replyMapLetterJpaRepository.findAllBySourceLetterCreateUserId(userId);
 
         if (letters.isEmpty()) {
-            throw new PersistenceException("삭제할 편지가 없습니다.");
+            throw new AdaptorException("삭제할 편지가 없습니다.");
         }
 
         letters.forEach(letter -> letter.updateRecipientDeleted(true));

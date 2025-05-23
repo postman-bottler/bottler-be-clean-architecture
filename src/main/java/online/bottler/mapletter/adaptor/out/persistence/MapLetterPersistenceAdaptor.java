@@ -1,10 +1,9 @@
 package online.bottler.mapletter.adaptor.out.persistence;
 
-import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.AdaptorException;
 import online.bottler.mapletter.adaptor.out.persistence.repository.MapLetterJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,14 +31,14 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
     @Override
     public MapLetter findById(Long id) {
         MapLetterEntity mapLetter = mapLetterJpaRepository.findById(id)
-                .orElseThrow(() -> new PersistenceException("해당 편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("해당 편지를 찾을 수 없습니다."));
         return MapLetterEntity.toDomain(mapLetter);
     }
 
     @Override
     public void softDelete(Long letterId) {
         MapLetterEntity letter = mapLetterJpaRepository.findById(letterId)
-                .orElseThrow(() -> new PersistenceException("해당 편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("해당 편지를 찾을 수 없습니다."));
 
         letter.updateDelete(true);
     }
@@ -68,7 +67,7 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
     public MapLetter findSourceMapLetterById(Long sourceMapLetterId) {
         MapLetterEntity activeLetter = mapLetterJpaRepository.findActiveById(sourceMapLetterId);
         if (activeLetter == null) {
-            throw new PersistenceException("원본 편지를 찾을 수 없습니다. 편지가 존재하지 않거나 삭제되었습니다.");
+            throw new AdaptorException("원본 편지를 찾을 수 없습니다. 편지가 존재하지 않거나 삭제되었습니다.");
         }
         return MapLetterEntity.toDomain(activeLetter);
     }
@@ -109,7 +108,7 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
     @Override
     public void updateRead(MapLetter mapLetter) {
         MapLetterEntity mapLetterEntity = mapLetterJpaRepository.findById(mapLetter.getId())
-                .orElseThrow(() -> new PersistenceException("해당 편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("해당 편지를 찾을 수 없습니다."));
         mapLetterEntity.updateRead();
     }
 
@@ -118,7 +117,7 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
         List<MapLetterEntity> mapLetterEntities = mapLetterJpaRepository.findAllByCreateUserId(userId);
 
         if (mapLetterEntities.isEmpty()) {
-            throw new PersistenceException("삭제할 편지가 없습니다.");
+            throw new AdaptorException("삭제할 편지가 없습니다.");
         }
 
         mapLetterEntities.forEach(mapLetterEntity -> mapLetterEntity.updateDelete(true));
@@ -127,7 +126,7 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
     @Override
     public void softDeleteForRecipient(Long letterId) {
         MapLetterEntity deleteLetter = mapLetterJpaRepository.findById(letterId)
-                .orElseThrow(() -> new PersistenceException("편지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AdaptorException("편지를 찾을 수 없습니다."));
         deleteLetter.updateRecipientDeleted(true);
     }
 
@@ -136,7 +135,7 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
         List<MapLetterEntity> mapLetterEntities = mapLetterJpaRepository.findAllByTargetUserId(userId);
 
         if (mapLetterEntities.isEmpty()) {
-            throw new PersistenceException("삭제 할 편지가 없습니다.");
+            throw new AdaptorException("삭제 할 편지가 없습니다.");
         }
 
         mapLetterEntities.forEach(mapLetterEntity -> mapLetterEntity.updateRecipientDeleted(true));

@@ -1,9 +1,9 @@
 package online.bottler.mapletter.adaptor.out.persistence;
 
-import jakarta.persistence.PersistenceException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.AdaptorException;
 import online.bottler.mapletter.adaptor.out.persistence.repository.MapLetterArchiveJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +33,7 @@ public class MapLetterArchivePersistenceAdaptor implements MapLetterArchivePersi
     @Override
     public MapLetterArchive findById(Long archiveId) {
         return MapLetterArchiveEntity.toDomain(mapLetterArchiveJpaRepository.findById(archiveId)
-                .orElseThrow(() -> new PersistenceException("해당 편지를 찾을 수 없습니다.")));
+                .orElseThrow(() -> new AdaptorException("해당 편지를 찾을 수 없습니다.")));
     }
 
     @Override
