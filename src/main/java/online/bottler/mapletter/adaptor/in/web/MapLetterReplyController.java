@@ -43,7 +43,7 @@ public class MapLetterReplyController {
 
         Long userId = userDetails.getUserId();
         mapLetterReplyUseCase.createReplyMapLetter(
-                CreateReplyMapLetterRequest.toCommand(createReplyMapLetterRequestDTO), userId);
+                createReplyMapLetterRequestDTO.toCommand(), userId);
         return ApiResponse.onCreateSuccess("답장 편지 생성이 성공되었습니다.");
     }
 
@@ -79,7 +79,7 @@ public class MapLetterReplyController {
     public ApiResponse<?> deleteReplyMapLetter(@RequestBody DeleteReplyMapLettersRequest letters,
                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterReplyUseCase.deleteReplyMapLetter(DeleteReplyMapLettersRequest.toCommand(letters), userId);
+        mapLetterReplyUseCase.deleteReplyMapLetter(letters.toCommand(), userId);
         return ApiResponse.onDeleteSuccess(letters);
     }
 }

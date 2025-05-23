@@ -14,8 +14,7 @@ public record CreatePublicMapLetterRequest(
         String paper,
         String label
 ) {
-    public static CreatePublicMapLetterCommand toCommand(CreatePublicMapLetterRequest request) {
-        return new CreatePublicMapLetterCommand(request.title, request.content, request.description, request.latitude,
-                request.longitude, request.font, request.paper, request.label);
+    public CreatePublicMapLetterCommand toCommand() {
+        return new CreatePublicMapLetterCommand(title, content, description, latitude, longitude, font, paper, label);
     }
 }

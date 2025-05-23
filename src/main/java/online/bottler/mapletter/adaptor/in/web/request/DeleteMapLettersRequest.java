@@ -13,9 +13,9 @@ public record DeleteMapLettersRequest(
     ) {
     }
 
-    public static DeleteMapLettersCommand toCommand(DeleteMapLettersRequest request) {
+    public DeleteMapLettersCommand toCommand() {
         return new DeleteMapLettersCommand(
-                request.letters.stream()
+                letters.stream()
                         .map(letter -> new DeleteMapLettersCommand.LetterInfo(
                                 DeleteMapLettersCommand.LetterType.valueOf(letter.letterType().name()),
                                 letter.letterId()))

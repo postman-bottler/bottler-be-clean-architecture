@@ -6,7 +6,7 @@ import online.bottler.mapletter.application.command.DeleteReplyMapLettersCommand
 public record DeleteReplyMapLettersRequest(
         List<Long> letterIds
 ) {
-    public static DeleteReplyMapLettersCommand toCommand(DeleteReplyMapLettersRequest request) {
-        return new DeleteReplyMapLettersCommand(request.letterIds);
+    public DeleteReplyMapLettersCommand toCommand() {
+        return new DeleteReplyMapLettersCommand(letterIds);
     }
 }

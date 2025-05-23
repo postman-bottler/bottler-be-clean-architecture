@@ -44,7 +44,7 @@ public class MapLetterController {
 
         Long userId = userDetails.getUserId();
         mapLetterUseCase.createPublicMapLetter(
-                CreatePublicMapLetterRequest.toCommand(createPublicMapLetterRequest), userId);
+                createPublicMapLetterRequest.toCommand(), userId);
         return ApiResponse.onCreateSuccess("지도 편지 생성이 성공되었습니다.");
     }
 
@@ -60,7 +60,7 @@ public class MapLetterController {
 
         Long userId = userDetails.getUserId();
         mapLetterUseCase.createTargetMapLetter(
-                CreateTargetMapLetterRequest.toCommand(createTargetMapLetterRequest), userId);
+                createTargetMapLetterRequest.toCommand(), userId);
         return ApiResponse.onCreateSuccess("타겟 편지 생성이 성공되었습니다.");
     }
 
@@ -99,7 +99,7 @@ public class MapLetterController {
     public ApiResponse<?> deleteMapLetter(@RequestBody DeleteMapLettersRequest deleteMapLettersRequest,
                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.deleteSentMapLetters(DeleteMapLettersRequest.toCommand(deleteMapLettersRequest), userId);
+        mapLetterUseCase.deleteSentMapLetters(deleteMapLettersRequest.toCommand(), userId);
         return ApiResponse.onDeleteSuccess(deleteMapLettersRequest);
     }
 
@@ -117,7 +117,7 @@ public class MapLetterController {
     public ApiResponse<?> deleteSentMapLetter(@RequestBody DeleteMapLettersRequest deleteMapLettersRequest,
                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.deleteSentMapLetters(DeleteMapLettersRequest.toCommand(deleteMapLettersRequest), userId);
+        mapLetterUseCase.deleteSentMapLetters(deleteMapLettersRequest.toCommand(), userId);
         return ApiResponse.onDeleteSuccess(deleteMapLettersRequest);
     }
 
@@ -126,7 +126,7 @@ public class MapLetterController {
     public ApiResponse<?> deleteReceivedMapLetter(@RequestBody DeleteMapLettersRequest deleteMapLettersRequest,
                                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.deleteReceivedMapLetters(DeleteMapLettersRequest.toCommand(deleteMapLettersRequest), userId);
+        mapLetterUseCase.deleteReceivedMapLetters(deleteMapLettersRequest.toCommand(), userId);
         return ApiResponse.onDeleteSuccess(deleteMapLettersRequest);
     }
 }

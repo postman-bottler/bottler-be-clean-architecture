@@ -6,7 +6,7 @@ import online.bottler.mapletter.application.command.DeleteArchivedLettersCommand
 public record DeleteArchivedLettersRequest(
         List<Long> letterIds
 ) {
-    public static DeleteArchivedLettersCommand toCommand(DeleteArchivedLettersRequest request) {
-        return new DeleteArchivedLettersCommand(request.letterIds);
+    public DeleteArchivedLettersCommand toCommand() {
+        return new DeleteArchivedLettersCommand(letterIds);
     }
 }

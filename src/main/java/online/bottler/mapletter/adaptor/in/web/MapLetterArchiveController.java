@@ -52,7 +52,7 @@ public class MapLetterArchiveController {
             , @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         mapLetterArchiveUseCase.deleteArchivedLetter(
-                DeleteArchivedLettersRequest.toCommand(deleteArchivedLettersRequest), userId);
+                deleteArchivedLettersRequest.toCommand(), userId);
         return ApiResponse.onDeleteSuccess(deleteArchivedLettersRequest);
     }
 

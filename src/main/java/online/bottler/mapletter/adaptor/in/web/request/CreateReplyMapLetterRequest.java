@@ -11,8 +11,7 @@ public record CreateReplyMapLetterRequest(
         String paper,
         String label
 ) {
-    public static CreateReplyMapLetterCommand toCommand(CreateReplyMapLetterRequest request) {
-        return new CreateReplyMapLetterCommand(request.sourceLetter(), request.content(), request.font(),
-                request.paper(), request.label());
+    public CreateReplyMapLetterCommand toCommand() {
+        return new CreateReplyMapLetterCommand(sourceLetter(), content(), font(), paper(), label());
     }
 }

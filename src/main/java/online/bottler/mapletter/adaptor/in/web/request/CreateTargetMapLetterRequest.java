@@ -15,8 +15,8 @@ public record CreateTargetMapLetterRequest(
         String label,
         String target
 ) {
-    public static CreateTargetMapLetterCommand toCommand(CreateTargetMapLetterRequest request) {
-        return new CreateTargetMapLetterCommand(request.title, request.content, request.description, request.latitude,
-                request.longitude, request.font, request.paper, request.label, request.target);
+    public CreateTargetMapLetterCommand toCommand() {
+        return new CreateTargetMapLetterCommand(
+                title, content, description, latitude, longitude, font, paper, label, target);
     }
 }
