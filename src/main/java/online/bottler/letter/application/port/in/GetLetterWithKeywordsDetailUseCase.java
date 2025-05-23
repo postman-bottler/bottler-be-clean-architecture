@@ -1,7 +1,9 @@
 package online.bottler.letter.application.port.in;
 
-import online.bottler.letter.application.response.LetterDetailResponse;
+
+import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
+import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 
 public interface GetLetterWithKeywordsDetailUseCase {
-    LetterDetailResponse getDetail(Long userId, Long letterId);
+    LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery);
 }

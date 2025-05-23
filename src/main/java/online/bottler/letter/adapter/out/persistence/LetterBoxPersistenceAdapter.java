@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterBoxEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterBoxJpaRepository;
+import online.bottler.letter.application.port.out.CheckLetterBoxPort;
 import online.bottler.letter.application.port.out.CreateLetterBoxPort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
@@ -12,28 +13,33 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class LetterBoxPersistenceAdapter implements CreateLetterBoxPort {
+public class LetterBoxPersistenceAdapter implements CreateLetterBoxPort, CheckLetterBoxPort {
 
     private final LetterBoxJpaRepository letterBoxJpaRepository;
 
     @Override
-    public void saveLetter(Long userId, Long letterId, LocalDateTime createdAt) {
-        save(userId, letterId, LetterType.LETTER, BoxType.SEND, createdAt);
+    public void createForLetter(Long letterId, Long userId, LocalDateTime createdAt) {
+        save(letterId, userId, LetterType.LETTER, BoxType.SEND, createdAt);
     }
 
     @Override
-    public void saveReplyLetter(Long userId, Long receiverId, Long letterId, LocalDateTime createdAt) {
-        save(userId, letterId, LetterType.REPLY_LETTER, BoxType.SEND, createdAt);
-        save(receiverId, letterId, LetterType.REPLY_LETTER, BoxType.RECEIVE, createdAt);
+    public void createForReplyLetter(Long letterId, Long userId, Long receiverId, LocalDateTime createdAt) {
+        save(letterId, userId, LetterType.REPLY_LETTER, BoxType.SEND, createdAt);
+        save(letterId, receiverId, LetterType.REPLY_LETTER, BoxType.RECEIVE, createdAt);
     }
 
     @Override
-    public void saveRecommendedLetter(Long userId, Long letterId, LocalDateTime createdAt) {
-        saveLetter(userId, letterId, createdAt);
+    public void createForRecommendedLetter(Long letterId, Long userId, LocalDateTime createdAt) {
+        createForLetter(letterId, userId, createdAt);
     }
 
-    private void save(Long userId, Long letterId, LetterType letterType, BoxType boxType, LocalDateTime createdAt) {
+    private void save(Long letterId, Long userId, LetterType letterType, BoxType boxType, LocalDateTime createdAt) {
         letterBoxJpaRepository.save(
-                LetterBoxEntity.from(LetterBox.create(userId, letterId, letterType, boxType, createdAt))).toDomain();
+                LetterBoxEntity.from(LetterBox.create(letterId, userId, letterType, boxType, createdAt))).toDomain();
+    }
+
+    @Override
+    public boolean existsByLetterIdAndUserId(Long letterId, Long userId) {
+        return false;
     }
 }

@@ -58,6 +58,7 @@ public class LetterService {
         return letterRepository.findById(letterId).orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
     }
 
+    //done
     @Transactional(readOnly = true)
     public LetterDetailResponse findLetterDetail(Long userId, Long letterId) {
         boolean isLetterInUserBox = letterBoxRepository.existsByUserIdAndLetterId(userId, letterId);

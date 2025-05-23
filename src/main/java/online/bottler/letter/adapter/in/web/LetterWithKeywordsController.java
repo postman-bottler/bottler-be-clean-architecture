@@ -9,10 +9,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
 import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsRequest;
+import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
 import online.bottler.letter.application.port.in.GetRecommendedLettersUseCase;
+import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -26,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.letter.application.command.LetterDeleteDTO;
 import online.bottler.letter.adapter.in.web.request.LetterDeleteRequest;
-import online.bottler.letter.application.response.LetterDetailResponse;
 import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
 import online.bottler.user.auth.CustomUserDetails;
 
@@ -44,17 +45,20 @@ public class LetterWithKeywordsController {
     @Operation(summary = "키워드 편지 생성", description = "새로운 키워드 편지를 생성합니다.")
     @PostMapping
     @LetterValidationMetaData(message = "키워드 편지 유효성 검사 실패", errorStatus = LETTER_VALIDATION_ERROR)
-    public ApiResponse<LetterWithKeywordsResponse> createLetter(@RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
-                                                                BindingResult bindingResult,
-                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onCreateSuccess(createLetterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
+    public ApiResponse<LetterWithKeywordsResponse> createLetter(
+            @RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.onCreateSuccess(
+                createLetterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
     }
 
     @Operation(summary = "키워드 편지 상세 조회", description = "편지 ID로 키워드 편지의 상세 정보를 조회합니다.")
     @GetMapping("/detail/{letterId}")
-    public ApiResponse<LetterDetailResponse> getLetterDetail(@PathVariable Long letterId,
-                                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(getLetterWithKeywordsDetailUseCase.getDetail(userDetails.getUserId(), letterId));
+    public ApiResponse<LetterWithKeywordsDetailResponse> getLetterDetail(@PathVariable Long letterId,
+                                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.onSuccess(getLetterWithKeywordsDetailUseCase.getDetail(
+                LetterWithKeywordsDetailQuery.of(letterId, userDetails.getUserId())));
     }
 
     @Operation(summary = "추천 키워드 편지 조회", description = "사용자에게 현재 추천된 키워드 편지들의 정보를 제공합니다.")
