@@ -1,7 +1,6 @@
 package online.bottler.mapletter.application.response;
 
 import java.time.LocalDateTime;
-
 import lombok.Builder;
 import online.bottler.mapletter.application.DeleteLetterType;
 import online.bottler.mapletter.application.dto.FindSentMapLetter;
