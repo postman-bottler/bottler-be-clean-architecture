@@ -1,11 +1,15 @@
 package online.bottler.letter.adapter.out.persistence;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterBoxEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterBoxJpaRepository;
+import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRepository;
 import online.bottler.letter.application.port.out.CheckLetterBoxPort;
 import online.bottler.letter.application.port.out.CreateLetterBoxPort;
+import online.bottler.letter.application.port.out.DeleteLetterBoxPort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
@@ -13,9 +17,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class LetterBoxPersistenceAdapter implements CreateLetterBoxPort, CheckLetterBoxPort {
+public class LetterBoxPersistenceAdapter implements CreateLetterBoxPort, CheckLetterBoxPort, DeleteLetterBoxPort {
 
     private final LetterBoxJpaRepository letterBoxJpaRepository;
+    private final LetterBoxQueryRepository letterBoxQueryRepository;
 
     @Override
     public void createForLetter(Long letterId, Long userId, LocalDateTime createdAt) {
@@ -40,6 +45,13 @@ public class LetterBoxPersistenceAdapter implements CreateLetterBoxPort, CheckLe
 
     @Override
     public boolean existsByLetterIdAndUserId(Long letterId, Long userId) {
-        return false;
+        return letterBoxJpaRepository.existsByLetterIdAndUserId(letterId, userId);
+    }
+
+    @Override
+    public void delete(Long letterId, LetterType letterType, BoxType boxType) {
+        List<Long> letterIds = new ArrayList<>();
+        letterIds.add(letterId);
+        letterBoxQueryRepository.deleteByCondition(letterIds, letterType, boxType);
     }
 }

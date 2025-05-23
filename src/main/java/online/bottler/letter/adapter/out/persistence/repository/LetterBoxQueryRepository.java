@@ -88,6 +88,8 @@ public class LetterBoxQueryRepository {
                 .execute();
     }
 
+
+
     public void deleteByConditionAndUserId(List<Long> letterIds, LetterType letterType, BoxType boxType, Long userId) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
 

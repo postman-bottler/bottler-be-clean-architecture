@@ -6,13 +6,15 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterJpaRepository;
 import online.bottler.letter.application.port.out.CreateLetterPort;
+import online.bottler.letter.application.port.out.DeleteLetterPort;
 import online.bottler.letter.application.port.out.LoadLetterPort;
+import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class LetterPersistenceAdapter implements CreateLetterPort, LoadLetterPort {
+public class LetterPersistenceAdapter implements CreateLetterPort, LoadLetterPort, DeleteLetterPort {
 
     private final LetterJpaRepository letterJpaRepository;
 
@@ -29,5 +31,10 @@ public class LetterPersistenceAdapter implements CreateLetterPort, LoadLetterPor
     @Override
     public List<Letter> loadAllByIds(List<Long> letterIds) {
         return LetterEntity.toDomainList(letterJpaRepository.findAllByIds(letterIds));
+    }
+
+    @Override
+    public void softDelete(Long letterId, Long userId, BoxType boxType) {
+        letterJpaRepository.softDeleteById(letterId);
     }
 }

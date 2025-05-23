@@ -7,7 +7,6 @@ import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.repository.LetterJpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
@@ -40,13 +39,11 @@ public class LetterRepositoryImpl implements LetterRepository {
     }
 
     @Override
-    @Transactional
     public void softDeleteByIds(List<Long> letterIds) {
         letterJpaRepository.softDeleteByIds(letterIds);
     }
 
     @Override
-    @Transactional
     public void softBlockById(Long letterId) {
         letterJpaRepository.softBlockById(letterId);
     }

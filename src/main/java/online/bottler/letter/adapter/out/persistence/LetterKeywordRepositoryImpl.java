@@ -36,7 +36,7 @@ public class LetterKeywordRepositoryImpl implements LetterKeywordRepository {
 
     @Override
     public void markKeywordsAsDeleted(List<Long> letterIds) {
-        jpaRepository.updateIsDeleted(letterIds);
+        jpaRepository.softDeleteByIds(letterIds);
     }
 
     @Override

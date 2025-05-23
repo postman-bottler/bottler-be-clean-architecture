@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
+import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsDeleteRequest;
 import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsRequest;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
@@ -26,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import online.bottler.global.response.ApiResponse;
-import online.bottler.letter.application.command.LetterDeleteDTO;
-import online.bottler.letter.adapter.in.web.request.LetterDeleteRequest;
 import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
 import online.bottler.user.auth.CustomUserDetails;
 
@@ -70,10 +69,9 @@ public class LetterWithKeywordsController {
 
     @Operation(summary = "키워드 편지 삭제", description = "키워드 편지ID, BoxType 송수신(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")
     @DeleteMapping
-    public ApiResponse<String> deleteLetter(@RequestBody @Valid LetterDeleteRequest letterDeleteRequest,
+    public ApiResponse<String> deleteLetter(@RequestBody @Valid LetterWithKeywordsDeleteRequest letterWithKeywordsDeleteRequest,
                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        LetterDeleteDTO letterDeleteDTO = LetterDeleteDTO.fromLetter(letterDeleteRequest);
-        deleteLetterWithKeywordsUseCase.delete(letterDeleteDTO, userDetails.getUserId());
+        deleteLetterWithKeywordsUseCase.delete(letterWithKeywordsDeleteRequest.toCommand(userDetails.getUserId()));
         return ApiResponse.onSuccess("키워드 편지를 삭제했습니다.");
     }
 }

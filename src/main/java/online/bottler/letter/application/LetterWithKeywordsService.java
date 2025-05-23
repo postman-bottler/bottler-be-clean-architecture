@@ -2,8 +2,8 @@ package online.bottler.letter.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.application.command.LetterDeleteDTO;
 import online.bottler.letter.application.command.LetterWithKeywordsCommand;
+import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
@@ -13,10 +13,14 @@ import online.bottler.letter.application.port.out.CheckReplyLetterPort;
 import online.bottler.letter.application.port.out.CreateLetterBoxPort;
 import online.bottler.letter.application.port.out.CreateLetterKeywordPort;
 import online.bottler.letter.application.port.out.CreateLetterPort;
+import online.bottler.letter.application.port.out.DeleteLetterBoxPort;
+import online.bottler.letter.application.port.out.DeleteLetterKeywordPort;
+import online.bottler.letter.application.port.out.DeleteLetterPort;
 import online.bottler.letter.application.port.out.LoadLetterKeywordPort;
 import online.bottler.letter.application.port.out.LoadLetterPort;
 import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
+import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.domain.LetterType;
@@ -38,6 +42,9 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     private final CheckReplyLetterPort checkReplyLetterPort;
     private final LoadLetterKeywordPort loadLetterKeywordPort;
     private final LoadLetterPort loadLetterPort;
+    private final DeleteLetterPort deleteLetterPort;
+    private final DeleteLetterKeywordPort deleteLetterKeywordPort;
+    private final DeleteLetterBoxPort deleteLetterBoxPort;
     private final UserRepository userRepository;
 
     @Override
@@ -69,7 +76,9 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     }
 
     @Override
-    public void delete(LetterDeleteDTO letterDeleteDTO, Long userId) {
-
+    public void delete(LetterWithKeywordsDeleteCommand command) {
+        deleteLetterPort.softDelete(command.letterId(), command.userId(), command.boxType());
+        deleteLetterKeywordPort.softDelete(command.letterId());
+        deleteLetterBoxPort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
     }
 }
