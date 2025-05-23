@@ -94,7 +94,7 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     }
 
     @Override
-    public Long softBlock(String letter) {
+    public Long softBlock(Long letterId) {
         return 0L;
     }
 }
