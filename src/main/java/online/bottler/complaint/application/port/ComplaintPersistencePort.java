@@ -1,9 +1,9 @@
-package online.bottler.complaint.application.repository;
+package online.bottler.complaint.application.port;
 
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.Complaints;
 
-public interface ComplaintRepository {
+public interface ComplaintPersistencePort {
     Complaint save(Complaint complaint);
 
     Complaints findByLetterId(Long letterId);

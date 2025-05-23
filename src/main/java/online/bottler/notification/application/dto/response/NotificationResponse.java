@@ -8,7 +8,7 @@ import online.bottler.notification.domain.Notification;
 import online.bottler.notification.domain.NotificationType;
 import online.bottler.notification.domain.Notifications;
 
-public record NotificationResponseDTO(
+public record NotificationResponse(
         UUID id,
         NotificationType type,
         Long receiver,
@@ -17,8 +17,8 @@ public record NotificationResponseDTO(
         Boolean isRead,
         String label
 ) {
-    public static NotificationResponseDTO from(final Notification notification) {
-        return new NotificationResponseDTO(
+    public static NotificationResponse from(final Notification notification) {
+        return new NotificationResponse(
                 notification.getId(),
                 notification.getType(),
                 notification.getReceiver(),
@@ -28,9 +28,9 @@ public record NotificationResponseDTO(
                 notification instanceof LetterNotification ? ((LetterNotification) notification).getLabel() : null);
     }
 
-    public static List<NotificationResponseDTO> from(final Notifications notifications) {
+    public static List<NotificationResponse> from(final Notifications notifications) {
         return notifications.getNotifications().stream()
-                .map(NotificationResponseDTO::from)
+                .map(NotificationResponse::from)
                 .toList();
     }
 }
