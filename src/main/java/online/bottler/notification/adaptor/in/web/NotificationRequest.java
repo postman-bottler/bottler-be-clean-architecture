@@ -1,9 +1,9 @@
-package online.bottler.notification.application.dto.request;
+package online.bottler.notification.adaptor.in.web;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-public record NotificationRequestDTO(
+public record NotificationRequest(
         @NotEmpty(message = "알림 유형은 필수입니다.")
         String notificationType,
 
