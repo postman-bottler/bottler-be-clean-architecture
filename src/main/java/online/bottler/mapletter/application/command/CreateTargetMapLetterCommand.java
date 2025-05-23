@@ -16,15 +16,15 @@ public record CreateTargetMapLetterCommand(
         String label,
         String target
 ) {
-    public static MapLetter toTargetMapLetter(CreateTargetMapLetterCommand command, Long userId, Long targetUserId) {
+    public MapLetter toTargetMapLetter(Long userId, Long targetUserId) {
         return MapLetter.builder()
-                .title(command.title)
-                .content(command.content)
-                .latitude(command.latitude)
-                .longitude(command.longitude)
-                .font(command.font)
-                .paper(command.paper)
-                .label(command.label)
+                .title(title)
+                .content(content)
+                .latitude(latitude)
+                .longitude(longitude)
+                .font(font)
+                .paper(paper)
+                .label(label)
                 .type(MapLetterType.PRIVATE)
                 .createUserId(userId)
                 .targetUserId(targetUserId)
@@ -33,7 +33,7 @@ public record CreateTargetMapLetterCommand(
                 .isDeleted(false)
                 .isBlocked(false)
                 .isRead(false)
-                .description(command.description)
+                .description(description)
                 .isRecipientDeleted(false)
                 .build();
     }

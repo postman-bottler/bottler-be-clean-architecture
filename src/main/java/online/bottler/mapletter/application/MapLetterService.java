@@ -47,7 +47,7 @@ public class MapLetterService implements MapLetterUseCase {
     @Override
     @Transactional
     public MapLetter createPublicMapLetter(CreatePublicMapLetterCommand createPublicMapLetterCommand, Long userId) {
-        MapLetter mapLetter = CreatePublicMapLetterCommand.toPublicMapLetter(createPublicMapLetterCommand, userId);
+        MapLetter mapLetter = createPublicMapLetterCommand.toPublicMapLetter(userId);
         return mapLetterPersistencePort.save(mapLetter);
     }
 
@@ -55,8 +55,7 @@ public class MapLetterService implements MapLetterUseCase {
     @Transactional
     public MapLetter createTargetMapLetter(CreateTargetMapLetterCommand createTargetMapLetterCommand, Long userId) {
         Long targetUserId = userService.getUserIdByNickname(createTargetMapLetterCommand.target());
-        MapLetter mapLetter = CreateTargetMapLetterCommand.toTargetMapLetter(
-                createTargetMapLetterCommand, userId, targetUserId);
+        MapLetter mapLetter = createTargetMapLetterCommand.toTargetMapLetter(userId, targetUserId);
 
         MapLetter save = mapLetterPersistencePort.save(mapLetter);
         notificationService.sendLetterNotification(TARGET_LETTER, targetUserId, save.getId(), save.getLabel());

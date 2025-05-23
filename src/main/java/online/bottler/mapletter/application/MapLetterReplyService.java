@@ -50,8 +50,7 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
         }
 
         MapLetter source = mapLetterPersistencePort.findSourceMapLetterById(createReplyMapLetterCommand.sourceLetter());
-        ReplyMapLetter replyMapLetter = CreateReplyMapLetterCommand.toReplyMapLetter(
-                createReplyMapLetterCommand, userId);
+        ReplyMapLetter replyMapLetter = createReplyMapLetterCommand.toReplyMapLetter(userId);
         ReplyMapLetter save = replyMapLetterPersistencePort.save(replyMapLetter);
 
         MapLetter sourceLetter = mapLetterPersistencePort.findById(save.getSourceLetterId());

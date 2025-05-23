@@ -15,15 +15,15 @@ public record CreatePublicMapLetterCommand(
         String paper,
         String label
 ) {
-    public static MapLetter toPublicMapLetter(CreatePublicMapLetterCommand command, Long userId) {
+    public MapLetter toPublicMapLetter(Long userId) {
         return MapLetter.builder()
-                .title(command.title)
-                .content(command.content)
-                .latitude(command.latitude)
-                .longitude(command.longitude)
-                .font(command.font)
-                .paper(command.paper)
-                .label(command.label)
+                .title(title)
+                .content(content)
+                .latitude(latitude)
+                .longitude(longitude)
+                .font(font)
+                .paper(paper)
+                .label(label)
                 .type(MapLetterType.PUBLIC)
                 .createUserId(userId)
                 .createdAt(LocalDateTime.now())
@@ -31,7 +31,7 @@ public record CreatePublicMapLetterCommand(
                 .isDeleted(false)
                 .isBlocked(false)
                 .isRead(false)
-                .description(command.description)
+                .description(description)
                 .isRecipientDeleted(false)
                 .build();
     }

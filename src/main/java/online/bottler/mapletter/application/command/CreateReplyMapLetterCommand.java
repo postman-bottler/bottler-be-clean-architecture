@@ -10,13 +10,13 @@ public record CreateReplyMapLetterCommand(
         String paper,
         String label
 ) {
-    public static ReplyMapLetter toReplyMapLetter(CreateReplyMapLetterCommand command, Long userId) {
+    public ReplyMapLetter toReplyMapLetter(Long userId) {
         return ReplyMapLetter.builder()
-                .sourceLetterId(command.sourceLetter)
-                .font(command.font)
-                .content(command.content)
-                .paper(command.paper)
-                .label(command.label)
+                .sourceLetterId(sourceLetter)
+                .font(font)
+                .content(content)
+                .paper(paper)
+                .label(label)
                 .isBlocked(false)
                 .isDeleted(false)
                 .createUserId(userId)
