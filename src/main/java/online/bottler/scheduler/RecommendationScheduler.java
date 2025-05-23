@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import online.bottler.letter.application.AsyncRecommendationService;
 import online.bottler.letter.application.RedisLetterService;
 import online.bottler.letter.application.LetterService;
-import online.bottler.notification.application.dto.request.RecommendNotificationCommand;
+import online.bottler.notification.application.request.RecommendNotificationCommand;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.user.application.UserService;
 

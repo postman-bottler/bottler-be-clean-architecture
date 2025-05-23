@@ -1,4 +1,4 @@
-package online.bottler.notification.application.dto.response;
+package online.bottler.notification.application.response;
 
 import java.time.LocalDateTime;
 import java.util.List;

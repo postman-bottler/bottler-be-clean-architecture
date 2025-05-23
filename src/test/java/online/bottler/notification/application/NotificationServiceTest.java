@@ -1,9 +1,9 @@
 package online.bottler.notification.application;
 
 import online.bottler.global.exception.DomainException;
-import online.bottler.notification.application.dto.request.RecommendNotificationCommand;
-import online.bottler.notification.application.dto.response.NotificationResponse;
-import online.bottler.notification.application.dto.response.UnreadNotificationResponse;
+import online.bottler.notification.application.request.RecommendNotificationCommand;
+import online.bottler.notification.application.response.NotificationResponse;
+import online.bottler.notification.application.response.UnreadNotificationResponse;
 import online.bottler.notification.application.port.NotificationPersistencePort;
 import online.bottler.notification.application.port.SubscriptionPersistencePort;
 import online.bottler.notification.domain.*;

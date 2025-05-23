@@ -1,4 +1,4 @@
-package online.bottler.notification.application.dto.request;
+package online.bottler.notification.application.request;
 
 public record RecommendNotificationCommand(
         Long userId,

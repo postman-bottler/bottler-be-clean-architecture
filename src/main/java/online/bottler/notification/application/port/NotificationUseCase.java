@@ -1,8 +1,8 @@
 package online.bottler.notification.application.port;
 
-import online.bottler.notification.application.dto.request.RecommendNotificationCommand;
-import online.bottler.notification.application.dto.response.NotificationResponse;
-import online.bottler.notification.application.dto.response.UnreadNotificationResponse;
+import online.bottler.notification.application.request.RecommendNotificationCommand;
+import online.bottler.notification.application.response.NotificationResponse;
+import online.bottler.notification.application.response.UnreadNotificationResponse;
 import online.bottler.notification.domain.NotificationType;
 
 import java.util.List;

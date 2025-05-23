@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import online.bottler.letter.application.AsyncRecommendationService;
 import online.bottler.letter.application.RedisLetterService;
-import online.bottler.notification.application.dto.request.RecommendNotificationCommand;
+import online.bottler.notification.application.request.RecommendNotificationCommand;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.user.application.UserService;
 

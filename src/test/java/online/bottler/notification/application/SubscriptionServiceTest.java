@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import online.bottler.notification.domain.Subscription;
-import online.bottler.notification.application.dto.response.SubscriptionResponse;
+import online.bottler.notification.application.response.SubscriptionResponse;
 
 @DisplayName("알림 구독 서비스 테스트")
 @ExtendWith(MockitoExtension.class)

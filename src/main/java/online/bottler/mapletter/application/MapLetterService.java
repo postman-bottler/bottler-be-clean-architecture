@@ -51,7 +51,7 @@ import online.bottler.mapletter.exception.MapLetterAlreadyArchivedException;
 import online.bottler.mapletter.exception.MapLetterNotFoundException;
 import online.bottler.mapletter.exception.PageRequestException;
 import online.bottler.mapletter.exception.TypeNotFoundException;
-import online.bottler.notification.application.dto.request.NotificationLabelRequestDTO;
+import online.bottler.notification.application.request.NotificationLabelRequestDTO;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.reply.application.dto.ReplyType;
 import online.bottler.user.application.UserService;

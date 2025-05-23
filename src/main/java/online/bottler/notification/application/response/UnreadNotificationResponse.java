@@ -1,4 +1,4 @@
-package online.bottler.notification.application.dto.response;
+package online.bottler.notification.application.response;
 
 public record UnreadNotificationResponse(
         long count

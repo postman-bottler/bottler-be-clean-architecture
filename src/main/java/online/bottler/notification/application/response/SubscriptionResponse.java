@@ -1,4 +1,4 @@
-package online.bottler.notification.application.dto.response;
+package online.bottler.notification.application.response;
 
 import online.bottler.notification.domain.Subscription;
 
