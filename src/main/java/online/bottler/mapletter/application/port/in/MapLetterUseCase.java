@@ -22,9 +22,9 @@ public interface MapLetterUseCase {
 
     Page<FindReceivedMapLetterResponse> findReceivedMapLetters(int page, int size, Long userId);
 
-    Page<FindAllSentMapLetterResponse> findAllSentMapLetter(int page, int size, Long userId);
+    Page<FindAllSentMapLetterResponse> findAllSentMapLetters(int page, int size, Long userId);
 
-    Page<FindAllReceivedLetterResponse> findAllReceivedLetter(int page, int size, Long userId);
+    Page<FindAllReceivedLetterResponse> findAllReceivedLetters(int page, int size, Long userId);
 
     void deleteMapLetter(List<Long> letters, Long userId);
 

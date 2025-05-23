@@ -44,4 +44,6 @@ public interface MapLetterPersistencePort {
     void softDeleteForRecipient(Long letterId);
 
     void softDeleteAllForRecipient(Long userId);
+
+    void softDeleteAll(List<MapLetter> mapLetters);
 }

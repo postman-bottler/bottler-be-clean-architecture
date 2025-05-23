@@ -53,9 +53,8 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
         ReplyMapLetter replyMapLetter = createReplyMapLetterCommand.toReplyMapLetter(userId);
         ReplyMapLetter save = replyMapLetterPersistencePort.save(replyMapLetter);
 
-        MapLetter sourceLetter = mapLetterPersistencePort.findById(save.getSourceLetterId());
         recentReplyCachePort.saveRecentReply(
-                sourceLetter.getCreateUserId(), ReplyType.MAP.name(), save.getReplyLetterId(), save.getLabel());
+                source.getCreateUserId(), ReplyType.MAP.name(), save.getReplyLetterId(), save.getLabel());
 
         notificationService.sendLetterNotification(
                 MAP_REPLY, source.getCreateUserId(), save.getReplyLetterId(), save.getLabel());
@@ -65,7 +64,7 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindAllReplyMapLettersResponse> findAllReplyMapLetter(int page, int size, Long letterId, Long userId) {
+    public Page<FindAllReplyMapLettersResponse> findAllReplyMapLetters(int page, int size, Long letterId, Long userId) {
         mapLetterService.validMinPage(page);
         MapLetter sourceLetter = mapLetterPersistencePort.findById(letterId);
 
@@ -85,7 +84,7 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public OneReplyLetterResponse findOneReplyMapLetter(Long letterId, Long userId) {
+    public OneReplyLetterResponse findReplyMapLetter(Long letterId, Long userId) {
         ReplyMapLetter replyMapLetter = replyMapLetterPersistencePort.findById(letterId);
         MapLetter sourceLetter = mapLetterPersistencePort.findById(replyMapLetter.getSourceLetterId());
 
@@ -97,21 +96,19 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public CheckReplyMapLetterResponse checkReplyMapLetter(Long letterId, Long userId) {
+    public CheckReplyMapLetterResponse hasReplyForMapLetter(Long letterId, Long userId) {
         return new CheckReplyMapLetterResponse(replyMapLetterPersistencePort.findByLetterIdAndUserId(letterId, userId));
     }
 
     @Override
     @Transactional
     public void deleteReplyMapLetter(DeleteReplyMapLettersCommand deleteReplyMapLettersCommand, Long userId) {
-        List<ReplyMapLetter> replyMapLetters = new ArrayList<>();
+        List<ReplyMapLetter> replyMapLetters = replyMapLetterPersistencePort.findByIds(
+                deleteReplyMapLettersCommand.letterIds());
 
-        for (Long letterId : deleteReplyMapLettersCommand.letterIds()) {
-            ReplyMapLetter replyMapLetter = replyMapLetterPersistencePort.findById(letterId);
+        for (ReplyMapLetter replyMapLetter : replyMapLetters) {
             replyMapLetter.validDeleteReplyMapLetter(userId);
-            replyMapLetterPersistencePort.softDelete(letterId);
-
-            replyMapLetters.add(replyMapLetter);
+            replyMapLetterPersistencePort.softDelete(replyMapLetter.getReplyLetterId());
         }
         deleteRecentRepliesFromRedis(replyMapLetters);
     }
@@ -126,7 +123,7 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindAllSentReplyMapLetterResponse> findAllSentReplyMapLetter(int page, int size, Long userId) {
+    public Page<FindAllSentReplyMapLetterResponse> findAllSentReplyMapLetters(int page, int size, Long userId) {
         mapLetterService.validMinPage(page);
         Page<ReplyMapLetter> letters = replyMapLetterPersistencePort.findAllSentReplyByUserId(userId,
                 PageRequest.of(page - 1, size));
@@ -145,7 +142,7 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindAllReceivedReplyLetterResponse> findAllReceivedReplyLetter(int page, int size, Long userId) {
+    public Page<FindAllReceivedReplyLetterResponse> findAllReceivedReplyMapLetters(int page, int size, Long userId) {
         mapLetterService.validMinPage(page);
         Page<ReplyMapLetter> letters = replyMapLetterPersistencePort.findActiveReplyMapLettersBySourceUserId(userId,
                 PageRequest.of(page - 1, size));

@@ -55,7 +55,7 @@ public class MapLetterReplyController {
             @PathVariable Long letterId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         return ApiResponse.onSuccess(
-                MapLetterPageResponse.from(mapLetterReplyUseCase.findAllReplyMapLetter(page, size, letterId, userId)));
+                MapLetterPageResponse.from(mapLetterReplyUseCase.findAllReplyMapLetters(page, size, letterId, userId)));
     }
 
     @GetMapping("/reply/{letterId}")
@@ -63,7 +63,7 @@ public class MapLetterReplyController {
     public ApiResponse<OneReplyLetterResponse> findOneReplyMapLetter(@PathVariable Long letterId,
                                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterReplyUseCase.findOneReplyMapLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterReplyUseCase.findReplyMapLetter(letterId, userId));
     }
 
     @GetMapping("/reply/check/{letterId}")
@@ -71,7 +71,7 @@ public class MapLetterReplyController {
     public ApiResponse<CheckReplyMapLetterResponse> checkReplyMapLetter(@PathVariable Long letterId,
                                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterReplyUseCase.checkReplyMapLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterReplyUseCase.hasReplyForMapLetter(letterId, userId));
     }
 
     @DeleteMapping("/reply")

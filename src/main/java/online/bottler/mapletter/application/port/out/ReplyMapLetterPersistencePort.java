@@ -31,4 +31,6 @@ public interface ReplyMapLetterPersistencePort {
     void softDeleteForRecipient(Long letterId);
 
     void softDeleteAllForRecipient(Long userId);
+
+    List<ReplyMapLetter> findByIds(List<Long> longs);
 }

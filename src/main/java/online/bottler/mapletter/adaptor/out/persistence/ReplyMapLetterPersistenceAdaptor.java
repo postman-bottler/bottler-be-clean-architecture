@@ -111,4 +111,10 @@ public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersisten
 
         letters.forEach(letter -> letter.updateRecipientDeleted(true));
     }
+
+    @Override
+    public List<ReplyMapLetter> findByIds(List<Long> letterIds) {
+        List<ReplyMapLetterEntity> replyLetters = replyMapLetterJpaRepository.findAllById(letterIds);
+        return replyLetters.stream().map(ReplyMapLetterEntity::toDomain).toList();
+    }
 }

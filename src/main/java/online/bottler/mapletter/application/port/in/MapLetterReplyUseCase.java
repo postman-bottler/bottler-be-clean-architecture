@@ -13,15 +13,15 @@ import org.springframework.data.domain.Page;
 public interface MapLetterReplyUseCase {
     ReplyMapLetter createReplyMapLetter(CreateReplyMapLetterCommand createReplyMapLetterCommand, Long userId);
 
-    Page<FindAllReplyMapLettersResponse> findAllReplyMapLetter(int page, int size, Long letterId, Long userId);
+    Page<FindAllReplyMapLettersResponse> findAllReplyMapLetters(int page, int size, Long letterId, Long userId);
 
-    OneReplyLetterResponse findOneReplyMapLetter(Long letterId, Long userId);
+    OneReplyLetterResponse findReplyMapLetter(Long letterId, Long userId);
 
-    CheckReplyMapLetterResponse checkReplyMapLetter(Long letterId, Long userId);
+    CheckReplyMapLetterResponse hasReplyForMapLetter(Long letterId, Long userId);
 
     void deleteReplyMapLetter(DeleteReplyMapLettersCommand deleteReplyMapLettersCommand, Long userId);
 
-    Page<FindAllSentReplyMapLetterResponse> findAllSentReplyMapLetter(int page, int size, Long userId);
+    Page<FindAllSentReplyMapLetterResponse> findAllSentReplyMapLetters(int page, int size, Long userId);
 
-    Page<FindAllReceivedReplyLetterResponse> findAllReceivedReplyLetter(int page, int size, Long userId);
+    Page<FindAllReceivedReplyLetterResponse> findAllReceivedReplyMapLetters(int page, int size, Long userId);
 }

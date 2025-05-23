@@ -116,7 +116,7 @@ public class MapLetterService implements MapLetterUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindAllSentMapLetterResponse> findAllSentMapLetter(int page, int size, Long userId) {
+    public Page<FindAllSentMapLetterResponse> findAllSentMapLetters(int page, int size, Long userId) {
         validMinPage(page);
         Page<MapLetter> letters = mapLetterPersistencePort.findActiveByCreateUserId(userId,
                 PageRequest.of(page - 1, size));
@@ -136,7 +136,7 @@ public class MapLetterService implements MapLetterUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindAllReceivedLetterResponse> findAllReceivedLetter(int page, int size, Long userId) {
+    public Page<FindAllReceivedLetterResponse> findAllReceivedLetters(int page, int size, Long userId) {
         validMinPage(page);
         Page<MapLetter> letters = mapLetterPersistencePort.findActiveByTargetUserId(userId,
                 PageRequest.of(page - 1, size));
@@ -155,11 +155,9 @@ public class MapLetterService implements MapLetterUseCase {
     @Override
     @Transactional
     public void deleteMapLetter(List<Long> letters, Long userId) {
-        for (Long letterId : letters) {
-            MapLetter findMapLetter = mapLetterPersistencePort.findById(letterId);
-            findMapLetter.validDeleteMapLetter(userId);
-            mapLetterPersistencePort.softDelete(letterId);
-        }
+        List<MapLetter> mapLetters = mapLetterPersistencePort.findAllByIds(letters);
+        mapLetters.forEach(letter -> {letter.validDeleteMapLetter(userId);});
+        mapLetterPersistencePort.softDeleteAll(mapLetters);
     }
 
     @Override

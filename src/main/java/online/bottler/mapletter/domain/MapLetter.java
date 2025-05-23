@@ -44,7 +44,7 @@ public class MapLetter {
 
     public void validateFindOneMapLetter(double viewDistance, Double distance) {
         validDeleteAndBlocked();
-        if (distance > viewDistance) {
+        if (distance == null || distance > viewDistance) {
             throw new DomainException("편지와의 거리가 멀어서 조회가 불가능합니다.");
         }
     }
@@ -89,7 +89,7 @@ public class MapLetter {
         }
     }
 
-    public void isPrivate() {
+    public void validatePublicAccess() {
         if (this.getType() == MapLetterType.PRIVATE) {
             throw new CommonForbiddenException("해당 편지에 접근할 수 없습니다.");
         }

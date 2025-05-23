@@ -1,11 +1,10 @@
 package online.bottler.mapletter.adaptor.in.web;
 
 import io.swagger.v3.oas.annotations.Operation;
-import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
+import online.bottler.mapletter.adaptor.in.web.MapLetterProximityController.Coordinates;
 import online.bottler.mapletter.application.port.in.MapLetterGuestUseCase;
 import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
@@ -21,21 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class MapLetterGuestController {
 
     private final MapLetterGuestUseCase mapLetterGuestUseCase;
+    private final MapLetterProximityController mapLetterProximityController;
 
     @GetMapping()
     @Operation(summary = "로그인 하지 않은 유저 주변 편지 조회", description = "로그인 하지 않은 유저의 반경 500m 내 퍼블릭 편지 조회")
     public ApiResponse<List<FindNearbyLettersResponse>> guestFindNearbyMapLetters(@RequestParam String latitude,
                                                                                   @RequestParam String longitude) {
-        BigDecimal lat = BigDecimal.ZERO;
-        BigDecimal lon = BigDecimal.ZERO;
-        try {
-            lat = new BigDecimal(latitude);
-            lon = new BigDecimal(longitude);
-        } catch (Exception e) {
-            throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
-        }
-
-        return ApiResponse.onSuccess(mapLetterGuestUseCase.guestFindNearByMapLetters(lat, lon));
+        Coordinates coordinates = mapLetterProximityController.parseCoordinates(latitude, longitude);
+        return ApiResponse.onSuccess(
+                mapLetterGuestUseCase.guestFindNearByMapLetters(coordinates.latitude(), coordinates.longitude()));
     }
 
     @GetMapping("/{letterId}")
@@ -43,15 +36,8 @@ public class MapLetterGuestController {
     public ApiResponse<OneLetterResponse> guestFindOneMapLetter(@RequestParam String latitude,
                                                                 @RequestParam String longitude,
                                                                 @PathVariable Long letterId) {
-        BigDecimal lat = BigDecimal.ZERO;
-        BigDecimal lon = BigDecimal.ZERO;
-        try {
-            lat = new BigDecimal(latitude);
-            lon = new BigDecimal(longitude);
-        } catch (Exception e) {
-            throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
-        }
-
-        return ApiResponse.onSuccess(mapLetterGuestUseCase.guestFindOneMapLetter(letterId, lat, lon));
+        Coordinates coordinates = mapLetterProximityController.parseCoordinates(latitude, longitude);
+        return ApiResponse.onSuccess(mapLetterGuestUseCase.guestFindOneMapLetter(
+                letterId, coordinates.latitude(), coordinates.longitude()));
     }
 }

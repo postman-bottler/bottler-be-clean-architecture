@@ -30,17 +30,10 @@ public class MapLetterProximityController {
                                                            @RequestParam String longitude,
                                                            @PathVariable Long letterId,
                                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Coordinates coordinates = parseCoordinates(latitude, longitude);
         Long userId = userDetails.getUserId();
-        BigDecimal lat = BigDecimal.ZERO;
-        BigDecimal lon = BigDecimal.ZERO;
-        try {
-            lat = new BigDecimal(latitude);
-            lon = new BigDecimal(longitude);
-        } catch (Exception e) {
-            throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
-        }
-
-        return ApiResponse.onSuccess(mapLetterProximityUseCase.findOneMapLetter(letterId, userId, lat, lon));
+        return ApiResponse.onSuccess(mapLetterProximityUseCase.findOneMapLetter(letterId, userId, coordinates.latitude,
+                coordinates.longitude));
     }
 
     @GetMapping
@@ -48,16 +41,31 @@ public class MapLetterProximityController {
     public ApiResponse<List<FindNearbyLettersResponse>> findNearbyMapLetters(@RequestParam String latitude,
                                                                              @RequestParam String longitude,
                                                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = userDetails.getUserId();
-        BigDecimal lat = BigDecimal.ZERO;
-        BigDecimal lon = BigDecimal.ZERO;
-        try {
-            lat = new BigDecimal(latitude);
-            lon = new BigDecimal(longitude);
-        } catch (Exception e) {
-            throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
-        }
 
-        return ApiResponse.onSuccess(mapLetterProximityUseCase.findNearByMapLetters(lat, lon, userId));
+        Coordinates coordinates = parseCoordinates(latitude, longitude);
+        Long userId = userDetails.getUserId();
+        return ApiResponse.onSuccess(
+                mapLetterProximityUseCase.findNearByMapLetters(coordinates.latitude, coordinates.longitude, userId));
+    }
+
+    record Coordinates(BigDecimal latitude, BigDecimal longitude) {
+        Coordinates {
+            if (latitude.compareTo(new BigDecimal("-90")) < 0 || latitude.compareTo(new BigDecimal("90")) > 0) {
+                throw new AdaptorException("유효하지 않은 위도입니다. 위도는 -90에서 90 사이어야 합니다.");
+            }
+            if (longitude.compareTo(new BigDecimal("-180")) < 0 || longitude.compareTo(new BigDecimal("180")) > 0) {
+                throw new AdaptorException("유효하지 않은 경도입니다. 위도는 -180에서 180 사이어야 합니다.");
+            }
+        }
+    }
+
+    Coordinates parseCoordinates(String latitudeStr, String longitudeStr) {
+        try {
+            BigDecimal latitude = new BigDecimal(latitudeStr);
+            BigDecimal longitude = new BigDecimal(longitudeStr);
+            return new Coordinates(latitude, longitude);
+        } catch (NumberFormatException e) {
+            throw new AdaptorException("위도 또는 경도 형식이 올바르지 않습니다. 숫자 형식으로 입력해주세요.");
+        }
     }
 }

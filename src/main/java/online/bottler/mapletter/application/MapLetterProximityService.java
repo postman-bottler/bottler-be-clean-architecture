@@ -2,6 +2,8 @@ package online.bottler.mapletter.application;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
 import online.bottler.mapletter.application.port.in.MapLetterProximityUseCase;
@@ -41,8 +43,8 @@ public class MapLetterProximityService implements MapLetterProximityUseCase {
         }
 
         String profileImg = userService.getProfileImageUrlById(mapLetter.getCreateUserId());
-        return OneLetterResponse.from(mapLetter, profileImg, mapLetter.getCreateUserId() == userId,
-                mapLetterReplyService.checkReplyMapLetter(letterId, userId).isReplied(),
+        return OneLetterResponse.from(mapLetter, profileImg, Objects.equals(mapLetter.getCreateUserId(), userId),
+                mapLetterReplyService.hasReplyForMapLetter(letterId, userId).isReplied(),
                 mapLetterArchiveService.isArchived(letterId, userId));
     }
 
@@ -55,7 +57,7 @@ public class MapLetterProximityService implements MapLetterProximityUseCase {
 
         return letters.stream()
                 .map(letter -> {
-                            String nickname = userService.getNicknameById(letter.getCreateUserId());
+                            String nickname = userService.getNicknameById(letter.getCreateUserId()); //TODO: UserService에 getNicknamesByIds 생성하기
                             return FindNearbyLettersResponse.from(letter, nickname);
                         }
                 ).toList();

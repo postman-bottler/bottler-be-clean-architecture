@@ -76,20 +76,20 @@ public class MapLetterController {
             case "sent-reply" -> //보낸 답장 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(
-                                    mapLetterReplyUseCase.findAllSentReplyMapLetter(page, size, userId)));
+                                    mapLetterReplyUseCase.findAllSentReplyMapLetters(page, size, userId)));
             case "sent-map" -> //보낸 지도 편지 전체 조회
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findAllSentMapLetter(page, size, userId)));
+                            MapLetterPageResponse.from(mapLetterUseCase.findAllSentMapLetters(page, size, userId)));
             case "received-all" -> //받은 편지 전체 조회(타겟 편지, 답장 편지)
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(mapLetterUseCase.findReceivedMapLetters(page, size, userId)));
             case "received-reply" -> //받은 답장 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(
-                                    mapLetterReplyUseCase.findAllReceivedReplyLetter(page, size, userId)));
+                                    mapLetterReplyUseCase.findAllReceivedReplyMapLetters(page, size, userId)));
             case "received-map" -> //받은 타겟 편지 전체 조회
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findAllReceivedLetter(page, size, userId)));
+                            MapLetterPageResponse.from(mapLetterUseCase.findAllReceivedLetters(page, size, userId)));
             default -> throw new AdaptorException("잘못된 저장된 지도 편지 조회 타입입니다.");
         };
     }

@@ -48,7 +48,7 @@ public class MapLetterArchiveController {
 
     @DeleteMapping("/archived")
     @Operation(summary = "편지 보관 취소(삭제).", description = "로그인 필수. 편지를 보관함에서 삭제한다.(리스트로 1~n개 까지의 편지를 한 번에 삭제 한다.")
-    public ApiResponse<?> archiveLetter(@RequestBody DeleteArchivedLettersRequest deleteArchivedLettersRequest
+    public ApiResponse<?> deleteArchiveLetter(@RequestBody DeleteArchivedLettersRequest deleteArchivedLettersRequest
             , @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         mapLetterArchiveUseCase.deleteArchivedLetter(

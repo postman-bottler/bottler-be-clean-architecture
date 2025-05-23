@@ -31,7 +31,7 @@ public class MapLetterGuestService implements MapLetterGuestUseCase {
 
         return letters.stream()
                 .map(letter -> {
-                            String nickname = userService.getNicknameById(letter.getCreateUserId());
+                            String nickname = userService.getNicknameById(letter.getCreateUserId()); //TODO: UserService에 getNicknamesByIds 생성하기
                             return FindNearbyLettersResponse.from(letter, nickname);
                         }
                 ).toList();
@@ -42,10 +42,10 @@ public class MapLetterGuestService implements MapLetterGuestUseCase {
     public OneLetterResponse guestFindOneMapLetter(Long letterId, BigDecimal latitude, BigDecimal longitude) {
         MapLetter mapLetter = mapLetterPersistencePort.findById(letterId);
 
-        Double distance = mapLetterPersistencePort.findDistanceByLatitudeAndLongitudeAndLetterId(latitude, longitude,
-                letterId);
+        Double distance = mapLetterPersistencePort.findDistanceByLatitudeAndLongitudeAndLetterId(
+                latitude, longitude, letterId);
 
-        mapLetter.isPrivate();
+        mapLetter.validatePublicAccess();
 
         mapLetter.validateFindOneMapLetter(VIEW_DISTANCE, distance);
 

@@ -140,4 +140,11 @@ public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
 
         mapLetterEntities.forEach(mapLetterEntity -> mapLetterEntity.updateRecipientDeleted(true));
     }
+
+    @Override
+    public void softDeleteAll(List<MapLetter> mapLetters) {
+        List<Long> ids=mapLetters.stream().map(MapLetter::getId).toList();
+        List<MapLetterEntity> mapLetterEntities = mapLetterJpaRepository.findAllById(ids);
+        mapLetterEntities.forEach(mapLetterEntity -> mapLetterEntity.updateDelete(true));
+    }
 }
