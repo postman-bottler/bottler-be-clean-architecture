@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import online.bottler.letter.application.AsyncRecommendationService;
 import online.bottler.letter.application.RedisLetterService;
-import online.bottler.notification.application.dto.request.RecommendNotificationRequestDTO;
+import online.bottler.notification.application.dto.request.RecommendNotificationCommand;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.user.application.UserService;
 
@@ -57,7 +57,7 @@ class RecommendationSchedulerTest {
     void updateAllRecommendations() {
         // Given
         List<Long> userIds = List.of(1L, 2L);
-        RecommendNotificationRequestDTO mockNotification = new RecommendNotificationRequestDTO(1L, 101L, "label1");
+        RecommendNotificationCommand mockNotification = new RecommendNotificationCommand(1L, 101L, "label1");
 
         when(userService.getAllUserIds()).thenReturn(userIds);
 //        when(redisLetterService.updateRecommendationsFromTemp(anyLong())).thenReturn(mockNotification);

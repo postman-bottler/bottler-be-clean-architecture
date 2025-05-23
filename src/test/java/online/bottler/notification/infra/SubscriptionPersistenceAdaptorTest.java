@@ -3,21 +3,21 @@ package online.bottler.notification.infra;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import online.bottler.notification.application.port.SubscriptionPersistencePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.notification.application.repository.SubscriptionRepository;
 import online.bottler.notification.domain.Subscription;
 import online.bottler.notification.domain.Subscriptions;
 
 @SpringBootTest
 @Transactional
-class SubscriptionRepositoryImplTest {
+class SubscriptionPersistenceAdaptorTest {
 
     @Autowired
-    private SubscriptionRepository subscriptionRepository;
+    private SubscriptionPersistencePort subscriptionRepository;
 
     @DisplayName("사용자의 기기 구독 정보를 저장한다.")
     @Test

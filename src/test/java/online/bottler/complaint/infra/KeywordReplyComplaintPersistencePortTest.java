@@ -5,6 +5,8 @@ import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
+
+import online.bottler.complaint.adaptor.out.persistence.KeywordReplyComplaintPersistenceAdaptor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,10 @@ import online.bottler.complaint.domain.Complaints;
 @DisplayName("키워드 답장 편지 리포지토리 테스트")
 @SpringBootTest
 @Transactional
-class KeywordReplyComplaintRepositoryImplTest {
+class KeywordReplyComplaintPersistencePortTest {
 
     @Autowired
-    private KeywordReplyComplaintRepositoryImpl keywordReplyComplaintRepository;
+    private KeywordReplyComplaintPersistenceAdaptor keywordReplyComplaintRepository;
 
     @DisplayName("새로운 신고를 저장한다.")
     @Test

@@ -10,16 +10,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.complaint.application.repository.MapComplaintRepository;
+import online.bottler.complaint.application.port.MapComplaintPersistencePort;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.Complaints;
 
 @DisplayName("지도 편지 리포지토리 테스트")
 @SpringBootTest
 @Transactional
-public class MapComplaintRepositoryTest {
+public class MapComplaintPersistencePortTest {
     @Autowired
-    private MapComplaintRepository mapComplaintRepository;
+    private MapComplaintPersistencePort mapComplaintRepository;
 
     @DisplayName("새로운 신고를 저장한다.")
     @Test
