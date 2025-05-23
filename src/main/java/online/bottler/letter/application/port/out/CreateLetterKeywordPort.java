@@ -4,5 +4,5 @@ import java.util.List;
 import online.bottler.letter.domain.LetterKeyword;
 
 public interface CreateLetterKeywordPort {
-    void saveAll(List<LetterKeyword> letterKeywords);
+    List<LetterKeyword> saveAll(List<LetterKeyword> letterKeywords);
 }

@@ -66,20 +66,8 @@ public class LetterEntity {
     }
 
     public Letter toDomain() {
-        return Letter.of(
-                id,
-                userId,
-                LetterContent.of(
-                        title,
-                        content,
-                        font,
-                        paper,
-                        label
-                ),
-                isDeleted,
-                isBlocked,
-                createdAt
-        );
+        return Letter.of(id, userId, LetterContent.of(title, content, font, paper, label), isDeleted, isBlocked,
+                createdAt);
     }
 
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -51,7 +52,19 @@ public class LetterKeywordEntity {
                 .build();
     }
 
+    public static List<LetterKeywordEntity> fromList(List<LetterKeyword> letterKeywords) {
+        return letterKeywords.stream()
+                .map(LetterKeywordEntity::from)
+                .toList();
+    }
+
     public LetterKeyword toDomain() {
         return LetterKeyword.of(id, letterId, keyword, isDeleted);
+    }
+
+    public static List<LetterKeyword> toDomainList(List<LetterKeywordEntity> letterKeywordEntities) {
+        return letterKeywordEntities.stream()
+                .map(LetterKeywordEntity::toDomain)
+                .toList();
     }
 }
