@@ -7,7 +7,7 @@ import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.mapletter.adaptor.in.web.request.CreateReplyMapLetterRequest;
 import online.bottler.mapletter.adaptor.in.web.request.DeleteReplyMapLettersRequest;
-import online.bottler.mapletter.application.port.in.MapLetterUseCase;
+import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.response.CheckReplyMapLetterResponse;
 import online.bottler.mapletter.application.response.FindAllReplyMapLettersResponse;
 import online.bottler.mapletter.application.response.MapLetterPageResponse;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MapLetterReplyController {
 
-    private final MapLetterUseCase mapLetterUseCase;
+    private final MapLetterReplyUseCase mapLetterReplyUseCase;
 
     @PostMapping("/reply")
     @Operation(summary = "답장 편지 생성", description = "로그인 필수. 지도편지 답장을 생성한다.")
@@ -42,7 +42,7 @@ public class MapLetterReplyController {
         }
 
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.createReplyMapLetter(
+        mapLetterReplyUseCase.createReplyMapLetter(
                 CreateReplyMapLetterRequest.toCommand(createReplyMapLetterRequestDTO), userId);
         return ApiResponse.onCreateSuccess("답장 편지 생성이 성공되었습니다.");
     }
@@ -55,7 +55,7 @@ public class MapLetterReplyController {
             @PathVariable Long letterId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         return ApiResponse.onSuccess(
-                MapLetterPageResponse.from(mapLetterUseCase.findAllReplyMapLetter(page, size, letterId, userId)));
+                MapLetterPageResponse.from(mapLetterReplyUseCase.findAllReplyMapLetter(page, size, letterId, userId)));
     }
 
     @GetMapping("/reply/{letterId}")
@@ -63,7 +63,7 @@ public class MapLetterReplyController {
     public ApiResponse<OneReplyLetterResponse> findOneReplyMapLetter(@PathVariable Long letterId,
                                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterUseCase.findOneReplyMapLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterReplyUseCase.findOneReplyMapLetter(letterId, userId));
     }
 
     @GetMapping("/reply/check/{letterId}")
@@ -71,7 +71,7 @@ public class MapLetterReplyController {
     public ApiResponse<CheckReplyMapLetterResponse> checkReplyMapLetter(@PathVariable Long letterId,
                                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterUseCase.checkReplyMapLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterReplyUseCase.checkReplyMapLetter(letterId, userId));
     }
 
     @DeleteMapping("/reply")
@@ -79,7 +79,7 @@ public class MapLetterReplyController {
     public ApiResponse<?> deleteReplyMapLetter(@RequestBody DeleteReplyMapLettersRequest letters,
                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.deleteReplyMapLetter(DeleteReplyMapLettersRequest.toCommand(letters), userId);
+        mapLetterReplyUseCase.deleteReplyMapLetter(DeleteReplyMapLettersRequest.toCommand(letters), userId);
         return ApiResponse.onDeleteSuccess(letters);
     }
 }

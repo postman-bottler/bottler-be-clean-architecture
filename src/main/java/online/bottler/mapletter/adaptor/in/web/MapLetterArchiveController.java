@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.mapletter.adaptor.in.web.request.DeleteArchivedLettersRequest;
-import online.bottler.mapletter.application.port.in.MapLetterUseCase;
+import online.bottler.mapletter.application.port.in.MapLetterArchiveUseCase;
 import online.bottler.mapletter.application.response.FindAllArchiveLettersResponse;
 import online.bottler.mapletter.application.response.MapLetterPageResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MapLetterArchiveController {
 
-    private final MapLetterUseCase mapLetterUseCase;
+    private final MapLetterArchiveUseCase mapLetterArchiveUseCase;
 
     @PostMapping("/{letterId}")
     @Operation(summary = "편지 보관", description = "로그인 필수. 퍼블릭 편지를 보관한다.")
     public ApiResponse<?> mapLetterArchive(@PathVariable Long letterId,
                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.mapLetterArchive(letterId, userId);
+        mapLetterArchiveUseCase.mapLetterArchive(letterId, userId);
         return ApiResponse.onCreateSuccess("편지 저장이 성공되었습니다.");
     }
 
@@ -43,7 +43,7 @@ public class MapLetterArchiveController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
         return ApiResponse.onSuccess(
-                MapLetterPageResponse.from(mapLetterUseCase.findArchiveLetters(page, size, userId)));
+                MapLetterPageResponse.from(mapLetterArchiveUseCase.findArchiveLetters(page, size, userId)));
     }
 
     @DeleteMapping("/archived")
@@ -51,7 +51,7 @@ public class MapLetterArchiveController {
     public ApiResponse<?> archiveLetter(@RequestBody DeleteArchivedLettersRequest deleteArchivedLettersRequest
             , @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.deleteArchivedLetter(
+        mapLetterArchiveUseCase.deleteArchivedLetter(
                 DeleteArchivedLettersRequest.toCommand(deleteArchivedLettersRequest), userId);
         return ApiResponse.onDeleteSuccess(deleteArchivedLettersRequest);
     }
@@ -61,6 +61,6 @@ public class MapLetterArchiveController {
     public ApiResponse<OneLetterResponse> findArchiveOneLetter(@PathVariable Long letterId,
                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterUseCase.findArchiveOneLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterArchiveUseCase.findArchiveOneLetter(letterId, userId));
     }
 }

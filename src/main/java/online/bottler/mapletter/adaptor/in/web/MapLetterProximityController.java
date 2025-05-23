@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
-import online.bottler.mapletter.application.port.in.MapLetterUseCase;
+import online.bottler.mapletter.application.port.in.MapLetterProximityUseCase;
 import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
 import online.bottler.user.auth.CustomUserDetails;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MapLetterProximityController {
 
-    private final MapLetterUseCase mapLetterUseCase;
+    private final MapLetterProximityUseCase mapLetterProximityUseCase;
 
     @GetMapping("/{letterId}")
     @Operation(summary = "편지 상세 조회", description = "로그인 필수. 위경도 필수. 반경 15m 내 편지만 상세조회 가능. 내가 타겟인 편지와 퍼블릭 편지만 조회 가능. 나머지는 오류")
@@ -40,7 +40,7 @@ public class MapLetterProximityController {
             throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
         }
 
-        return ApiResponse.onSuccess(mapLetterUseCase.findOneMapLetter(letterId, userId, lat, lon));
+        return ApiResponse.onSuccess(mapLetterProximityUseCase.findOneMapLetter(letterId, userId, lat, lon));
     }
 
     @GetMapping
@@ -58,6 +58,6 @@ public class MapLetterProximityController {
             throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
         }
 
-        return ApiResponse.onSuccess(mapLetterUseCase.findNearByMapLetters(lat, lon, userId));
+        return ApiResponse.onSuccess(mapLetterProximityUseCase.findNearByMapLetters(lat, lon, userId));
     }
 }

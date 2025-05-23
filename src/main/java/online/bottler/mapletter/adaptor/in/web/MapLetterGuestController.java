@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
-import online.bottler.mapletter.application.port.in.MapLetterUseCase;
+import online.bottler.mapletter.application.port.in.MapLetterGuestUseCase;
 import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MapLetterGuestController {
 
-    private final MapLetterUseCase mapLetterUseCase;
+    private final MapLetterGuestUseCase mapLetterGuestUseCase;
 
     @GetMapping()
     @Operation(summary = "로그인 하지 않은 유저 주변 편지 조회", description = "로그인 하지 않은 유저의 반경 500m 내 퍼블릭 편지 조회")
@@ -35,7 +35,7 @@ public class MapLetterGuestController {
             throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
         }
 
-        return ApiResponse.onSuccess(mapLetterUseCase.guestFindNearByMapLetters(lat, lon));
+        return ApiResponse.onSuccess(mapLetterGuestUseCase.guestFindNearByMapLetters(lat, lon));
     }
 
     @GetMapping("/{letterId}")
@@ -52,6 +52,6 @@ public class MapLetterGuestController {
             throw new AdaptorException("지도에서 해당 위치를 찾을 수 없습니다.");
         }
 
-        return ApiResponse.onSuccess(mapLetterUseCase.guestFindOneMapLetter(letterId, lat, lon));
+        return ApiResponse.onSuccess(mapLetterGuestUseCase.guestFindOneMapLetter(letterId, lat, lon));
     }
 }

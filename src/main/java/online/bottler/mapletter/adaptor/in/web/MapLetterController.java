@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.AdaptorException;
+import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,7 @@ import online.bottler.user.auth.CustomUserDetails;
 public class MapLetterController {
 
     private final MapLetterUseCase mapLetterUseCase;
+    private final MapLetterReplyUseCase mapLetterReplyUseCase;
 
     @PostMapping("/public")
     @Operation(summary = "지도 퍼블릭 편지 생성", description = "로그인 필수. 제목 없으면 무제로 넣어주세요.")
@@ -73,7 +75,8 @@ public class MapLetterController {
                             MapLetterPageResponse.from(mapLetterUseCase.findSentMapLetters(page, size, userId)));
             case "sent-reply" -> //보낸 답장 편지 전체 조회
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findAllSentReplyMapLetter(page, size, userId)));
+                            MapLetterPageResponse.from(
+                                    mapLetterReplyUseCase.findAllSentReplyMapLetter(page, size, userId)));
             case "sent-map" -> //보낸 지도 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(mapLetterUseCase.findAllSentMapLetter(page, size, userId)));
@@ -83,7 +86,7 @@ public class MapLetterController {
             case "received-reply" -> //받은 답장 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(
-                                    mapLetterUseCase.findAllReceivedReplyLetter(page, size, userId)));
+                                    mapLetterReplyUseCase.findAllReceivedReplyLetter(page, size, userId)));
             case "received-map" -> //받은 타겟 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(mapLetterUseCase.findAllReceivedLetter(page, size, userId)));
