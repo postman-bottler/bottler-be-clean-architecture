@@ -15,18 +15,21 @@ class LetterTest {
         LocalDateTime now = LocalDateTime.now();
 
         // when
-        Letter letter = Letter.builder()
-                .id(1L)
-                .title("테스트 제목")
-                .content("테스트 내용")
-                .font("Pretendard")
-                .paper("Classic")
-                .label("라벨")
-                .userId(100L)
-                .isDeleted(false)
-                .isBlocked(false)
-                .createdAt(now)
-                .build();
+        Letter letter = Letter.of(
+                1L,
+                1L,
+                LetterContent.of(
+                        "테스트 제목",
+                        "테스트 내용",
+                        "Pretendard",
+                        "Classic",
+                        "라벨"
+                ),
+                false,
+                false,
+                LocalDateTime.now()
+        );
+
 
         // then
         assertThat(letter.getId()).isEqualTo(1L);

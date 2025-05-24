@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import online.bottler.letter.application.response.KeywordResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,9 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.response.KeywordResponseDTO;
-import online.bottler.letter.application.dto.response.KeywordResponseDTO.CategoryKeywordsDTO;
-import online.bottler.letter.application.repository.KeywordRepository;
+import online.bottler.letter.application.response.KeywordResponse.CategoryKeywordsDTO;
+import online.bottler.letter.application.port.out.KeywordRepository;
 import online.bottler.letter.domain.Keyword;
 import online.bottler.letter.application.KeywordService;
 
@@ -35,16 +35,16 @@ class KeywordServiceTest extends TestBase {
     void getKeywords() {
         // given
         List<Keyword> mockKeywords = List.of(
-                Keyword.builder().id(1L).keyword("사랑").category("감정").build(),
-                Keyword.builder().id(2L).keyword("행복").category("감정").build(),
-                Keyword.builder().id(3L).keyword("우정").category("사회").build(),
-                Keyword.builder().id(4L).keyword("성공").category("자기계발").build()
+                Keyword.of(1L, "사랑", "감정"),
+                Keyword.of(2L, "행복", "감정"),
+                Keyword.of(3L, "우정", "사회"),
+                Keyword.of(4L, "성공", "자기계발")
         );
 
         when(keywordRepository.getKeywords()).thenReturn(mockKeywords);
 
         // when
-        KeywordResponseDTO result = keywordService.getKeywords();
+        KeywordResponse result = keywordService.getKeywords();
 
         // then
         assertThat(result).isNotNull();
@@ -65,7 +65,7 @@ class KeywordServiceTest extends TestBase {
         verify(keywordRepository, times(1)).getKeywords();
     }
 
-    private CategoryKeywordsDTO findCategory(KeywordResponseDTO result, String category) {
+    private CategoryKeywordsDTO findCategory(KeywordResponse result, String category) {
         return result.categories().stream()
                 .filter(c -> c.category().equals(category))
                 .findFirst()

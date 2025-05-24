@@ -17,11 +17,7 @@ class KeywordTest {
         String category = "Technology";
 
         // when
-        Keyword keywordObj = Keyword.builder()
-                .id(id)
-                .keyword(keyword)
-                .category(category)
-                .build();
+        Keyword keywordObj = Keyword.of(id, keyword, category);
 
         // then
         assertThat(keywordObj).isNotNull();

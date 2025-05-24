@@ -16,9 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.request.UserKeywordRequestDTO;
-import online.bottler.letter.application.dto.response.UserKeywordResponseDTO;
-import online.bottler.letter.application.repository.UserKeywordRepository;
+import online.bottler.letter.adapter.in.web.request.UserKeywordRequest;
+import online.bottler.letter.application.response.UserKeywordResponse;
+import online.bottler.letter.application.port.out.UserKeywordRepository;
 import online.bottler.letter.domain.UserKeyword;
 import online.bottler.letter.application.UserKeywordService;
 
@@ -38,14 +38,14 @@ class UserKeywordServiceTest extends TestBase {
         // given
         Long userId = 1L;
         List<UserKeyword> mockKeywords = List.of(
-                UserKeyword.builder().id(1L).userId(userId).keyword("키워드1").build(),
-                UserKeyword.builder().id(2L).userId(userId).keyword("키워드2").build()
+//                UserKeyword.builder().id(1L).userId(userId).keyword("키워드1").build(),
+//                UserKeyword.builder().id(2L).userId(userId).keyword("키워드2").build()
         );
 
         when(userKeywordRepository.findUserKeywordsByUserId(userId)).thenReturn(mockKeywords);
 
         // when
-        UserKeywordResponseDTO result = userKeywordService.findUserKeywords(userId);
+        UserKeywordResponse result = userKeywordService.findUserKeywords(userId);
 
         // then
         assertThat(result).isNotNull();
@@ -59,7 +59,7 @@ class UserKeywordServiceTest extends TestBase {
     void createKeywords() {
         // given
         Long userId = 1L;
-        UserKeywordRequestDTO requestDTO = new UserKeywordRequestDTO(List.of("키워드1", "키워드2"));
+        UserKeywordRequest requestDTO = new UserKeywordRequest(List.of("키워드1", "키워드2"));
 
         // when
         userKeywordService.createKeywords(requestDTO, userId);

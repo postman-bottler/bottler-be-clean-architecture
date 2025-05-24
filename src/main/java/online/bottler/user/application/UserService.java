@@ -15,7 +15,7 @@ import online.bottler.label.application.repository.LabelRepository;
 import online.bottler.label.domain.Label;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.RedisLetterService;
-import online.bottler.letter.application.dto.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 import online.bottler.notification.application.NotificationService;
@@ -93,7 +93,7 @@ public class UserService implements UserUseCase {
         redisLetterService.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
         randomDevelopLetter.forEach(
                 letterId -> letterBoxService.saveLetter(
-                        LetterBoxDTO.of(
+                        LetterBoxCommand.of(
                                 storedUser.getUserId(), letterId, LetterType.LETTER,
                                 BoxType.RECEIVE, LocalDateTime.now()
                         )

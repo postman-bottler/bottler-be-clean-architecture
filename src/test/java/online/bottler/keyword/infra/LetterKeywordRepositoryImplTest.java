@@ -15,9 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.domain.LetterKeyword;
-import online.bottler.letter.infra.entity.LetterKeywordEntity;
-import online.bottler.letter.infra.LetterKeywordQueryDslRepository;
-import online.bottler.letter.infra.LetterKeywordRepositoryImpl;
+import online.bottler.letter.adapter.out.persistence.entity.LetterKeywordEntity;
+import online.bottler.letter.adapter.out.persistence.repository.LetterKeywordQueryDslRepository;
+import online.bottler.letter.adapter.out.persistence.LetterKeywordRepositoryImpl;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +33,8 @@ class LetterKeywordRepositoryImplTest extends TestBase {
 //    private LetterKeywordJdbcRepository jdbcRepository;
 
     private static final List<LetterKeyword> MOCK_KEYWORDS = List.of(
-            LetterKeyword.from(1L, "keyword1"),
-            LetterKeyword.from(1L, "keyword2")
+            LetterKeyword.create(1L, "keyword1"),
+            LetterKeyword.create(1L, "keyword2")
     );
 
     private static final List<Long> MOCK_MATCHED_LETTER_IDS = List.of(1L, 2L);

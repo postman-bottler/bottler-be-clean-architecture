@@ -17,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.response.FrequentKeywordsDTO;
-import online.bottler.letter.application.repository.LetterKeywordRepository;
+import online.bottler.letter.application.response.FrequentKeywordsDTO;
+import online.bottler.letter.application.port.out.LetterKeywordRepository;
 import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.application.LetterKeywordService;
 import online.bottler.letter.application.LetterService;
@@ -48,7 +48,7 @@ class LetterKeywordServiceTest extends TestBase {
         Long letterId = 1L;
         List<String> keywords = List.of("사랑", "우정", "행복");
         List<LetterKeyword> expectedKeywords = keywords.stream()
-                .map(keyword -> LetterKeyword.from(letterId, keyword))
+                .map(keyword -> LetterKeyword.create(letterId, keyword))
                 .toList();
 
         when(letterKeywordRepository.saveAll(anyList())).thenReturn(expectedKeywords);
@@ -68,8 +68,8 @@ class LetterKeywordServiceTest extends TestBase {
         // given
         Long letterId = 1L;
         List<LetterKeyword> mockKeywords = List.of(
-                LetterKeyword.from(letterId, "사랑"),
-                LetterKeyword.from(letterId, "행복")
+                LetterKeyword.create(letterId, "사랑"),
+                LetterKeyword.create(letterId, "행복")
         );
 
         when(letterKeywordRepository.getKeywordsByLetterId(letterId)).thenReturn(mockKeywords);

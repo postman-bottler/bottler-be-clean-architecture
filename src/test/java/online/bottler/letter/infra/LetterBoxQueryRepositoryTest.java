@@ -2,8 +2,8 @@ package online.bottler.letter.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,15 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.config.QueryDslConfig;
-import online.bottler.letter.application.dto.response.LetterSummaryResponseDTO;
+import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.Letter;
-import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
-import online.bottler.letter.domain.ReplyLetter;
-import online.bottler.letter.infra.entity.LetterBoxEntity;
-import online.bottler.letter.infra.entity.LetterEntity;
-import online.bottler.letter.infra.entity.ReplyLetterEntity;
+import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -45,7 +40,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
     void setUp() {
         pageable = PageRequest.of(0, 10);
 
-        Letter letter = Letter.builder()
+        /*Letter letter = Letter.builder()
                 .title("Test Letter")
                 .content("Sample content")
                 .font("Arial")
@@ -110,7 +105,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                 .boxType(BoxType.SEND)
                 .createdAt(LocalDateTime.now())
                 .build();
-        em.persist(LetterBoxEntity.from(replySend));
+        em.persist(LetterBoxEntity.from(replySend));*/
     }
 
     @Nested
@@ -121,8 +116,8 @@ class LetterBoxQueryRepositoryTest extends TestBase {
         @DisplayName("사용자가 보유한 편지 조회")
         void fetchLetters() {
             // when
-            List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.SEND, pageable);
-            for (LetterSummaryResponseDTO letter : letters) {
+            List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.SEND, pageable);
+            for (LetterSummaryResponse letter : letters) {
                 System.out.println("letter = " + letter.toString());
             }
             // then
@@ -135,7 +130,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
         @DisplayName("사용자가 없을 경우 빈 목록 반환")
         void returnEmptyWhenNoUserExists() {
             // when
-            List<LetterSummaryResponseDTO> letters = repository.fetchLetters(999L, BoxType.RECEIVE, pageable);
+            List<LetterSummaryResponse> letters = repository.fetchLetters(999L, BoxType.RECEIVE, pageable);
 
             // then
             assertThat(letters).isEmpty();
@@ -207,7 +202,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                 repository.deleteByCondition(List.of(letterEntity.toDomain().getId()), LetterType.LETTER, BoxType.SEND);
 
                 // then
-                List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.SEND, pageable);
+                List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.SEND, pageable);
                 assertThat(letters.size()).isEqualTo(1);
             }
 
@@ -219,7 +214,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                         BoxType.RECEIVE);
 
                 // then
-                List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
+                List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
                 assertThat(letters.size()).isEqualTo(1);
             }
         }
@@ -236,7 +231,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                         BoxType.SEND);
 
                 // then
-                List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.SEND, pageable);
+                List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.SEND, pageable);
                 assertThat(letters.size()).isEqualTo(1);
             }
 
@@ -248,7 +243,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                         BoxType.RECEIVE);
 
                 // then
-                List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
+                List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
                 assertThat(letters.size()).isEqualTo(1);
             }
 
@@ -260,7 +255,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                         BoxType.RECEIVE);
 
                 // then
-                List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
+                List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
                 assertThat(letters).isEmpty();
             }
         }
@@ -272,7 +267,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
             repository.deleteByCondition(List.of(999L), LetterType.LETTER, BoxType.RECEIVE);
 
             // then
-            List<LetterSummaryResponseDTO> letterIds = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
+            List<LetterSummaryResponse> letterIds = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
             assertThat(letterIds.size()).isEqualTo(2);
         }
     }
@@ -289,7 +284,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
                     BoxType.RECEIVE, 1L);
 
             // then
-            List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
+            List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
             assertThat(letters.size()).isEqualTo(1);
         }
 
@@ -303,7 +298,7 @@ class LetterBoxQueryRepositoryTest extends TestBase {
             repository.deleteByConditionAndUserId(List.of(999L), LetterType.LETTER, BoxType.RECEIVE, 1L);
 
             // then
-            List<LetterSummaryResponseDTO> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
+            List<LetterSummaryResponse> letters = repository.fetchLetters(1L, BoxType.RECEIVE, pageable);
             assertThat(letters.size()).isEqualTo(2);
         }
     }

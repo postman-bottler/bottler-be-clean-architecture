@@ -24,11 +24,10 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.utiil.RedisLetterKeyUtil;
-import online.bottler.letter.application.dto.LetterBoxDTO;
+import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.LetterService;
 import online.bottler.letter.application.RedisLetterService;
-import online.bottler.letter.domain.Letter;
 import online.bottler.letter.exception.LetterNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,8 +99,8 @@ class RedisLetterServiceTest extends TestBase {
         when(valueOperations.get(activeKey)).thenReturn(activeRecommendations);
         when(letterService.existsLetterById(301L)).thenReturn(true);
 
-        Letter mockLetter = Letter.builder().id(301L).label("testLabel").build();
-        when(letterService.findLetter(301L)).thenReturn(mockLetter);
+//        Letter mockLetter = Letter.builder().id(301L).label("testLabel").build();
+//        when(letterService.findLetter(301L)).thenReturn(mockLetter);
 
         // when
 //        RecommendNotificationRequestDTO result = redisLetterService.updateRecommendationsFromTemp(userId);
@@ -111,7 +110,7 @@ class RedisLetterServiceTest extends TestBase {
 //        assertThat(result.userId()).isEqualTo(userId);
 //        assertThat(result.letterId()).isEqualTo(301L);
 //        assertThat(result.label()).isEqualTo("testLabel");
-        verify(letterBoxService, times(1)).saveLetter(any(LetterBoxDTO.class));
+        verify(letterBoxService, times(1)).saveLetter(any(LetterBoxCommand.class));
         verify(valueOperations, times(1)).set(eq(activeKey), any());
         verify(redisTemplate, times(1)).delete(eq(tempKey));
     }

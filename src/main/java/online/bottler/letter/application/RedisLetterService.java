@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.dto.RecommendedLetterDTO;
-import online.bottler.letter.application.repository.RecommendedLetterRepository;
-import online.bottler.letter.application.repository.RedisLetterRepository;
-import online.bottler.letter.application.dto.LetterBoxDTO;
-import online.bottler.letter.application.repository.LetterBoxRepository;
-import online.bottler.letter.application.repository.LetterRepository;
+import online.bottler.letter.application.command.RecommendedLetterDTO;
+import online.bottler.letter.application.port.out.RecommendedLetterRepository;
+import online.bottler.letter.application.port.out.RedisLetterRepository;
+import online.bottler.letter.application.command.LetterBoxCommand;
+import online.bottler.letter.application.port.out.LetterBoxRepository;
+import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 
@@ -88,9 +88,9 @@ public class RedisLetterService {
     }
 
     private void saveLetterToBox(Long userId, Long letterId) {
-        LetterBoxDTO letterBoxDTO = LetterBoxDTO.of(userId, letterId, LetterType.LETTER, BoxType.RECEIVE,
+        LetterBoxCommand letterBoxCommand = LetterBoxCommand.of(userId, letterId, LetterType.LETTER, BoxType.RECEIVE,
                 LocalDateTime.now());
-        letterBoxRepository.save(letterBoxDTO.toDomain());
+        letterBoxRepository.save(letterBoxCommand.toDomain());
     }
 
     private void saveLetterToRecommendedLetter(Long userId, Long letterId) {

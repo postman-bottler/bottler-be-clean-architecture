@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.dto.response.FrequentKeywordsDTO;
-import online.bottler.letter.application.repository.LetterKeywordRepository;
+import online.bottler.letter.application.response.FrequentKeywordsDTO;
+import online.bottler.letter.application.port.out.LetterKeywordRepository;
 import online.bottler.letter.domain.LetterKeyword;
-import online.bottler.letter.application.repository.LetterRepository;
+import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.domain.Letter;
 
 @Slf4j
@@ -25,7 +25,7 @@ public class LetterKeywordService {
     public List<LetterKeyword> createLetterKeywords(Long letterId, List<String> keywords) {
         log.info("편지 키워드 생성 요청: letterId={}, 키워드 개수={}", letterId, keywords.size());
 
-        List<LetterKeyword> letterKeywords = keywords.stream().map(keyword -> LetterKeyword.from(letterId, keyword))
+        List<LetterKeyword> letterKeywords = keywords.stream().map(keyword -> LetterKeyword.create(letterId, keyword))
                 .toList();
 
         return letterKeywordRepository.saveAll(letterKeywords);

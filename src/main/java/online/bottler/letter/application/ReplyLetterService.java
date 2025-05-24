@@ -5,19 +5,19 @@ import static online.bottler.notification.domain.NotificationType.KEYWORD_REPLY;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.dto.LetterBoxDTO;
-import online.bottler.letter.application.dto.ReceiverDTO;
-import online.bottler.letter.application.dto.request.PageRequestDTO;
-import online.bottler.letter.application.dto.request.ReplyLetterRequestDTO;
-import online.bottler.letter.application.dto.response.ReplyLetterDetailResponseDTO;
-import online.bottler.letter.application.dto.response.ReplyLetterResponseDTO;
-import online.bottler.letter.application.dto.response.ReplyLetterSummaryResponseDTO;
-import online.bottler.letter.application.repository.LetterBoxRepository;
-import online.bottler.letter.application.repository.LetterRepository;
-import online.bottler.letter.application.repository.ReplyLetterRepository;
+import online.bottler.letter.application.command.LetterBoxCommand;
+import online.bottler.letter.application.command.ReceiverDTO;
+import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.application.response.ReplyLetterDetailResponse;
+import online.bottler.letter.application.response.ReplyLetterResponse;
+import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
+import online.bottler.letter.application.port.out.LetterBoxRepository;
+import online.bottler.letter.application.port.out.LetterRepository;
+import online.bottler.letter.application.port.out.ReplyLetterRepository;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterType;
@@ -40,7 +40,7 @@ public class ReplyLetterService {
     private final RedisLetterService redisLetterService;
 
     @Transactional
-    public ReplyLetterResponseDTO createReplyLetter(Long letterId, ReplyLetterRequestDTO requestDTO, Long senderId) {
+    public ReplyLetterResponse createReplyLetter(Long letterId, ReplyLetterRequest requestDTO, Long senderId) {
         log.info("답장 생성 요청: senderId={}, letterId={}", senderId, letterId);
 
         if (checkIsReplied(letterId, senderId)) {
@@ -50,21 +50,21 @@ public class ReplyLetterService {
         ReplyLetter replyLetter = saveReplyLetter(letterId, requestDTO, senderId);
         handleReplyPostProcessing(replyLetter, requestDTO.label());
 
-        return ReplyLetterResponseDTO.from(replyLetter);
+        return ReplyLetterResponse.from(replyLetter);
     }
 
     @Transactional(readOnly = true)
-    public Page<ReplyLetterSummaryResponseDTO> findReplyLetterSummaries(Long letterId, PageRequestDTO pageRequestDTO,
-                                                                        Long receiverId) {
+    public Page<ReplyLetterSummaryResponse> findReplyLetterSummaries(Long letterId, PageRequest pageRequestDTO,
+                                                                     Long receiverId) {
         return replyLetterRepository.findAllByLetterIdAndReceiverId(letterId, receiverId, pageRequestDTO.toPageable())
-                .map(ReplyLetterSummaryResponseDTO::from);
+                .map(ReplyLetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public ReplyLetterDetailResponseDTO findReplyLetterDetail(Long replyLetterId, Long userId) {
+    public ReplyLetterDetailResponse findReplyLetterDetail(Long replyLetterId, Long userId) {
         boolean isReplied = checkIsReplied(replyLetterId, userId);
         ReplyLetter replyLetter = findReplyLetter(replyLetterId);
-        return ReplyLetterDetailResponseDTO.from(replyLetter, isReplied);
+        return ReplyLetterDetailResponse.from(replyLetter, isReplied);
     }
 
     @Transactional
@@ -77,7 +77,7 @@ public class ReplyLetterService {
 
         List<ReplyLetter> replyLetters = replyLetterRepository.findAllByIds(replyLetterIds);
 
-        if (replyLetters.stream().anyMatch(replyLetter -> !replyLetter.getSenderId().equals(senderId))) {
+        if (replyLetters.stream().anyMatch(replyLetter -> !replyLetter.getUserId().equals(senderId))) {
             throw new LetterAuthorMismatchException();
         }
 
@@ -95,14 +95,14 @@ public class ReplyLetterService {
         ReplyLetter replyLetter = findReplyLetter(replyLetterId);
         replyLetterRepository.softBlockById(replyLetterId);
 
-        return replyLetter.getSenderId();
+        return replyLetter.getUserId();
     }
 
     public boolean checkIsReplied(Long letterId, Long senderId) {
         return replyLetterRepository.existsByLetterIdAndSenderId(letterId, senderId);
     }
 
-    private ReplyLetter saveReplyLetter(Long letterId, ReplyLetterRequestDTO requestDTO, Long senderId) {
+    private ReplyLetter saveReplyLetter(Long letterId, ReplyLetterRequest requestDTO, Long senderId) {
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
         ReceiverDTO receiverInfo = ReceiverDTO.from(letter);
@@ -123,12 +123,12 @@ public class ReplyLetterService {
     }
 
     private void saveReplyLetterToBox(ReplyLetter replyLetter) {
-        saveLetterToBox(replyLetter.getSenderId(), replyLetter, BoxType.SEND);
+        saveLetterToBox(replyLetter.getUserId(), replyLetter, BoxType.SEND);
         saveLetterToBox(replyLetter.getReceiverId(), replyLetter, BoxType.RECEIVE);
     }
 
     private void saveLetterToBox(Long userId, ReplyLetter replyLetter, BoxType boxType) {
-        letterBoxRepository.save(LetterBoxDTO.of(userId, replyLetter.getId(), LetterType.REPLY_LETTER, boxType,
+        letterBoxRepository.save(LetterBoxCommand.of(userId, replyLetter.getId(), LetterType.REPLY_LETTER, boxType,
                 replyLetter.getCreatedAt()).toDomain());
     }
 

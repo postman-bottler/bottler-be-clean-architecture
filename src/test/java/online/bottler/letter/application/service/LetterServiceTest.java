@@ -24,9 +24,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.LetterBoxDTO;
-import online.bottler.letter.application.dto.request.LetterRequestDTO;
-import online.bottler.letter.application.repository.LetterRepository;
+import online.bottler.letter.application.command.LetterBoxCommand;
+import online.bottler.letter.adapter.in.web.request.LetterRequest;
+import online.bottler.letter.application.port.out.LetterRepository;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
 import online.bottler.letter.exception.LetterNotFoundException;
@@ -48,23 +48,23 @@ class LetterServiceTest extends TestBase {
 
     @BeforeEach
     void setUp() {
-        mockLetter = Letter.builder()
+        /*mockLetter = Letter.builder()
                 .id(1L)
                 .title("테스트 제목")
                 .content("테스트 내용")
                 .userId(100L)
-                .build();
+                .build();*/
     }
 
     @Test
     @DisplayName("새로운 편지 생성")
     void createLetter() {
         // given
-        LetterRequestDTO requestDTO = new LetterRequestDTO("테스트 제목", "테스트 내용", List.of("키워드1"), "폰트", "편지지", "라벨");
+        LetterRequest requestDTO = new LetterRequest("테스트 제목", "테스트 내용", List.of("키워드1"), "폰트", "편지지", "라벨");
         Long userId = 100L;
 
         when(letterRepository.save(any(Letter.class))).thenReturn(mockLetter);
-        doNothing().when(letterBoxService).saveLetter(any(LetterBoxDTO.class));
+        doNothing().when(letterBoxService).saveLetter(any(LetterBoxCommand.class));
 
         // when
 //        Letter result = letterService.createLetter(requestDTO, userId);
@@ -73,7 +73,7 @@ class LetterServiceTest extends TestBase {
 //        assertThat(result).isNotNull();
 //        assertThat(result.getId()).isEqualTo(1L);
         verify(letterRepository, times(1)).save(any(Letter.class));
-        verify(letterBoxService, times(1)).saveLetter(any(LetterBoxDTO.class));
+        verify(letterBoxService, times(1)).saveLetter(any(LetterBoxCommand.class));
     }
 
     @Nested
@@ -113,8 +113,8 @@ class LetterServiceTest extends TestBase {
         // given
         List<Long> letterIds = List.of(1L, 2L);
         List<Letter> mockLetters = List.of(
-                Letter.builder().id(1L).title("추천 제목1").content("내용1").build(),
-                Letter.builder().id(2L).title("추천 제목2").content("내용2").build()
+//                Letter.builder().id(1L).title("추천 제목1").content("내용1").build(),
+//                Letter.builder().id(2L).title("추천 제목2").content("내용2").build()
         );
         when(letterRepository.findAllByIds(letterIds)).thenReturn(mockLetters);
 

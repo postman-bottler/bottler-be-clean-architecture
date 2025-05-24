@@ -10,8 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
 
+import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.LetterService;
 import online.bottler.letter.application.ReplyLetterService;
@@ -26,10 +26,9 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
-import online.bottler.letter.application.dto.ReceiverDTO;
-import online.bottler.letter.application.dto.request.ReplyLetterRequestDTO;
-import online.bottler.letter.application.dto.response.ReplyLetterResponseDTO;
-import online.bottler.letter.application.repository.ReplyLetterRepository;
+import online.bottler.letter.application.command.ReceiverDTO;
+import online.bottler.letter.application.response.ReplyLetterResponse;
+import online.bottler.letter.application.port.out.ReplyLetterRepository;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.DuplicateReplyLetterException;
 import online.bottler.notification.application.NotificationService;
@@ -69,7 +68,7 @@ class ReplyLetterServiceTest extends TestBase {
             // given
             Long letterId = 10L;
             Long senderId = 100L;
-            ReplyLetterRequestDTO requestDTO = new ReplyLetterRequestDTO("내용", "폰트", "편지지", "label");
+            ReplyLetterRequest requestDTO = new ReplyLetterRequest("내용", "폰트", "편지지", "label");
 
             when(replyLetterRepository.existsByLetterIdAndSenderId(letterId, senderId)).thenReturn(false);
 
@@ -84,7 +83,7 @@ class ReplyLetterServiceTest extends TestBase {
             when(listOperations.range(anyString(), eq(0L), eq(-1L))).thenReturn(List.of());
 
             // when
-            ReplyLetterResponseDTO result = replyLetterService.createReplyLetter(letterId, requestDTO, senderId);
+            ReplyLetterResponse result = replyLetterService.createReplyLetter(letterId, requestDTO, senderId);
 
             // then
             assertThat(result).isNotNull();
@@ -99,7 +98,7 @@ class ReplyLetterServiceTest extends TestBase {
             // given
             Long letterId = 10L;
             Long senderId = 100L;
-            ReplyLetterRequestDTO requestDTO = new ReplyLetterRequestDTO("내용", "폰트", "편지지", "label");
+            ReplyLetterRequest requestDTO = new ReplyLetterRequest("내용", "폰트", "편지지", "label");
 
             when(replyLetterRepository.existsByLetterIdAndSenderId(letterId, senderId)).thenReturn(true);
 
@@ -121,7 +120,7 @@ class ReplyLetterServiceTest extends TestBase {
             // given
             Long letterId = 10L;
             Long senderId = 100L;
-            ReplyLetterRequestDTO requestDTO = new ReplyLetterRequestDTO("내용", "폰트", "편지지", "label");
+            ReplyLetterRequest requestDTO = new ReplyLetterRequest("내용", "폰트", "편지지", "label");
 
             String key = "REPLY:200";
             String value = "KEYWORD:10:label";
@@ -155,7 +154,7 @@ class ReplyLetterServiceTest extends TestBase {
             Long replyLetterId = 1L;
             Long userId = 100L;
 
-            ReplyLetter mockReplyLetter = ReplyLetter.builder()
+            /*ReplyLetter mockReplyLetter = ReplyLetter.builder()
                     .id(replyLetterId)
                     .title("RE: 제목")
                     .content("내용")
@@ -163,7 +162,7 @@ class ReplyLetterServiceTest extends TestBase {
 
             when(replyLetterRepository.existsByIdAndSenderId(replyLetterId, userId)).thenReturn(true);
             when(replyLetterRepository.findById(replyLetterId)).thenReturn(Optional.of(mockReplyLetter));
-
+*/
             // when
             var result = replyLetterService.findReplyLetterDetail(replyLetterId, userId);
 

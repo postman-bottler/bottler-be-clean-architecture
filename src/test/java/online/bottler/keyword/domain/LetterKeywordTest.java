@@ -10,13 +10,13 @@ class LetterKeywordTest {
 
     @Test
     @DisplayName("from 메서드로 LetterKeyword 생성 검증")
-    void from() {
+    void of() {
         // given
         Long letterId = 102L;
         String keyword = "Motivation";
 
         // when
-        LetterKeyword letterKeyword = LetterKeyword.from(letterId, keyword);
+        LetterKeyword letterKeyword = LetterKeyword.create(letterId, keyword);
 
         // then
         assertThat(letterKeyword).isNotNull();
@@ -35,12 +35,7 @@ class LetterKeywordTest {
         String keyword = "Motivation";
 
         // when
-        LetterKeyword letterKeyword = LetterKeyword.builder()
-                .id(id)
-                .letterId(letterId)
-                .keyword(keyword)
-                .isDeleted(true)
-                .build();
+        LetterKeyword letterKeyword = LetterKeyword.of(id, letterId, keyword, true);
 
         // then
         assertThat(letterKeyword).isNotNull();

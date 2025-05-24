@@ -1,18 +1,25 @@
 package online.bottler.letter.domain;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserKeyword {
 
     private Long id;
-    private Long userId;
-    private String keyword;
+    private final Long userId;
+    private final String keyword;
+
+    public UserKeyword(Long id, Long userId, String keyword) {
+        this.id = id;
+        this.userId = userId;
+        this.keyword = keyword;
+    }
+
+    public static UserKeyword of(Long id, Long userId, String keyword) {
+        return new UserKeyword(id, userId, keyword);
+    }
+
+    public static UserKeyword create(Long userId, String keyword) {
+        return new UserKeyword(null, userId, keyword);
+    }
 }

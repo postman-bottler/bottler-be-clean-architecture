@@ -1,18 +1,24 @@
 package online.bottler.letter.domain;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 public class RecommendedLetter {
-
     private Long id;
-    private Long userId;
-    private Long letterId;
+    private final Long userId;
+    private final Long letterId;
+
+    private RecommendedLetter(Long id, Long userId, Long letterId) {
+        this.id = id;
+        this.userId = userId;
+        this.letterId = letterId;
+    }
+
+    public static RecommendedLetter of(Long id, Long userId, Long letterId) {
+        return new RecommendedLetter(id, userId, letterId);
+    }
+
+    public static RecommendedLetter create(Long userId, Long letterId) {
+        return new RecommendedLetter(null, userId, letterId);
+    }
 }

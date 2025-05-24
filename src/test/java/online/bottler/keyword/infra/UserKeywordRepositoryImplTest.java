@@ -16,10 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.domain.UserKeyword;
-import online.bottler.letter.infra.entity.UserKeywordEntity;
-import online.bottler.letter.infra.UserKeywordJdbcRepository;
-import online.bottler.letter.infra.UserKeywordJpaRepository;
-import online.bottler.letter.infra.UserKeywordRepositoryImpl;
+import online.bottler.letter.adapter.out.persistence.entity.UserKeywordEntity;
+import online.bottler.letter.adapter.out.persistence.repository.UserKeywordJdbcRepository;
+import online.bottler.letter.adapter.out.persistence.repository.UserKeywordJpaRepository;
+import online.bottler.letter.adapter.out.persistence.UserKeywordRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")

@@ -14,9 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import online.bottler.TestBase;
 import online.bottler.letter.domain.Keyword;
-import online.bottler.letter.infra.entity.KeywordEntity;
-import online.bottler.letter.infra.KeywordJpaRepository;
-import online.bottler.letter.infra.KeywordRepositoryImpl;
+import online.bottler.letter.adapter.out.persistence.entity.KeywordEntity;
+import online.bottler.letter.adapter.out.persistence.repository.KeywordJpaRepository;
+import online.bottler.letter.adapter.out.persistence.KeywordRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
