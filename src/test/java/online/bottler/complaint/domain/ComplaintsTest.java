@@ -28,7 +28,7 @@ public class ComplaintsTest {
     }
 
     @Test
-    @DisplayName("한 편지의 신고자가 2명일 경우, DuplicateComplainException 예외를 발생시킨다.")
+    @DisplayName("한 편지의 신고자가 2명일 경우, DomainException 예외를 발생시킨다.")
     public void addWithDuplicateComplaint() {
         // GIVEN
         List<Complaint> complaintList = new ArrayList<>();
