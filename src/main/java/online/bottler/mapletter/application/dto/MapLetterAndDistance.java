@@ -23,5 +23,4 @@ public interface MapLetterAndDistance {
     String getLabel();
 
     String getDescription();
-
 }

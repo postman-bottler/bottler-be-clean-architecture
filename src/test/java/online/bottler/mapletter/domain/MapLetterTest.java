@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import online.bottler.mapletter.application.dto.request.CreatePublicMapLetterRequestDTO;
-import online.bottler.mapletter.application.dto.request.CreateTargetMapLetterRequestDTO;
+import online.bottler.mapletter.adaptor.in.web.request.CreatePublicMapLetterRequest;
+import online.bottler.mapletter.adaptor.in.web.request.CreateTargetMapLetterRequest;
 
 class MapLetterTest {
 
@@ -16,7 +16,7 @@ class MapLetterTest {
     @DisplayName("퍼블릭 편지 생성에 성공한다")
     void createPublicMapLetterTest() {
         //given
-        CreatePublicMapLetterRequestDTO requestDTO = new CreatePublicMapLetterRequestDTO(
+        CreatePublicMapLetterRequest requestDTO = new CreatePublicMapLetterRequest(
                 "퍼블릭 편지",
                 "편지 내용",
                 "역곡역 씨지비 앞",
@@ -48,7 +48,7 @@ class MapLetterTest {
         //given
         String targetUserId = "3L";
 
-        CreateTargetMapLetterRequestDTO requestDTO = new CreateTargetMapLetterRequestDTO(
+        CreateTargetMapLetterRequest requestDTO = new CreateTargetMapLetterRequest(
                 "타겟 편지",
                 "편지 내용",
                 "우리 첫 만남 장소",
