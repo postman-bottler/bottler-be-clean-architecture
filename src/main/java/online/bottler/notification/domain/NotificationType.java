@@ -1,7 +1,7 @@
 package online.bottler.notification.domain;
 
 import lombok.Getter;
-import online.bottler.notification.exception.NoTypeException;
+import online.bottler.global.exception.DomainException;
 
 @Getter
 public enum NotificationType {
@@ -31,6 +31,6 @@ public enum NotificationType {
                 return value;
             }
         }
-        throw new NoTypeException();
+        throw new DomainException("해당하는 타입의 알림 유형이 존재하지 않습니다.");
     }
 }

@@ -1,8 +1,9 @@
 package online.bottler.complaint.domain;
 
-import java.time.LocalDateTime;
 import lombok.Getter;
-import online.bottler.complaint.exception.DuplicateComplainException;
+import online.bottler.global.exception.DomainException;
+
+import java.time.LocalDateTime;
 
 @Getter
 public class Complaint {
@@ -41,7 +42,7 @@ public class Complaint {
 
     public void validateDuplicateComplaint(Long letterId, Long reporterId) {
         if (letterId.equals(this.letterId) && reporterId.equals(this.reporterId)) {
-            throw new DuplicateComplainException();
+            throw new DomainException("이미 신고된 편지입니다.");
         }
     }
 }

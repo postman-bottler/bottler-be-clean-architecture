@@ -1,24 +1,12 @@
 package online.bottler.notification.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static online.bottler.notification.domain.NotificationType.BAN;
-import static online.bottler.notification.domain.NotificationType.MAP_REPLY;
-import static online.bottler.notification.domain.NotificationType.NEW_LETTER;
-import static online.bottler.notification.domain.NotificationType.TARGET_LETTER;
-import static online.bottler.notification.domain.NotificationType.WARNING;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import online.bottler.global.exception.DomainException;
+import online.bottler.notification.application.request.RecommendNotificationCommand;
+import online.bottler.notification.application.response.NotificationResponse;
+import online.bottler.notification.application.response.UnreadNotificationResponse;
+import online.bottler.notification.application.port.NotificationPersistencePort;
+import online.bottler.notification.application.port.SubscriptionPersistencePort;
+import online.bottler.notification.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,17 +18,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
-import online.bottler.notification.application.dto.request.RecommendNotificationRequestDTO;
-import online.bottler.notification.application.dto.response.NotificationResponseDTO;
-import online.bottler.notification.application.dto.response.UnreadNotificationResponseDTO;
-import online.bottler.notification.application.repository.NotificationRepository;
-import online.bottler.notification.application.repository.SubscriptionRepository;
-import online.bottler.notification.domain.Notification;
-import online.bottler.notification.domain.NotificationType;
-import online.bottler.notification.domain.Notifications;
-import online.bottler.notification.domain.Subscription;
-import online.bottler.notification.domain.Subscriptions;
-import online.bottler.notification.exception.NoLetterIdException;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+import static online.bottler.notification.domain.NotificationType.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("알림 서비스 테스트")
 @SpringBootTest
@@ -48,11 +41,11 @@ public class NotificationServiceTest {
     @Autowired
     private NotificationService notificationService;
     @MockBean
-    private NotificationRepository notificationRepository;
+    private NotificationPersistencePort notificationRepository;
     @MockBean
-    private SubscriptionRepository subscriptionRepository;
+    private SubscriptionPersistencePort subscriptionRepository;
     @MockBean
-    private PushNotificationProvider pushNotificationProvider;
+    private PushNotificationPort pushNotificationProvider;
     @Autowired
     PlatformTransactionManager transactionManager;
 
@@ -123,7 +116,7 @@ public class NotificationServiceTest {
                     .willReturn(Subscriptions.from(List.of()));
 
             // when
-            NotificationResponseDTO response = notificationService.sendNotification(type, 1L, 1L, "label");
+            NotificationResponse response = notificationService.sendNotification(type, 1L, 1L, "label");
 
             // then
             assertThat(response)
@@ -137,7 +130,7 @@ public class NotificationServiceTest {
         void sendNotificationWithoutLetterId(NotificationType notificationType) {
             // when then
             assertThatThrownBy(() -> notificationService.sendNotification(notificationType, 1L, null, "label"))
-                    .isInstanceOf(NoLetterIdException.class);
+                    .isInstanceOf(DomainException.class);
         }
 
         @Test
@@ -149,7 +142,7 @@ public class NotificationServiceTest {
                     .willReturn(Subscriptions.from(List.of(Subscription.create(1L, "token"))));
 
             // WHEN
-            NotificationResponseDTO response = notificationService.sendNotification(WARNING, 1L, null, null);
+            NotificationResponse response = notificationService.sendNotification(WARNING, 1L, null, null);
 
             // THEN
             assertThat(response)
@@ -166,7 +159,7 @@ public class NotificationServiceTest {
                     .willReturn(Subscriptions.from(List.of(Subscription.create(1L, "token"))));
 
             // WHEN
-            NotificationResponseDTO response = notificationService.sendNotification(BAN, 1L, null, null);
+            NotificationResponse response = notificationService.sendNotification(BAN, 1L, null, null);
 
             // THEN
             assertThat(response)
@@ -186,7 +179,7 @@ public class NotificationServiceTest {
                     .willReturn(Subscriptions.from(List.of(Subscription.create(1L, "token"))));
 
             // when
-            NotificationResponseDTO response = notificationService.sendNotification(BAN, 1L, null, null);
+            NotificationResponse response = notificationService.sendNotification(BAN, 1L, null, null);
 
             // then
             assertThat(response)
@@ -228,7 +221,7 @@ public class NotificationServiceTest {
             given(notificationRepository.findByReceiver(any())).willReturn(notifications);
 
             // WHEN
-            List<NotificationResponseDTO> notReadResponse = notificationService.getUserNotifications(1L);
+            List<NotificationResponse> notReadResponse = notificationService.getUserNotifications(1L);
 
             // THEN
             assertThat(notReadResponse).hasSize(3)
@@ -248,9 +241,9 @@ public class NotificationServiceTest {
         @Test
         void sendKeywordNotifications() {
             // given
-            List<RecommendNotificationRequestDTO> recommends = List.of(
-                    new RecommendNotificationRequestDTO(1L, 1L, "label"),
-                    new RecommendNotificationRequestDTO(2L, 1L, "label"));
+            List<RecommendNotificationCommand> recommends = List.of(
+                    new RecommendNotificationCommand(1L, 1L, "label"),
+                    new RecommendNotificationCommand(2L, 1L, "label"));
 
             given(subscriptionRepository.findAll()).willReturn(
                     Subscriptions.from(List.of(Subscription.create(1L, "token"), Subscription.create(2L, "token"))));
@@ -274,7 +267,7 @@ public class NotificationServiceTest {
                         Notification.of(UUID.randomUUID(), BAN, 1L, null, LocalDateTime.now(), false, null))));
 
         // when
-        UnreadNotificationResponseDTO result = notificationService.getUnreadNotificationCount(1L);
+        UnreadNotificationResponse result = notificationService.getUnreadNotificationCount(1L);
 
         // then
         assertThat(result.count()).isEqualTo(1L);

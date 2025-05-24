@@ -1,12 +1,13 @@
 package online.bottler.complaint.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDateTime;
+import online.bottler.global.exception.DomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import online.bottler.complaint.exception.DuplicateComplainException;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("신고 테스트")
 class ComplaintTest {
@@ -46,6 +47,6 @@ class ComplaintTest {
 
         // when then
         assertThatThrownBy(() -> complaint.validateDuplicateComplaint(1L, 1L))
-                .isInstanceOf(DuplicateComplainException.class);
+                .isInstanceOf(DomainException.class);
     }
 }

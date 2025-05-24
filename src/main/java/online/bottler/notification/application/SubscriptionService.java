@@ -1,35 +1,36 @@
 package online.bottler.notification.application;
 
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.ApplicationException;
+import online.bottler.notification.application.response.SubscriptionResponse;
+import online.bottler.notification.application.port.SubscriptionUseCase;
+import online.bottler.notification.application.port.SubscriptionPersistencePort;
+import online.bottler.notification.domain.Subscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.notification.application.repository.SubscriptionRepository;
-import online.bottler.notification.domain.Subscription;
-import online.bottler.notification.application.dto.response.SubscriptionResponseDTO;
-import online.bottler.notification.exception.DuplicateTokenException;
 
 @Service
 @RequiredArgsConstructor
-public class SubscriptionService {
-    private final SubscriptionRepository subscriptionRepository;
+public class SubscriptionService implements SubscriptionUseCase {
+    private final SubscriptionPersistencePort subscriptionPersistencePort;
 
     @Transactional
-    public SubscriptionResponseDTO subscribe(Long userId, String token) {
+    public SubscriptionResponse subscribe(Long userId, String token) {
         Subscription subscribe = Subscription.create(userId, token);
-        if (subscriptionRepository.isDuplicate(subscribe)) {
-            throw new DuplicateTokenException();
+        if (subscriptionPersistencePort.isDuplicate(subscribe)) {
+            throw new ApplicationException("해당 기기는 이미 알림이 허용되어 있습니다.");
         }
-        Subscription save = subscriptionRepository.save(subscribe);
-        return SubscriptionResponseDTO.from(save);
+        Subscription save = subscriptionPersistencePort.save(subscribe);
+        return SubscriptionResponse.from(save);
     }
 
     @Transactional
     public void unsubscribeAll(Long userId) {
-        subscriptionRepository.deleteAllByUserId(userId);
+        subscriptionPersistencePort.deleteAllByUserId(userId);
     }
 
     @Transactional
     public void unsubscribe(String token) {
-        subscriptionRepository.deleteByToken(token);
+        subscriptionPersistencePort.deleteByToken(token);
     }
 }

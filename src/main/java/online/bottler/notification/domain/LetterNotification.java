@@ -1,9 +1,10 @@
 package online.bottler.notification.domain;
 
+import lombok.Getter;
+import online.bottler.global.exception.DomainException;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Getter;
-import online.bottler.notification.exception.NoLetterIdException;
 
 @Getter
 public class LetterNotification extends Notification {
@@ -28,7 +29,7 @@ public class LetterNotification extends Notification {
 
     private void validateLetterId(Long letterId) {
         if (letterId == null) {
-            throw new NoLetterIdException();
+            throw new DomainException("편지 관련 알림은 편지 ID가 있어야 합니다.");
         }
     }
 }
