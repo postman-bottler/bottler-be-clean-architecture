@@ -1,18 +1,13 @@
 package online.bottler.notification.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static online.bottler.notification.domain.NotificationType.BAN;
-import static online.bottler.notification.domain.NotificationType.KEYWORD_REPLY;
-import static online.bottler.notification.domain.NotificationType.MAP_REPLY;
-import static online.bottler.notification.domain.NotificationType.NEW_LETTER;
-import static online.bottler.notification.domain.NotificationType.TARGET_LETTER;
-import static online.bottler.notification.domain.NotificationType.WARNING;
-
+import online.bottler.global.exception.DomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import online.bottler.notification.exception.NoLetterIdException;
+
+import static online.bottler.notification.domain.NotificationType.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("알림 테스트")
 public class NotificationTest {
@@ -50,7 +45,7 @@ public class NotificationTest {
             // WHEN THEN
             assertThatThrownBy(
                     () -> Notification.create(type, receiver, letterId, label))
-                    .isInstanceOf(NoLetterIdException.class);
+                    .isInstanceOf(DomainException.class);
         }
 
         @Test
@@ -83,7 +78,7 @@ public class NotificationTest {
             // WHEN THEN
             assertThatThrownBy(
                     () -> Notification.create(type, receiver, letterId, label))
-                    .isInstanceOf(NoLetterIdException.class);
+                    .isInstanceOf(DomainException.class);
         }
 
         @Test
@@ -116,7 +111,7 @@ public class NotificationTest {
             // WHEN THEN
             assertThatThrownBy(
                     () -> Notification.create(type, receiver, letterId, label))
-                    .isInstanceOf(NoLetterIdException.class);
+                    .isInstanceOf(DomainException.class);
         }
 
         @Test
@@ -149,7 +144,7 @@ public class NotificationTest {
             // WHEN THEN
             assertThatThrownBy(
                     () -> Notification.create(type, receiver, letterId, label))
-                    .isInstanceOf(NoLetterIdException.class);
+                    .isInstanceOf(DomainException.class);
         }
 
         @Test

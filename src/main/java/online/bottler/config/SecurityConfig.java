@@ -3,6 +3,10 @@ package online.bottler.config;
 import java.util.Arrays;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
+import online.bottler.user.adapter.in.web.auth.JwtAccessDeniedHandler;
+import online.bottler.user.adapter.in.web.auth.JwtAuthenticationEntryPoint;
+import online.bottler.user.adapter.in.web.auth.JwtFilter;
+import online.bottler.user.adapter.in.web.auth.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,10 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import online.bottler.user.auth.JwtAccessDeniedHandler;
-import online.bottler.user.auth.JwtAuthenticationEntryPoint;
-import online.bottler.user.auth.JwtFilter;
-import online.bottler.user.auth.JwtTokenProvider;
 
 @Configuration
 @RequiredArgsConstructor

@@ -1,13 +1,13 @@
 package online.bottler.notification.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
+import online.bottler.global.exception.DomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import online.bottler.notification.exception.NoTypeException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("알림 타입 테스트")
 public class NotificationTypeTest {
@@ -43,6 +43,6 @@ public class NotificationTypeTest {
         String nonNotification = "WRONG";
 
         // WHEN - THEN
-        assertThatThrownBy(() -> NotificationType.from(nonNotification)).isInstanceOf(NoTypeException.class);
+        assertThatThrownBy(() -> NotificationType.from(nonNotification)).isInstanceOf(DomainException.class);
     }
 }

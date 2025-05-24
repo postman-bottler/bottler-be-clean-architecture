@@ -7,9 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import online.bottler.global.exception.CommonForbiddenException;
-import online.bottler.mapletter.application.dto.request.CreateReplyMapLetterRequestDTO;
-import online.bottler.mapletter.exception.BlockedLetterException;
-import online.bottler.mapletter.exception.MapLetterAlreadyDeletedException;
+import online.bottler.global.exception.DomainException;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,23 +26,6 @@ public class ReplyMapLetter {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isRecipientDeleted;
-
-    public static ReplyMapLetter createReplyMapLetter(CreateReplyMapLetterRequestDTO createReplyMapLetterRequestDTO,
-                                                      Long userId) {
-        return ReplyMapLetter.builder()
-                .sourceLetterId(createReplyMapLetterRequestDTO.sourceLetter())
-                .font(createReplyMapLetterRequestDTO.font())
-                .content(createReplyMapLetterRequestDTO.content())
-                .paper(createReplyMapLetterRequestDTO.paper())
-                .label(createReplyMapLetterRequestDTO.label())
-                .isBlocked(false)
-                .isDeleted(false)
-                .createUserId(userId)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .isRecipientDeleted(false)
-                .build();
-    }
 
     public void updateDelete(boolean deleted) {
         this.isDeleted = deleted;
@@ -70,10 +51,10 @@ public class ReplyMapLetter {
 
     private void validDeleteAndBlocked() {
         if (this.isDeleted()) {
-            throw new MapLetterAlreadyDeletedException("해당 편지는 삭제되었습니다.");
+            throw new DomainException("해당 편지는 삭제되었습니다.");
         }
         if (this.isBlocked()) {
-            throw new BlockedLetterException("해당 편지는 신고당한 편지입니다.");
+            throw new DomainException("해당 편지는 신고당한 편지입니다.");
         }
     }
 
@@ -82,10 +63,10 @@ public class ReplyMapLetter {
             throw new CommonForbiddenException("편지를 삭제 할 권한이 없습니다. 편지 삭제에 실패하였습니다.");
         }
         if (this.isBlocked()) {
-            throw new BlockedLetterException("해당 편지는 신고당한 편지입니다.");
+            throw new DomainException("해당 편지는 신고당한 편지입니다.");
         }
         if (this.isRecipientDeleted()) {
-            throw new MapLetterAlreadyDeletedException("해당 편지는 이미 삭제되었습니다.");
+            throw new DomainException("해당 편지는 이미 삭제되었습니다.");
         }
     }
 }

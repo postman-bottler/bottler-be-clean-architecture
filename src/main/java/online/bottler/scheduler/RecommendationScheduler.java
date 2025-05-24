@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import online.bottler.letter.application.AsyncRecommendationService;
 import online.bottler.letter.application.RedisLetterService;
 import online.bottler.letter.application.LetterService;
-import online.bottler.notification.application.dto.request.RecommendNotificationRequestDTO;
+import online.bottler.notification.application.request.RecommendNotificationCommand;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.user.application.UserService;
 
@@ -76,7 +76,7 @@ public class RecommendationScheduler {
         List<Long> userIds = userService.getAllUserIds();
         List<List<Long>> batches = createBatches(userIds);
 
-        List<RecommendNotificationRequestDTO> notifications = new ArrayList<>();
+        List<RecommendNotificationCommand> notifications = new ArrayList<>();
         for (List<Long> batch : batches) {
             batch.forEach(userId -> redisLetterService.updateRecommendationsFromTemp(userId)
                     .ifPresent(recommendId -> notifications.add(createRecommendNotification(userId, recommendId))));
@@ -100,8 +100,8 @@ public class RecommendationScheduler {
         return batches;
     }
 
-    private RecommendNotificationRequestDTO createRecommendNotification(Long userId, Long recommendId) {
-        return RecommendNotificationRequestDTO.of(userId, recommendId, letterService.findLetter(recommendId).getLabel());
+    private RecommendNotificationCommand createRecommendNotification(Long userId, Long recommendId) {
+        return RecommendNotificationCommand.of(userId, recommendId, letterService.findLetter(recommendId).getLabel());
     }
 
     private void handleFutureResult(CompletableFuture<String> future) {

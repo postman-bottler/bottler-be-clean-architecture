@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import online.bottler.global.exception.CommonForbiddenException;
-import online.bottler.mapletter.application.dto.request.CreatePublicMapLetterRequestDTO;
-import online.bottler.mapletter.application.dto.request.CreateTargetMapLetterRequestDTO;
-import online.bottler.mapletter.application.repository.MapLetterRepository;
+import online.bottler.mapletter.adaptor.in.web.request.CreatePublicMapLetterRequest;
+import online.bottler.mapletter.adaptor.in.web.request.CreateTargetMapLetterRequest;
+import online.bottler.mapletter.application.port.out.MapLetterPersistencePort;
 import online.bottler.mapletter.application.MapLetterService;
 import online.bottler.mapletter.domain.MapLetter;
 import online.bottler.mapletter.domain.MapLetterType;
@@ -27,7 +27,7 @@ class MapLetterServiceTest {
     @InjectMocks
     private MapLetterService mapLetterService;
     @Mock
-    private MapLetterRepository mapLetterRepository;
+    private MapLetterPersistencePort mapLetterRepository;
 
     @BeforeEach
     void resetMocks() {
@@ -38,7 +38,7 @@ class MapLetterServiceTest {
     @DisplayName("퍼블릭 편지 생성에 성공한다.")
     void createPublicMapLetterTest() {
         //given
-        CreatePublicMapLetterRequestDTO requestDTO = new CreatePublicMapLetterRequestDTO(
+        CreatePublicMapLetterRequest requestDTO = new CreatePublicMapLetterRequest(
                 "Test Title",
                 "TestContent",
                 "장소 설명",
@@ -70,7 +70,7 @@ class MapLetterServiceTest {
     @DisplayName("타겟 편지 생성에 성공한다.")
     void createTargetLetterTest() {
         //given
-        CreateTargetMapLetterRequestDTO requestDTO = new CreateTargetMapLetterRequestDTO(
+        CreateTargetMapLetterRequest requestDTO = new CreateTargetMapLetterRequest(
                 "Test Title",
                 "TestContent",
                 "장소 설명",

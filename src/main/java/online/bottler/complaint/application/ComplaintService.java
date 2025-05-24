@@ -1,14 +1,7 @@
 package online.bottler.complaint.application;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import online.bottler.complaint.application.dto.response.ComplaintResponseDTO;
-import online.bottler.complaint.application.repository.ComplaintRepository;
-import online.bottler.complaint.application.repository.KeywordComplaintRepository;
-import online.bottler.complaint.application.repository.KeywordReplyComplaintRepository;
-import online.bottler.complaint.application.repository.MapComplaintRepository;
-import online.bottler.complaint.application.repository.MapReplyComplaintRepository;
+import online.bottler.complaint.application.port.*;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.ComplaintType;
 import online.bottler.complaint.domain.Complaints;
@@ -19,14 +12,16 @@ import online.bottler.mapletter.application.MapLetterService;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.notification.domain.NotificationType;
 import online.bottler.user.application.UserService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ComplaintService {
-    private final KeywordComplaintRepository keywordComplaintRepository;
-    private final MapComplaintRepository mapComplaintRepository;
-    private final KeywordReplyComplaintRepository keywordReplyComplaintRepository;
-    private final MapReplyComplaintRepository mapReplyComplaintRepository;
+public class ComplaintService implements ComplaintUseCase {
+    private final KeywordComplaintPersistencePort keywordComplaintPersistencePort;
+    private final MapComplaintPersistencePort mapComplaintPersistencePort;
+    private final KeywordReplyComplaintPersistencePort keywordReplyComplaintPersistencePort;
+    private final MapReplyComplaintPersistencePort mapReplyComplaintPersistencePort;
 
     private final NotificationService notificationService;
     private final LetterService letterService;
@@ -34,19 +29,20 @@ public class ComplaintService {
     private final MapLetterService mapLetterService;
     private final UserService userService;
 
+    @Override
     @Transactional
-    public ComplaintResponseDTO complain(ComplaintType type, Long letterId, Long reporterId, String description) {
-        Complaint newComplaint = Complaint.create(letterId, reporterId, description);
-        Complaints existingComplaints = findExistingComplaints(type, letterId);
+    public ComplaintResponse complain(ComplaintCommand complaintCommand) {
+        Complaint newComplaint = complaintCommand.toComplaint();
+        Complaints existingComplaints = findExistingComplaints(complaintCommand.type(), complaintCommand.letterId());
         existingComplaints.add(newComplaint);
         if (existingComplaints.needWarning()) {
-            sendWarningToWriter(type, letterId);
+            sendWarningToWriter(complaintCommand.type(), complaintCommand.letterId());
         }
-        return ComplaintResponseDTO.from(saveComplaint(newComplaint, type));
+        return ComplaintResponse.from(saveComplaint(newComplaint, complaintCommand.type()));
     }
 
     private Complaints findExistingComplaints(ComplaintType type, Long letterId) {
-        ComplaintRepository repository = getRepositoryByType(type);
+        ComplaintPersistencePort repository = getRepositoryByType(type);
         return repository.findByLetterId(letterId);
     }
 
@@ -66,16 +62,16 @@ public class ComplaintService {
     }
 
     private Complaint saveComplaint(Complaint complaint, ComplaintType type) {
-        ComplaintRepository repository = getRepositoryByType(type);
+        ComplaintPersistencePort repository = getRepositoryByType(type);
         return repository.save(complaint);
     }
 
-    private ComplaintRepository getRepositoryByType(ComplaintType type) {
+    private ComplaintPersistencePort getRepositoryByType(ComplaintType type) {
         return switch (type) {
-            case MAP_LETTER -> mapComplaintRepository;
-            case MAP_REPLY_LETTER -> mapReplyComplaintRepository;
-            case KEYWORD_LETTER -> keywordComplaintRepository;
-            case KEYWORD_REPLY_LETTER -> keywordReplyComplaintRepository;
+            case MAP_LETTER -> mapComplaintPersistencePort;
+            case MAP_REPLY_LETTER -> mapReplyComplaintPersistencePort;
+            case KEYWORD_LETTER -> keywordComplaintPersistencePort;
+            case KEYWORD_REPLY_LETTER -> keywordReplyComplaintPersistencePort;
         };
     }
 }

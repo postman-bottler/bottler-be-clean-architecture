@@ -1,8 +1,8 @@
 package online.bottler.label.domain;
 
 import lombok.Getter;
-import online.bottler.label.application.dto.LabelResponseDTO;
-import online.bottler.label.exception.InvalidLabelException;
+import online.bottler.global.exception.DomainException;
+import online.bottler.label.application.response.LabelResponse;
 
 @Getter
 public class Label {
@@ -39,7 +39,7 @@ public class Label {
 
     private static void validateCount(int count) {
         if (count < 0) {
-            throw new InvalidLabelException("라벨 인원수는 음수일 수 없습니다.");
+            throw new DomainException("라벨 인원수는 음수일 수 없습니다.");
         }
     }
 
@@ -47,8 +47,8 @@ public class Label {
         this.ownedCount++;
     }
 
-    public LabelResponseDTO toLabelResponseDTO() {
-        return new LabelResponseDTO(this.labelId, this.imageUrl);
+    public LabelResponse toLabelResponseDTO() {
+        return new LabelResponse(this.labelId, this.imageUrl);
     }
 
     public boolean isOwnedCountValid() {

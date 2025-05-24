@@ -13,10 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import online.bottler.mapletter.application.repository.PaperRepository;
+import online.bottler.mapletter.application.port.out.PaperPersistencePort;
 import online.bottler.mapletter.application.PaperService;
 import online.bottler.mapletter.domain.Paper;
-import online.bottler.mapletter.application.dto.PaperDTO;
+import online.bottler.mapletter.application.response.PaperResponse;
 
 @ExtendWith(MockitoExtension.class)
 class PaperServiceTest {
@@ -25,7 +25,7 @@ class PaperServiceTest {
     private PaperService paperService;
 
     @Mock
-    private PaperRepository paperRepository;
+    private PaperPersistencePort paperPersistencePort;
 
     @Test
     @DisplayName("편지지 전체 조회에 성공한다.")
@@ -36,22 +36,22 @@ class PaperServiceTest {
                 Paper.builder().paperId(2L).paperUrl("www.paper2.com").build()
         );
 
-        List<PaperDTO> expectedPapers = mockPapers.stream()
+        List<PaperResponse> expectedPapers = mockPapers.stream()
                 .map(Paper::toPaperDTO)
                 .toList();
 
-        Mockito.when(paperRepository.findAll()).thenReturn(mockPapers);
+        Mockito.when(paperPersistencePort.findAll()).thenReturn(mockPapers);
 
         //when
-        List<PaperDTO> actualPaperDTOs = paperService.findPapers();
+        List<PaperResponse> actualPaperResponses = paperService.findPapers();
 
         //then
-        assertNotNull(actualPaperDTOs);
-        assertEquals(expectedPapers.size(), actualPaperDTOs.size());
-        assertEquals(expectedPapers.get(0).paperUrl(), actualPaperDTOs.get(0).paperUrl());
-        assertEquals(expectedPapers.get(1).paperUrl(), actualPaperDTOs.get(1).paperUrl());
+        assertNotNull(actualPaperResponses);
+        assertEquals(expectedPapers.size(), actualPaperResponses.size());
+        assertEquals(expectedPapers.get(0).paperUrl(), actualPaperResponses.get(0).paperUrl());
+        assertEquals(expectedPapers.get(1).paperUrl(), actualPaperResponses.get(1).paperUrl());
 
-        Mockito.verify(paperRepository, Mockito.times(1)).findAll();
+        Mockito.verify(paperPersistencePort, Mockito.times(1)).findAll();
 
     }
 
@@ -59,15 +59,15 @@ class PaperServiceTest {
     @DisplayName("전체 편지지 조회 시 결과가 없을 경우 빈 리스트를 반환한다.")
     void findAllPapersEmptyTest() {
         // given
-        Mockito.when(paperRepository.findAll()).thenReturn(Collections.emptyList());
+        Mockito.when(paperPersistencePort.findAll()).thenReturn(Collections.emptyList());
 
         // when
-        List<PaperDTO> actualPaperDTOs = paperService.findPapers();
+        List<PaperResponse> actualPaperResponses = paperService.findPapers();
 
         // then
-        assertNotNull(actualPaperDTOs);
-        assertTrue(actualPaperDTOs.isEmpty());
+        assertNotNull(actualPaperResponses);
+        assertTrue(actualPaperResponses.isEmpty());
 
-        Mockito.verify(paperRepository, Mockito.times(1)).findAll();
+        Mockito.verify(paperPersistencePort, Mockito.times(1)).findAll();
     }
 }
