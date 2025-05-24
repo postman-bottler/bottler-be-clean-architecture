@@ -8,11 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import online.bottler.global.exception.CommonForbiddenException;
-import online.bottler.mapletter.application.dto.request.CreatePublicMapLetterRequestDTO;
-import online.bottler.mapletter.application.dto.request.CreateTargetMapLetterRequestDTO;
-import online.bottler.mapletter.exception.BlockedLetterException;
-import online.bottler.mapletter.exception.DistanceToFarException;
-import online.bottler.mapletter.exception.MapLetterAlreadyDeletedException;
+import online.bottler.global.exception.DomainException;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,51 +34,6 @@ public class MapLetter {
     private boolean isRead;
     private boolean isRecipientDeleted;
 
-    public static MapLetter createPublicMapLetter(CreatePublicMapLetterRequestDTO createPublicMapLetterRequestDTO,
-                                                  Long userId) {
-        return MapLetter.builder()
-                .title(createPublicMapLetterRequestDTO.title())
-                .content(createPublicMapLetterRequestDTO.content())
-                .latitude(createPublicMapLetterRequestDTO.latitude())
-                .longitude(createPublicMapLetterRequestDTO.longitude())
-                .font(createPublicMapLetterRequestDTO.font())
-                .paper(createPublicMapLetterRequestDTO.paper())
-                .label(createPublicMapLetterRequestDTO.label())
-                .type(MapLetterType.PUBLIC)
-                .createUserId(userId)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .isDeleted(false)
-                .isBlocked(false)
-                .isRead(false)
-                .description(createPublicMapLetterRequestDTO.description())
-                .isRecipientDeleted(false)
-                .build();
-    }
-
-    public static MapLetter createTargetMapLetter(CreateTargetMapLetterRequestDTO createTargetMapLetterRequestDTO,
-                                                  Long userId, Long targetUserId) {
-        return MapLetter.builder()
-                .title(createTargetMapLetterRequestDTO.title())
-                .content(createTargetMapLetterRequestDTO.content())
-                .latitude(createTargetMapLetterRequestDTO.latitude())
-                .longitude(createTargetMapLetterRequestDTO.longitude())
-                .font(createTargetMapLetterRequestDTO.font())
-                .paper(createTargetMapLetterRequestDTO.paper())
-                .label(createTargetMapLetterRequestDTO.label())
-                .type(MapLetterType.PRIVATE)
-                .createUserId(userId)
-                .targetUserId(targetUserId)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .isDeleted(false)
-                .isBlocked(false)
-                .isRead(false)
-                .description(createTargetMapLetterRequestDTO.description())
-                .isRecipientDeleted(false)
-                .build();
-    }
-
     public void updateDelete(boolean deleted) {
         this.isDeleted = deleted;
     }
@@ -93,8 +44,8 @@ public class MapLetter {
 
     public void validateFindOneMapLetter(double viewDistance, Double distance) {
         validDeleteAndBlocked();
-        if (distance > viewDistance) {
-            throw new DistanceToFarException("편지와의 거리가 멀어서 조회가 불가능합니다.");
+        if (distance == null || distance > viewDistance) {
+            throw new DomainException("편지와의 거리가 멀어서 조회가 불가능합니다.");
         }
     }
 
@@ -111,7 +62,7 @@ public class MapLetter {
             throw new CommonForbiddenException("편지를 삭제 할 권한이 없습니다. 편지 삭제에 실패하였습니다.");
         }
         if (this.isBlocked()) {
-            throw new BlockedLetterException("해당 편지는 신고당한 편지입니다.");
+            throw new DomainException("해당 편지는 신고당한 편지입니다.");
         }
     }
 
@@ -131,14 +82,14 @@ public class MapLetter {
 
     public void validDeleteAndBlocked() {
         if (this.isDeleted()) {
-            throw new MapLetterAlreadyDeletedException("해당 편지는 삭제되었습니다.");
+            throw new DomainException("해당 편지는 삭제되었습니다.");
         }
         if (this.isBlocked()) {
-            throw new BlockedLetterException("해당 편지는 신고당한 편지입니다.");
+            throw new DomainException("해당 편지는 신고당한 편지입니다.");
         }
     }
 
-    public void isPrivate() {
+    public void validatePublicAccess() {
         if (this.getType() == MapLetterType.PRIVATE) {
             throw new CommonForbiddenException("해당 편지에 접근할 수 없습니다.");
         }
@@ -153,10 +104,10 @@ public class MapLetter {
             throw new CommonForbiddenException("편지를 삭제 할 권한이 없습니다. 편지 삭제에 실패하였습니다.");
         }
         if (this.isBlocked()) {
-            throw new BlockedLetterException("해당 편지는 신고당한 편지입니다.");
+            throw new DomainException("해당 편지는 신고당한 편지입니다.");
         }
         if (this.isRecipientDeleted()) {
-            throw new MapLetterAlreadyDeletedException("해당 편지는 이미 삭제되었습니다.");
+            throw new DomainException("해당 편지는 이미 삭제되었습니다.");
         }
     }
 }

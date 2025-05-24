@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 import online.bottler.letter.application.repository.RedisLetterRepository;
 import online.bottler.letter.utiil.RedisLetterKeyUtil;
-import online.bottler.reply.application.dto.ReplyType;
+import online.bottler.reply.application.ReplyType;
 
 @Slf4j
 @Repository
