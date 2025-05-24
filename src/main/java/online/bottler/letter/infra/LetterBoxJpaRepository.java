@@ -5,4 +5,6 @@ import online.bottler.letter.infra.entity.LetterBoxEntity;
 
 public interface LetterBoxJpaRepository extends JpaRepository<LetterBoxEntity, Long> {
     boolean existsByUserIdAndLetterId(Long userId, Long letterId);
+    boolean existsByLetterIdAndUserId(Long letterId, Long userId);
+
 }

@@ -26,6 +26,10 @@ public interface LetterJpaRepository extends JpaRepository<LetterEntity, Long> {
     void softDeleteByIds(List<Long> ids);
 
     @Modifying
+    @Query("UPDATE LetterEntity l SET l.isDeleted = true WHERE l.id = :id")
+    void softDeleteById(Long id);
+
+    @Modifying
     @Query("UPDATE LetterEntity l SET l.isBlocked = true, l.isDeleted = true WHERE l.id = :id")
     void softBlockById(Long id);
 

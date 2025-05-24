@@ -1,4 +1,4 @@
-package online.bottler.letter.presentation;
+package online.bottler.letter.v2.adapter.in.web;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

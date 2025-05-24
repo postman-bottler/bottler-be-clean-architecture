@@ -1,27 +1,18 @@
 package online.bottler.letter.domain;
 
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-public class Letter {
-    private Long id;
-    private String title;
-    private String content;
-    private String font;
-    private String paper;
-    private String label;
-    private Long userId;
-    private boolean isDeleted;
-    private boolean isBlocked;
 
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+public class Letter extends BaseLetter{
+    private Letter(Long id, Long userId, LetterContent letterContent, boolean isDeleted, boolean isBlocked, LocalDateTime createdAt) {
+        super(id, userId, letterContent, isDeleted, isBlocked, createdAt);
+    }
+
+    public static Letter of(Long id, Long userId, LetterContent letterContent, boolean isDeleted, boolean isBlocked, LocalDateTime createdAt) {
+        return new Letter(id, userId, letterContent, isDeleted, isBlocked, createdAt);
+    }
+
+    public static Letter create(Long userId, LetterContent letterContent) {
+        return new Letter(null, userId, letterContent, false, false, LocalDateTime.now());
+    }
 }
