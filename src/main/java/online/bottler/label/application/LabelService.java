@@ -2,21 +2,22 @@ package online.bottler.label.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import online.bottler.label.application.dto.LabelRequestDTO;
+import online.bottler.global.exception.ApplicationException;
 import online.bottler.label.application.repository.LabelRepository;
 import online.bottler.label.domain.Label;
 import online.bottler.label.domain.LabelType;
-import online.bottler.label.application.dto.LabelResponseDTO;
-import online.bottler.label.exception.FirstComeFirstServedLabelException;
+import online.bottler.label.application.command.LabelCommand;
+import online.bottler.label.application.port.in.LabelUseCase;
+import online.bottler.label.application.response.LabelResponse;
 import online.bottler.scheduler.LabelScheduler;
-import online.bottler.user.domain.User;
 import online.bottler.user.application.UserService;
+import online.bottler.user.domain.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class LabelService {
+public class LabelService implements LabelUseCase {
     private final LabelRepository labelRepository;
     private final UserService userService;
     private final LabelScheduler labelScheduler;
@@ -27,19 +28,19 @@ public class LabelService {
     }
 
     @Transactional
-    public List<LabelResponseDTO> findAllLabels() {
+    public List<LabelResponse> findAllLabels() {
         List<Label> labels = labelRepository.findAllLabels();
-        return labels.stream().map(Label::toLabelResponseDTO).toList();
+        return labels.stream().map(Label::toLabelResponse).toList();
     }
 
     @Transactional
-    public List<LabelResponseDTO> findUserLabels(Long userId) {
+    public List<LabelResponse> findUserLabels(Long userId) {
         List<Label> labels = labelRepository.findLabelsByUser(userId);
-        return labels.stream().map(Label::toLabelResponseDTO).toList();
+        return labels.stream().map(Label::toLabelResponse).toList();
     }
 
     @Transactional
-    public LabelResponseDTO createFirstComeFirstServedLabel(Long userId) {
+    public LabelResponse createFirstComeFirstServedLabel(Long userId) {
         User user = userService.findById(userId);
 
         List<Label> firstComeLabels = labelRepository.findByLabelType(LabelType.FIRST_COME);
@@ -49,21 +50,21 @@ public class LabelService {
             if (!hasLabel && label.isOwnedCountValid()) {
                 labelRepository.updateOwnedCount(label);
                 labelRepository.createUserLabel(user, label);
-                return label.toLabelResponseDTO();
+                return label.toLabelResponse();
             }
         }
 
-        throw new FirstComeFirstServedLabelException("모든 선착순 뽑기 라벨이 마감되었습니다.");
+        throw new ApplicationException("모든 선착순 뽑기 라벨이 마감되었습니다.");
     }
 
     @Transactional
-    public List<LabelResponseDTO> findFirstComeLabels() {
+    public List<LabelResponse> findFirstComeLabels() {
         List<Label> labels = labelRepository.findFirstComeLabels();
-        return labels.stream().map(Label::toLabelResponseDTO).toList();
+        return labels.stream().map(Label::toLabelResponse).toList();
     }
 
     @Transactional
-    public void updateFirstComeLabel(LabelRequestDTO labelRequestDTO) {
-        labelScheduler.scheduleUpdateFirstComeLabel(labelRequestDTO);
+    public void updateFirstComeLabel(LabelCommand labelCommand) {
+        labelScheduler.scheduleUpdateFirstComeLabel(labelCommand);
     }
 }

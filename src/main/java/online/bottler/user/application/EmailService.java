@@ -4,18 +4,19 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.global.exception.ApplicationException;
+import online.bottler.user.application.port.in.EmailUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.user.exception.EmailException;
 
 @Slf4j
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailService implements EmailUseCase {
 
     private final JavaMailSender emailSender;
 
@@ -32,7 +33,7 @@ public class EmailService {
         try {
             emailSender.send(message);
         } catch (RuntimeException e) {
-            throw new EmailException("이메일 인증 요청에 실패했습니다.");
+            throw new ApplicationException("이메일 인증 요청에 실패했습니다.");
         }
     }
 }

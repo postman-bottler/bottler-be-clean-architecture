@@ -11,7 +11,7 @@ import online.bottler.notification.application.response.UnreadNotificationRespon
 import online.bottler.notification.application.port.NotificationUseCase;
 import online.bottler.notification.application.port.SubscriptionUseCase;
 import online.bottler.notification.domain.NotificationType;
-import online.bottler.user.auth.CustomUserDetails;
+import online.bottler.user.adapter.in.web.auth.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
