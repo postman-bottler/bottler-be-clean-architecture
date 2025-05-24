@@ -1,24 +1,25 @@
-package online.bottler.label.infra;
+package online.bottler.label.adapter.out.persistence;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import online.bottler.global.exception.AdaptorException;
+import online.bottler.label.adapter.out.persistence.entity.LabelEntity;
+import online.bottler.label.adapter.out.persistence.entity.UserLabelEntity;
+import online.bottler.label.adapter.out.persistence.repository.LabelJpaRepository;
+import online.bottler.label.adapter.out.persistence.repository.UserLabelJpaRepository;
 import online.bottler.label.domain.Label;
 import online.bottler.label.domain.LabelType;
-import online.bottler.label.exception.InvalidLabelException;
-import online.bottler.label.exception.UserLabelNotFoundException;
-import online.bottler.label.infra.entity.LabelEntity;
-import online.bottler.label.infra.entity.UserLabelEntity;
-import online.bottler.label.application.repository.LabelRepository;
+import online.bottler.label.application.port.out.LabelPersistencePort;
 import online.bottler.user.domain.User;
 import online.bottler.user.infra.UserJpaRepository;
 import online.bottler.user.infra.entity.UserEntity;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-public class LabelRepositoryImpl implements LabelRepository {
+public class LabelPersistenceAdapter implements LabelPersistencePort {
 
     private final LabelJpaRepository labelJpaRepository;
     private final UserLabelJpaRepository userLabelJpaRepository;
@@ -29,7 +30,7 @@ public class LabelRepositoryImpl implements LabelRepository {
         try {
             labelJpaRepository.save(LabelEntity.from(label));
         } catch (DataIntegrityViolationException e) {
-            throw new InvalidLabelException("이미 존재하는 라벨입니다.");
+            throw new AdaptorException("이미 존재하는 라벨입니다.");
         }
     }
 
@@ -44,7 +45,7 @@ public class LabelRepositoryImpl implements LabelRepository {
         List<LabelEntity> labelEntities = userLabelJpaRepository.findLabelsByUserId(userId);
 
         if (labelEntities.isEmpty()) {
-            throw new UserLabelNotFoundException("유저 ID " + userId + " 에 해당하는 라벨이 존재하지 않습니다.");
+            throw new AdaptorException("유저 ID " + userId + " 에 해당하는 라벨이 존재하지 않습니다.");
         }
 
         return LabelEntity.toLabels(labelEntities);
@@ -54,7 +55,7 @@ public class LabelRepositoryImpl implements LabelRepository {
     @Transactional
     public Label findLabelByLabelId(Long labelId) {
         LabelEntity labelEntity = labelJpaRepository.findByIdWithLock(labelId)
-                .orElseThrow(() -> new InvalidLabelException("라벨 ID " + labelId + " 에 해당하는 라벨이 존재하지 않습니다."));
+                .orElseThrow(() -> new AdaptorException("라벨 ID " + labelId + " 에 해당하는 라벨이 존재하지 않습니다."));
         return LabelEntity.toLabel(labelEntity);
     }
 

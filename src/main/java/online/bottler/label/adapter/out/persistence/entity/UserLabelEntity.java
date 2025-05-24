@@ -1,4 +1,4 @@
-package online.bottler.label.infra.entity;
+package online.bottler.label.adapter.out.persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,12 +12,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import online.bottler.label.domain.Label;
 import online.bottler.label.domain.UserLabel;
 import online.bottler.user.domain.User;
 import online.bottler.user.infra.entity.UserEntity;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Builder
