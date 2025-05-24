@@ -10,6 +10,43 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.ApplicationException;
+import online.bottler.label.application.repository.LabelRepository;
+import online.bottler.label.domain.Label;
+import online.bottler.letter.application.LetterBoxService;
+import online.bottler.letter.application.RedisLetterService;
+import online.bottler.letter.application.dto.LetterBoxDTO;
+import online.bottler.letter.domain.BoxType;
+import online.bottler.letter.domain.LetterType;
+import online.bottler.notification.application.NotificationService;
+import online.bottler.slack.SlackConstant;
+import online.bottler.slack.SlackService;
+import online.bottler.user.application.command.AuthEmailCommand;
+import online.bottler.user.application.command.ChangePasswordCommand;
+import online.bottler.user.application.command.CheckDuplicateNicknameCommand;
+import online.bottler.user.application.command.CheckPasswordCommand;
+import online.bottler.user.application.command.EmailCommand;
+import online.bottler.user.application.command.NicknameCommand;
+import online.bottler.user.application.command.ProfileImgCommand;
+import online.bottler.user.application.command.SignInCommand;
+import online.bottler.user.application.command.SignUpCommand;
+import online.bottler.user.application.response.AccessTokenResponse;
+import online.bottler.user.application.response.ExistingUserResponse;
+import online.bottler.user.application.response.SignIn;
+import online.bottler.user.application.response.UserResponse;
+import online.bottler.user.domain.EmailCode;
+import online.bottler.user.domain.EmailForm;
+import online.bottler.user.domain.ProfileImage;
+import online.bottler.user.domain.RefreshToken;
+import online.bottler.user.domain.User;
+import online.bottler.user.adapter.in.web.auth.JwtTokenProvider;
+import online.bottler.user.application.port.in.BanUseCase;
+import online.bottler.user.application.port.in.EmailUseCase;
+import online.bottler.user.application.port.in.UserUseCase;
+import online.bottler.user.application.port.out.EmailCodePersistencePort;
+import online.bottler.user.application.port.out.ProfileImagePersistencePort;
+import online.bottler.user.application.port.out.RefreshTokenPersistencePort;
+import online.bottler.user.application.port.out.UserPersistencePort;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,49 +55,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.RedisLetterService;
-import online.bottler.label.application.repository.LabelRepository;
-import online.bottler.label.domain.Label;
-import online.bottler.letter.application.dto.LetterBoxDTO;
-import online.bottler.letter.application.LetterBoxService;
-import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterType;
-import online.bottler.notification.application.NotificationService;
-import online.bottler.slack.SlackConstant;
-import online.bottler.slack.SlackService;
-import online.bottler.user.application.dto.response.AccessTokenResponseDTO;
-import online.bottler.user.application.dto.response.ExistingUserResponseDTO;
-import online.bottler.user.application.dto.response.SignInDTO;
-import online.bottler.user.application.dto.response.UserResponseDTO;
-import online.bottler.user.application.repository.EmailCodeRepository;
-import online.bottler.user.application.repository.ProfileImageRepository;
-import online.bottler.user.application.repository.RefreshTokenRepository;
-import online.bottler.user.application.repository.UserRepository;
-import online.bottler.user.auth.JwtTokenProvider;
-import online.bottler.user.domain.EmailCode;
-import online.bottler.user.domain.EmailForm;
-import online.bottler.user.domain.ProfileImage;
-import online.bottler.user.domain.RefreshToken;
-import online.bottler.user.domain.User;
-import online.bottler.user.exception.EmailException;
-import online.bottler.user.exception.NicknameException;
-import online.bottler.user.exception.PasswordException;
-import online.bottler.user.exception.ProfileImageException;
-import online.bottler.user.exception.TokenException;
+
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final ProfileImageRepository profileImageRepository;
-    private final EmailCodeRepository emailCodeRepository;
-    private final BanService banService;
+public class UserService implements UserUseCase {
+    private final UserPersistencePort userPersistencePort;
+    private final RefreshTokenPersistencePort refreshTokenPersistencePort;
+    private final ProfileImagePersistencePort profileImagePersistencePort;
+    private final EmailCodePersistencePort emailCodePersistencePort;
+    private final BanUseCase banUseCase;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final EmailService emailService;
+    private final EmailUseCase emailUseCase;
     private final SlackService slackService;
     private final NotificationService notificationService;
     private final RedisLetterService redisLetterService;
@@ -72,12 +81,13 @@ public class UserService {
     private static final SecureRandom random = new SecureRandom();
 
     @Transactional
-    public void createUser(String email, String password, String nickname) {
-        String profileImageUrl = profileImageRepository.findProfileImage();
-        User user = User.createUser(email, passwordEncoder.encode(password), nickname, profileImageUrl);
-        User storedUser = userRepository.save(user);
+    public void createUser(SignUpCommand signUpCommand) {
+        String profileImageUrl = profileImagePersistencePort.findProfileImage();
+        User user = User.createUser(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
+                signUpCommand.nickname(), profileImageUrl);
+        User storedUser = userPersistencePort.save(user);
 
-        giveDefaultLabelsToNewUser(storedUser);
+//        giveDefaultLabelsToNewUser(storedUser);
 
         List<Long> randomDevelopLetter = findRandomDevelopLetter();
         redisLetterService.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
@@ -104,105 +114,105 @@ public class UserService {
     }
 
     @Transactional
-    public void createDeveloper(String email, String password, String nickname) {
-        String profileImageUrl = profileImageRepository.findProfileImage();
-        User user = User.createDeveloper(email, passwordEncoder.encode(password), nickname, profileImageUrl);
-        userRepository.save(user);
+    public void createDeveloper(SignUpCommand signUpCommand) {
+        String profileImageUrl = profileImagePersistencePort.findProfileImage();
+        User user = User.createDeveloper(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()), signUpCommand.nickname(), profileImageUrl);
+        userPersistencePort.save(user);
     }
 
     @Transactional
-    public void checkEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new EmailException("이메일이 중복되었습니다.");
+    public void checkEmail(EmailCommand emailCommand) {
+        if (userPersistencePort.existsByEmail(emailCommand.email())) {
+            throw new ApplicationException("이메일이 중복되었습니다.");
         }
     }
 
     @Transactional
-    public void checkNickname(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
-            throw new NicknameException("닉네임이 중복되었습니다.");
+    public void checkNickname(CheckDuplicateNicknameCommand checkDuplicateNicknameCommand) {
+        if (userPersistencePort.existsByNickname(checkDuplicateNicknameCommand.nickname())) {
+            throw new ApplicationException("닉네임이 중복되었습니다.");
         }
     }
 
     @Transactional
-    public SignInDTO signin(String email, String password) {
+    public SignIn signin(SignInCommand signInCommand) {
         try {
-            return authenticateAndGenerateTokens(email, password);
+            return authenticateAndGenerateTokens(signInCommand.email(), signInCommand.password());
         } catch (BadCredentialsException e) {
-            throw new PasswordException("비밀번호가 일치하지 않습니다.");
+            throw new ApplicationException("비밀번호가 일치하지 않습니다.");
         }
     }
 
     @Transactional
-    public AccessTokenResponseDTO validateRefreshToken(String refreshToken) {
+    public AccessTokenResponse validateRefreshToken(String refreshToken) {
         //db에 저장되어 있는 email과 refreshToken의 email과 같은지 비교
         String emailFromRefreshToken = jwtTokenProvider.getEmailFromToken(refreshToken);
-        String storedEmail = refreshTokenRepository.findEmailByRefreshToken(refreshToken);
+        String storedEmail = refreshTokenPersistencePort.findEmailByRefreshToken(refreshToken);
         if (!storedEmail.equals(emailFromRefreshToken)) {
-            throw new TokenException("유효하지 않은 jwt 토큰입니다.");
+            throw new ApplicationException("유효하지 않은 jwt 토큰입니다.");
         }
 
         Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
         String newAccessToken = jwtTokenProvider.createAccessToken(authentication);
-        return new AccessTokenResponseDTO(newAccessToken);
+        return new AccessTokenResponse(newAccessToken);
     }
 
     @Transactional
-    public void deleteUser(String password, String email) {
-        User user = userRepository.findByEmail(email);
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new PasswordException("비밀번호가 일치하지 않습니다.");
+    public void deleteUser(CheckPasswordCommand checkPasswordCommand, String email) {
+        User user = userPersistencePort.findByEmail(email);
+        if (!passwordEncoder.matches(checkPasswordCommand.password(), user.getPassword())) {
+            throw new ApplicationException("비밀번호가 일치하지 않습니다.");
         }
-        userRepository.softDeleteUser(user.getUserId());
-        refreshTokenRepository.deleteByEmail(email);
+        userPersistencePort.softDeleteUser(user.getUserId());
+        refreshTokenPersistencePort.deleteByEmail(email);
     }
 
     @Transactional
-    public UserResponseDTO findUser(String email) {
-        User user = userRepository.findByEmail(email);
-        return UserResponseDTO.from(user);
+    public UserResponse findUser(String email) {
+        User user = userPersistencePort.findByEmail(email);
+        return UserResponse.from(user);
     }
 
     @Transactional
-    public void updateNickname(String nickname, String email) {
-        if (userRepository.existsByNickname(nickname)) {
-            throw new NicknameException("닉네임이 중복되었습니다.");
+    public void updateNickname(NicknameCommand nicknameCommand, String email) {
+        if (userPersistencePort.existsByNickname(nicknameCommand.nickname())) {
+            throw new ApplicationException("닉네임이 중복되었습니다.");
         }
-        User user = userRepository.findByEmail(email);
-        userRepository.updateNickname(user.getUserId(), nickname);
+        User user = userPersistencePort.findByEmail(email);
+        userPersistencePort.updateNickname(user.getUserId(), nicknameCommand.nickname());
     }
 
     @Transactional
-    public void updatePassword(String existingPassword, String newPassword, String email) {
-        User user = userRepository.findByEmail(email);
-        if (!passwordEncoder.matches(existingPassword, user.getPassword())) {
-            throw new PasswordException("비밀번호가 일치하지 않습니다.");
+    public void updatePassword(ChangePasswordCommand changePasswordCommand, String email) {
+        User user = userPersistencePort.findByEmail(email);
+        if (!passwordEncoder.matches(changePasswordCommand.existingPassword(), user.getPassword())) {
+            throw new ApplicationException("비밀번호가 일치하지 않습니다.");
         }
-        userRepository.updatePassword(user.getUserId(), passwordEncoder.encode(newPassword));
+        userPersistencePort.updatePassword(user.getUserId(), passwordEncoder.encode(changePasswordCommand.newPassword()));
     }
 
     @Transactional
-    public void updateProfileImage(String newProfileImage, String email) {
-        if (!profileImageRepository.existsByUrl(newProfileImage)) {
-            throw new ProfileImageException("유효하지 않은 프로필 이미지 URL입니다.");
+    public void updateProfileImage(ProfileImgCommand profileImgCommand, String email) {
+        if (!profileImagePersistencePort.existsByUrl(profileImgCommand.imageUrl())) {
+            throw new ApplicationException("유효하지 않은 프로필 이미지 URL입니다.");
         }
-        User user = userRepository.findByEmail(email);
-        userRepository.updateProfileImageUrl(user.getUserId(), newProfileImage);
+        User user = userPersistencePort.findByEmail(email);
+        userPersistencePort.updateProfileImageUrl(user.getUserId(), profileImgCommand.imageUrl());
     }
 
     @Transactional
-    public void createProfileImg(String profileImageUrl) {
-        ProfileImage profileImage = ProfileImage.createProfileImg(profileImageUrl);
-        profileImageRepository.save(profileImage);
+    public void createProfileImg(ProfileImgCommand profileImgCommand) {
+        ProfileImage profileImage = ProfileImage.createProfileImg(profileImgCommand.imageUrl());
+        profileImagePersistencePort.save(profileImage);
     }
 
     @Transactional
-    public ExistingUserResponseDTO findExistingUser(String nickname) {
-        return new ExistingUserResponseDTO(userRepository.existsByNickname(nickname));
+    public ExistingUserResponse findExistingUser(String nickname) {
+        return new ExistingUserResponse(userPersistencePort.existsByNickname(nickname));
     }
 
     @Transactional
-    public void sendCodeToEmail(String email) {
+    public void sendCodeToEmail(EmailCommand emailCommand) {
         String authCode = createCode();
         EmailForm emailForm = EmailForm.EMAIL_AUTH;
 
@@ -210,10 +220,10 @@ public class UserService {
         String content = emailForm.getContent(authCode);
 
         try {
-            emailService.sendEmail(email, title, content);
-            emailCodeRepository.save(EmailCode.createEmailCode(email, authCode));
+            emailUseCase.sendEmail(emailCommand.email(), title, content);
+            emailCodePersistencePort.save(EmailCode.createEmailCode(emailCommand.email(), authCode));
         } catch (RuntimeException | MessagingException e) {
-            throw new EmailException("인증코드 요청에 실패했습니다.");
+            throw new ApplicationException("인증코드 요청에 실패했습니다.");
         }
     }
 
@@ -227,29 +237,29 @@ public class UserService {
     }
 
     @Transactional
-    public void verifyCode(String email, String code) {
-        EmailCode emailCode = emailCodeRepository.findEmailCode(email, code);
+    public void verifyCode(AuthEmailCommand authEmailCommand) {
+        EmailCode emailCode = emailCodePersistencePort.findEmailCode(authEmailCommand.email(), authEmailCommand.code());
         emailCode.checkExpiration();
     }
 
     @Transactional
     public User findById(Long userId) {
-        return userRepository.findById(userId);
+        return userPersistencePort.findById(userId);
     }
 
     @Transactional
-    public SignInDTO kakaoSignin(String kakaoId, String nickname) {
-        if (!userRepository.existsByEmailAndProvider(kakaoId)) {
+    public SignIn kakaoSignin(String kakaoId, String nickname) {
+        if (!userPersistencePort.existsByEmailAndProvider(kakaoId)) {
             nickname = generateUniqueNickname(nickname);
-            String profileImageUrl = profileImageRepository.findProfileImage();
+            String profileImageUrl = profileImagePersistencePort.findProfileImage();
             User user = User.createKakaoUser(kakaoId, nickname, profileImageUrl, passwordEncoder.encode(kakaoId));
-            User storedUser = userRepository.save(user);
+            User storedUser = userPersistencePort.save(user);
             giveDefaultLabelsToNewUser(storedUser);
         }
         return authenticateAndGenerateTokens(kakaoId, kakaoId);
     }
 
-    private SignInDTO authenticateAndGenerateTokens(String email, String password) {
+    private SignIn authenticateAndGenerateTokens(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -258,9 +268,9 @@ public class UserService {
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
         String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-        refreshTokenRepository.createRefreshToken(RefreshToken.createRefreshToken(email, refreshToken));
+        refreshTokenPersistencePort.createRefreshToken(RefreshToken.createRefreshToken(email, refreshToken));
 
-        return new SignInDTO(accessToken, refreshToken);
+        return new SignIn(accessToken, refreshToken);
     }
 
     private String generateUniqueNickname(String nickname) {
@@ -268,7 +278,7 @@ public class UserService {
         byte[] bytes = new byte[20];
         random.nextBytes(bytes);
 
-        while (userRepository.existsByNickname(nickname)) {
+        while (userPersistencePort.existsByNickname(nickname)) {
             int randomNumber = random.nextInt(10000);
             nickname = nickname + randomNumber;
         }
@@ -278,33 +288,33 @@ public class UserService {
     //아이디로 프로필 이미지 조회
     @Transactional
     public String getProfileImageUrlById(Long userId) {
-        return userRepository.findById(userId).getImageUrl();
+        return userPersistencePort.findById(userId).getImageUrl();
     }
 
     //아이디로 닉네임 조회
     @Transactional
     public String getNicknameById(Long userId) {
-        return userRepository.findById(userId).getNickname();
+        return userPersistencePort.findById(userId).getNickname();
     }
 
     //유저 경고 횟수 증가
     @Transactional
     public void updateWarningCount(Long userId) {
-        User user = userRepository.findById(userId);
+        User user = userPersistencePort.findById(userId);
         user.updateWarningCount();
         slackService.sendSlackMessage(SlackConstant.WARNING, userId);
         if (user.checkBan()) {
-            banService.banUser(user);
+            banUseCase.banUser(user);
             slackService.sendSlackMessage(SlackConstant.BAN, userId);
             notificationService.sendBanNotification(userId);
         }
-        userRepository.updateWarningCount(user);
+        userPersistencePort.updateWarningCount(user);
     }
 
     //전체 유저 아이디 조회
     @Transactional
     public List<Long> getAllUserIds() {
-        List<User> users = userRepository.findAllUserId();
+        List<User> users = userPersistencePort.findAllUserId();
         return users.stream()
                 .map(User::getUserId)
                 .collect(Collectors.toList());
@@ -312,13 +322,13 @@ public class UserService {
 
     @Transactional
     public Long getUserIdByNickname(String nickname) {
-        User user = userRepository.findByNickname(nickname);
+        User user = userPersistencePort.findByNickname(nickname);
         return user.getUserId();
     }
 
     @Transactional
-    public void deleteEmailCode(String email) {
-        emailCodeRepository.deleteByEmail(email);
+    public void deleteEmailCode(AuthEmailCommand authEmailCommand) {
+        emailCodePersistencePort.deleteByEmail(authEmailCommand.email());
     }
 
     public void giveDefaultLabelsToNewUser(User storedUser) {
@@ -331,6 +341,8 @@ public class UserService {
 
     private void giveLabelToUser(User user, Label label) {
         labelRepository.updateOwnedCount(label);
-        labelRepository.createUserLabel(user, label);
+
+        //오류나서 주석 처리
+//        labelRepository.createUserLabel(user, label);
     }
 }

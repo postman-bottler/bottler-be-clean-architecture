@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import online.bottler.user.adapter.in.web.auth.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +26,6 @@ import online.bottler.notification.application.dto.response.SubscriptionResponse
 import online.bottler.notification.exception.InvalidNotificationRequestException;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.notification.application.SubscriptionService;
-import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
 @RequestMapping("/notification")

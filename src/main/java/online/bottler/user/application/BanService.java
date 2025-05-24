@@ -3,41 +3,42 @@ package online.bottler.user.application;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.ApplicationException;
+import online.bottler.user.domain.Ban;
+import online.bottler.user.application.port.in.BanUseCase;
+import online.bottler.user.application.port.out.BanPersistencePort;
+import online.bottler.user.application.port.out.UserPersistencePort;
+import online.bottler.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.user.application.repository.BanRepository;
-import online.bottler.user.application.repository.UserRepository;
-import online.bottler.user.domain.Ban;
-import online.bottler.user.domain.User;
-import online.bottler.user.exception.UserBanException;
 
 @Service
 @RequiredArgsConstructor
-public class BanService {
+public class BanService implements BanUseCase {
     private static final Long BAN_DAYS = 7L;
 
-    private final BanRepository banRepository;
-    private final UserRepository userRepository;
+    private final BanPersistencePort banPersistencePort;
+    private final UserPersistencePort userPersistencePort;
 
     public void banUser(User user) {
         if (user.isBanned()) {
-            Ban ban = banRepository.findByUserId(user.getUserId())
-                    .orElseThrow(() -> new UserBanException("정지된 유저가 아닙니다."));
+            Ban ban = banPersistencePort.findByUserId(user.getUserId())
+                    .orElseThrow(() -> new ApplicationException("정지된 유저가 아닙니다."));
             ban.extendBanDuration(BAN_DAYS);
-            banRepository.updateBan(ban);
+            banPersistencePort.updateBan(ban);
             return;
         }
         Ban ban = Ban.create(user.getUserId(), BAN_DAYS);
         user.banned();
-        banRepository.save(ban);
+        banPersistencePort.save(ban);
     }
 
     @Transactional
     public void unbans(LocalDateTime now) {
-        List<Ban> expiredBans = banRepository.findExpiredBans(now);
-        List<User> willBeUnbanned = userRepository.findWillBeUnbannedUsers(expiredBans);
+        List<Ban> expiredBans = banPersistencePort.findExpiredBans(now);
+        List<User> willBeUnbanned = userPersistencePort.findWillBeUnbannedUsers(expiredBans);
         willBeUnbanned.forEach(User::unban);
-        userRepository.updateUsers(willBeUnbanned);
-        banRepository.deleteBans(expiredBans);
+        userPersistencePort.updateUsers(willBeUnbanned);
+        banPersistencePort.deleteBans(expiredBans);
     }
 }

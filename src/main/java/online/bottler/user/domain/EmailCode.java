@@ -2,7 +2,7 @@ package online.bottler.user.domain;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
-import online.bottler.user.exception.EmailCodeException;
+import online.bottler.global.exception.DomainException;
 
 @Getter
 public class EmailCode {
@@ -38,7 +38,7 @@ public class EmailCode {
     public void checkExpiration() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(this.expiresAt)) {
-            throw new EmailCodeException("유효시간이 지난 인증코드입니다.");
+            throw new DomainException("유효시간이 지난 인증코드입니다.");
         }
     }
 }
