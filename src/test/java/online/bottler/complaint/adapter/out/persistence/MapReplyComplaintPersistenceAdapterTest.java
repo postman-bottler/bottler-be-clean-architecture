@@ -1,4 +1,4 @@
-package online.bottler.complaint.infra;
+package online.bottler.complaint.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
 
-import online.bottler.complaint.adapter.out.persistence.MapComplaintPersistenceAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.Complaints;
 
-@DisplayName("지도 편지 리포지토리 테스트")
+
+@DisplayName("지도 답장 편지 리포지토리 테스트")
 @SpringBootTest
 @Transactional
-public class MapComplaintPersistenceAdapterTest {
+class MapReplyComplaintPersistenceAdapterTest {
+
     @Autowired
-    private MapComplaintPersistenceAdapter mapComplaintPersistenceAdapter;
+    private MapReplyComplaintPersistenceAdapter mapReplyComplaintPersistenceAdapter;
 
     @DisplayName("새로운 신고를 저장한다.")
     @Test
@@ -29,10 +30,10 @@ public class MapComplaintPersistenceAdapterTest {
         Complaint complaint = Complaint.create(1L, 1L, "욕설 사용");
 
         // when
-        mapComplaintPersistenceAdapter.save(complaint);
+        mapReplyComplaintPersistenceAdapter.save(complaint);
 
         // then
-        Complaints complaints = mapComplaintPersistenceAdapter.findByLetterId(complaint.getLetterId());
+        Complaints complaints = mapReplyComplaintPersistenceAdapter.findByLetterId(complaint.getLetterId());
         assertThat(complaints.getComplaints()).hasSize(1);
     }
 
@@ -40,10 +41,10 @@ public class MapComplaintPersistenceAdapterTest {
     @Test
     void findByLetterId() {
         // given
-        mapComplaintPersistenceAdapter.save(Complaint.create(1L, 1L, "설명"));
+        mapReplyComplaintPersistenceAdapter.save(Complaint.create(1L, 1L, "설명"));
 
         // when
-        Complaints find = mapComplaintPersistenceAdapter.findByLetterId(1L);
+        Complaints find = mapReplyComplaintPersistenceAdapter.findByLetterId(1L);
 
         // then
         assertThat(find.getComplaints()).hasSize(1)
@@ -54,13 +55,13 @@ public class MapComplaintPersistenceAdapterTest {
     @Test
     @DisplayName("편지 ID로 조회한 신고 리스트는 MutableList이어야 한다.")
     public void findByLetterIdWithMutable() {
-        // GIVEN
-        mapComplaintPersistenceAdapter.save(Complaint.create(1L, 1L, "설명"));
+        // given
+        mapReplyComplaintPersistenceAdapter.save(Complaint.create(1L, 1L, "설명"));
 
-        // WHEN
-        Complaints find = mapComplaintPersistenceAdapter.findByLetterId(1L);
+        // when
+        Complaints find = mapReplyComplaintPersistenceAdapter.findByLetterId(1L);
 
-        // THEN
+        // then
         List<Complaint> complaints = find.getComplaints();
         assertDoesNotThrow((() -> complaints.add(Complaint.create(2L, 1L, "설명"))));
     }

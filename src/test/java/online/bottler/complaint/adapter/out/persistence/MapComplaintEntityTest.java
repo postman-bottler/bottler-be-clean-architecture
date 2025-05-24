@@ -1,4 +1,4 @@
-package online.bottler.complaint.infra.entity;
+package online.bottler.complaint.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
