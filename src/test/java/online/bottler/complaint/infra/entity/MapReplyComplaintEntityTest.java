@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
-import online.bottler.complaint.adaptor.out.persistence.entity.MapReplyComplaintEntity;
+import online.bottler.complaint.adapter.out.persistence.entity.MapReplyComplaintEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import online.bottler.complaint.domain.Complaint;

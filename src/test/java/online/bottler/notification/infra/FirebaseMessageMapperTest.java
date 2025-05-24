@@ -6,7 +6,7 @@ import static org.assertj.core.groups.Tuple.tuple;
 import com.google.firebase.messaging.Message;
 import java.util.List;
 
-import online.bottler.notification.adaptor.out.push.FirebaseMessageMapper;
+import online.bottler.notification.adapter.out.push.FirebaseMessageMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
