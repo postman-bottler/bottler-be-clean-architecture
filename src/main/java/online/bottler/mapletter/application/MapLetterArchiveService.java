@@ -89,8 +89,7 @@ public class MapLetterArchiveService implements MapLetterArchiveUseCase {
 
         String profileImg = userService.getProfileImageUrlById(mapLetter.getCreateUserId());
         return OneLetterResponse.from(mapLetter, profileImg, mapLetter.getCreateUserId() == userId,
-                mapLetterReplyService.checkReplyMapLetter(letterId, userId).isReplied(),
-                isArchived(letterId, userId));
+                mapLetterReplyService.checkReplyMapLetter(letterId, userId).isReplied(), isArchived(letterId, userId));
     }
 
     @Override

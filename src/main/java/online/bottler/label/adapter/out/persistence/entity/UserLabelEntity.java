@@ -14,8 +14,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import online.bottler.label.domain.Label;
 import online.bottler.label.domain.UserLabel;
+import online.bottler.user.adapter.out.persistence.entity.UserEntity;
 import online.bottler.user.domain.User;
-import online.bottler.user.infra.entity.UserEntity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
@@ -53,7 +53,7 @@ public class UserLabelEntity {
     }
 
     public UserLabel to() {
-        User user = UserEntity.toUser(this.user);
+        User user = UserEntity.toDomain(this.user);
         Label label = LabelEntity.toLabel(this.label);
         return UserLabel.createUserLabel(user, label);
     }

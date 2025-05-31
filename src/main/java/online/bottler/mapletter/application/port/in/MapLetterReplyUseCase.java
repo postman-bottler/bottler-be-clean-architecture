@@ -24,4 +24,6 @@ public interface MapLetterReplyUseCase {
     Page<FindAllSentReplyMapLetterResponse> findAllSentReplyMapLetters(int page, int size, Long userId);
 
     Page<FindAllReceivedReplyLetterResponse> findAllReceivedReplyMapLetters(int page, int size, Long userId);
+
+    CheckReplyMapLetterResponse checkReplyMapLetter(Long letterId, Long userId);
 }

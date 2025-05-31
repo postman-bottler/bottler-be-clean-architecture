@@ -29,7 +29,6 @@ import online.bottler.mapletter.application.port.out.RecentReplyCachePort;
 import online.bottler.mapletter.domain.MapLetter;
 import online.bottler.mapletter.domain.MapLetterType;
 import online.bottler.mapletter.domain.ReplyMapLetter;
-import online.bottler.notification.application.dto.request.NotificationLabelRequestDTO;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.reply.application.ReplyType;
 import online.bottler.user.application.UserService;
@@ -250,15 +249,6 @@ public class MapLetterService implements MapLetterUseCase {
             return replyMapLetterPersistencePort.findById(letterId).getCreateUserId();
         }
         return null;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<NotificationLabelRequestDTO> getLabels(List<Long> ids) {
-        List<MapLetter> finds = mapLetterPersistencePort.findAllByIds(ids);
-        return finds.stream()
-                .map(find -> new NotificationLabelRequestDTO(find.getId(), find.getLabel()))
-                .toList();
     }
 
     void validMaxPage(int maxPage, int nowPage) {

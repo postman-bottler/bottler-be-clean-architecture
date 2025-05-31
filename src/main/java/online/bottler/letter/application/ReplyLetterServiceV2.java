@@ -3,6 +3,7 @@ package online.bottler.letter.application;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.ReplyLetterCommand;
 import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
+import online.bottler.letter.application.port.in.BlockReplyLetterUseCase;
 import online.bottler.letter.application.port.in.CreateReplyLetterUseCase;
 import online.bottler.letter.application.port.in.GetReplyLetterDetailUseCase;
 import online.bottler.letter.application.port.in.GetReplyLetterSummariesUseCase;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ReplyLetterServiceV2 implements CreateReplyLetterUseCase, GetReplyLetterSummariesUseCase,
-        GetReplyLetterDetailUseCase {
+        GetReplyLetterDetailUseCase, BlockReplyLetterUseCase {
 
     @Override
     public ReplyLetterResponse create(ReplyLetterCommand command) {
@@ -30,5 +31,10 @@ public class ReplyLetterServiceV2 implements CreateReplyLetterUseCase, GetReplyL
     @Override
     public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
         return null;
+    }
+
+    @Override
+    public Long softBlock(Long id) {
+        return 0L;
     }
 }

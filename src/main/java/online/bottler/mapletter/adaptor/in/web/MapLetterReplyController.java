@@ -3,6 +3,7 @@ package online.bottler.mapletter.adaptor.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.mapletter.adaptor.in.web.request.CreateReplyMapLetterRequest;
@@ -12,7 +13,6 @@ import online.bottler.mapletter.application.response.CheckReplyMapLetterResponse
 import online.bottler.mapletter.application.response.FindAllReplyMapLettersResponse;
 import online.bottler.mapletter.application.response.MapLetterPageResponse;
 import online.bottler.mapletter.application.response.OneReplyLetterResponse;
-import online.bottler.user.auth.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;

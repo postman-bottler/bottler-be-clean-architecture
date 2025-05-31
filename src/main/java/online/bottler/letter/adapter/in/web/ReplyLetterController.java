@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.auth.CustomUserDetails;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
 import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
@@ -33,7 +34,6 @@ import online.bottler.letter.application.response.ReplyLetterDetailResponse;
 import online.bottler.letter.application.response.ReplyLetterResponse;
 import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
 import online.bottler.letter.application.LetterDeletionService;
-import online.bottler.user.auth.CustomUserDetails;
 
 @Slf4j
 @RestController

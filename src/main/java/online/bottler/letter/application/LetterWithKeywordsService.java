@@ -29,7 +29,7 @@ import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.LetterWithKeywords;
 import online.bottler.letter.exception.LetterNotFoundException;
 import online.bottler.letter.exception.UnauthorizedLetterAccessException;
-import online.bottler.user.application.repository.UserRepository;
+import online.bottler.user.application.port.out.UserPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +48,7 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
     private final DeleteLetterPersistencePort deleteLetterPersistencePort;
     private final DeleteLetterKeywordPersistencePort deleteLetterKeywordPersistencePort;
     private final DeleteLetterBoxPersistencePort deleteLetterBoxPersistencePort;
-    private final UserRepository userRepository;
+    private final UserPersistencePort userPersistencePort;
 
     @Override
     @Transactional
@@ -73,7 +73,7 @@ public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCas
 
         boolean isReplied = checkReplyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
         List<LetterKeyword> keywords = loadLetterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
-        String profile = userRepository.findById(query.userId()).getImageUrl();
+        String profile = userPersistencePort.findById(query.userId()).getImageUrl();
         Letter letter = loadLetterPersistencePort.loadById(query.letterId())
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
 

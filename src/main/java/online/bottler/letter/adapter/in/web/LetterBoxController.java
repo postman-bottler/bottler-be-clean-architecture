@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.auth.CustomUserDetails;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
 import online.bottler.letter.application.port.in.GetAllLettersUseCase;
 import online.bottler.letter.application.port.in.GetReceivedLettersUseCase;
@@ -25,7 +26,6 @@ import online.bottler.letter.adapter.in.web.request.PageRequest;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.response.PageResponse;
 import online.bottler.letter.application.LetterDeletionService;
-import online.bottler.user.auth.CustomUserDetails;
 
 @Slf4j
 @RestController
