@@ -78,7 +78,7 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         Optional<Letter> letter = letterPersistencePort.loadById(command.letterId());
         validateLetterOwnerShip(letter, command.userId());
 
-        letterPersistencePort.softDelete(command.letterId(), command.userId(), command.boxType());
+        letterPersistencePort.softDelete(command.letterId());
         letterKeywordPersistencePort.softDelete(command.letterId());
         letterBoxPersistencePort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
     }
@@ -92,7 +92,7 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     }
 
     private void validateLetterOwnerShip(Optional<Letter> letter, Long userId) {
-        if (letter.isPresent() && letter.get().getUserId().equals(userId)) {
+        if (letter.isEmpty() || !letter.get().getUserId().equals(userId)) {
             throw new LetterAuthorMismatchException();
         }
     }

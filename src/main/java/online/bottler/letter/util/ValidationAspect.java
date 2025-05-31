@@ -1,4 +1,4 @@
-package online.bottler.letter.utiil;
+package online.bottler.letter.util;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

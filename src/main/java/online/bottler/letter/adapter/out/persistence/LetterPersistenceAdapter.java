@@ -3,12 +3,11 @@ package online.bottler.letter.adapter.out.persistence;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterJpaRepository;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
-import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import org.springframework.stereotype.Repository;
 
@@ -52,11 +51,12 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
         }
 
         List<Long> result = new ArrayList<>();
-        Random random = new Random();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
         int tryCount = 0;
 
         while (result.size() < count && tryCount < 5) {
-            long randomId = 1L + random.nextLong(maxId);
+            long randomId = random.nextLong(1L, maxId + 1);
 
             List<Long> partial = letterJpaRepository.getRandomIds(count, randomId, excludedIds);
 
@@ -68,7 +68,7 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public void softDelete(Long letterId, Long userId, BoxType boxType) {
+    public void softDelete(Long letterId) {
         letterJpaRepository.softDeleteById(letterId);
     }
 

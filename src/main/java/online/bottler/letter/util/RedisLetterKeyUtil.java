@@ -1,4 +1,4 @@
-package online.bottler.letter.utiil;
+package online.bottler.letter.util;
 
 
 public class RedisLetterKeyUtil {

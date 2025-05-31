@@ -14,7 +14,7 @@ public interface LetterBoxPersistencePort {
 
     void createForRecommendedLetter(Long letterId, Long userId);
 
-    void createForDeveloperLetter(Long letterId, Long userId, LocalDateTime createdAt);
+    void createForDeveloperLetter(Long letterId, Long userId);
 
     List<LetterSummaryProjection> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType);
 

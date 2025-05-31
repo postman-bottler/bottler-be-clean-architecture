@@ -3,7 +3,7 @@ package online.bottler.letter.adapter.out.persistence.repository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.utiil.RedisLetterKeyUtil;
+import online.bottler.letter.util.RedisLetterKeyUtil;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 

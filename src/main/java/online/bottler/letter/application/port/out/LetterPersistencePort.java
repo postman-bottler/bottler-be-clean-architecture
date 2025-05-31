@@ -2,7 +2,6 @@ package online.bottler.letter.application.port.out;
 
 import java.util.List;
 import java.util.Optional;
-import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 
 public interface LetterPersistencePort {
@@ -18,7 +17,7 @@ public interface LetterPersistencePort {
 
     List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds);
 
-    void softDelete(Long letterId, Long userId, BoxType boxType);
+    void softDelete(Long letterId);
 
     void softDeleteByIds(List<Long> letterIds);
 
