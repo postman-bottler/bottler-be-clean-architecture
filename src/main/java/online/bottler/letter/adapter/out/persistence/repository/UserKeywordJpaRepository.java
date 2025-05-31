@@ -10,5 +10,7 @@ public interface UserKeywordJpaRepository extends JpaRepository<UserKeywordEntit
     List<UserKeywordEntity> findAllByUserId(Long userId);
 
     @Query("SELECT uk.keyword FROM UserKeywordEntity uk WHERE uk.userId = :userId")
-    List<String> findKeywordsByUserId(@Param("userId") Long userId);
+    List<String> findUserKeywordsByUserId(@Param("userId") Long userId);
+
+    void deleteAllByUserId(Long userId);
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -43,7 +44,15 @@ public class UserKeywordEntity {
                 .build();
     }
 
+    public static List<UserKeywordEntity> fromList(List<UserKeyword> userKeywords) {
+        return userKeywords.stream().map(UserKeywordEntity::from).toList();
+    }
+
     public UserKeyword toDomain() {
         return UserKeyword.of(id, userId, keyword);
+    }
+
+    public static List<UserKeyword> toDomainList(List<UserKeywordEntity> userKeywordEntities) {
+        return userKeywordEntities.stream().map(UserKeywordEntity::toDomain).toList();
     }
 }

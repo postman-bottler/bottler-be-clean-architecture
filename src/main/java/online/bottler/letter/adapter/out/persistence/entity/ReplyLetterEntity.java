@@ -9,6 +9,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ import online.bottler.letter.domain.ReplyLetter;
 @Table(
         name = "reply_letters",
         indexes = @Index(name = "idx_replyletter_isdeleted_id", columnList = ("isDeleted, id")),
-        uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"letterId", "senderId"})
+        uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"senderId"})
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReplyLetterEntity {
@@ -75,21 +76,11 @@ public class ReplyLetterEntity {
     }
 
     public ReplyLetter toDomain() {
-        return ReplyLetter.of(
-                id,
-                senderId,
-                LetterContent.of(
-                        title,
-                        content,
-                        font,
-                        paper,
-                        label
-                ),
-                isDeleted,
-                isBlocked,
-                letterId,
-                receiverId,
-                createdAt
-        );
+        return ReplyLetter.of(id, senderId, LetterContent.of(title, content, font, paper, label),
+                isDeleted, isBlocked, letterId, receiverId, createdAt);
+    }
+
+    public static List<ReplyLetter> toDomainList(List<ReplyLetterEntity> replyLetterEntities) {
+        return replyLetterEntities.stream().map(ReplyLetterEntity::toDomain).toList();
     }
 }

@@ -1,25 +1,17 @@
 package online.bottler.letter.application;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.LetterWithKeywordsCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.BlockLetterUseCase;
-import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
-import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
-import online.bottler.letter.application.port.in.GetLetterUseCase;
-import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
-import online.bottler.letter.application.port.out.CheckLetterBoxPersistencePort;
-import online.bottler.letter.application.port.out.CheckReplyLetterPersistencePort;
-import online.bottler.letter.application.port.out.CreateLetterBoxPersistencePort;
-import online.bottler.letter.application.port.out.CreateLetterKeywordPersistencePort;
-import online.bottler.letter.application.port.out.CreateLetterPersistencePort;
-import online.bottler.letter.application.port.out.DeleteLetterBoxPersistencePort;
-import online.bottler.letter.application.port.out.DeleteLetterKeywordPersistencePort;
-import online.bottler.letter.application.port.out.DeleteLetterPersistencePort;
-import online.bottler.letter.application.port.out.LoadLetterKeywordPersistencePort;
-import online.bottler.letter.application.port.out.LoadLetterPersistencePort;
+import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
+import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
+import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
+import online.bottler.letter.application.port.out.LetterPersistencePort;
+import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
 import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import online.bottler.letter.domain.BoxType;
@@ -27,6 +19,7 @@ import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.LetterWithKeywords;
+import online.bottler.letter.exception.LetterAuthorMismatchException;
 import online.bottler.letter.exception.LetterNotFoundException;
 import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import online.bottler.user.application.port.out.UserPersistencePort;
@@ -35,66 +28,72 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class LetterWithKeywordsService implements CreateLetterWithKeywordsUseCase, GetLetterWithKeywordsDetailUseCase,
-        DeleteLetterWithKeywordsUseCase, GetLetterUseCase, BlockLetterUseCase {
+public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, BlockLetterUseCase {
 
-    private final CreateLetterPersistencePort createLetterPersistencePort;
-    private final CreateLetterKeywordPersistencePort createLetterKeywordPersistencePort;
-    private final CreateLetterBoxPersistencePort createLetterBoxPersistencePort;
-    private final CheckLetterBoxPersistencePort checkLetterBoxPersistencePort;
-    private final CheckReplyLetterPersistencePort checkReplyLetterPersistencePort;
-    private final LoadLetterKeywordPersistencePort loadLetterKeywordPersistencePort;
-    private final LoadLetterPersistencePort loadLetterPersistencePort;
-    private final DeleteLetterPersistencePort deleteLetterPersistencePort;
-    private final DeleteLetterKeywordPersistencePort deleteLetterKeywordPersistencePort;
-    private final DeleteLetterBoxPersistencePort deleteLetterBoxPersistencePort;
+    private final LetterPersistencePort letterPersistencePort;
+    private final LetterKeywordPersistencePort letterKeywordPersistencePort;
+    private final LetterBoxPersistencePort letterBoxPersistencePort;
+    private final ReplyLetterPersistencePort replyLetterPersistencePort;
     private final UserPersistencePort userPersistencePort;
 
-    @Override
     @Transactional
+    @Override
     public LetterWithKeywordsResponse create(LetterWithKeywordsCommand command) {
-        Letter letter = createLetterPersistencePort.create(command.toLetter());
+        Letter letter = letterPersistencePort.create(command.toLetter());
 
-        List<LetterKeyword> letterKeywords = LetterKeyword.createList(letter.getId(),
-                command.toKeywords());
-        createLetterKeywordPersistencePort.createAll(letterKeywords);
+        List<LetterKeyword> letterKeywords = LetterKeyword.createList(letter.getId(), command.toKeywords());
+        letterKeywordPersistencePort.createAll(letterKeywords);
 
-        createLetterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
+        letterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
 
         return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, command.keywords()));
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery query) {
-        if (!checkLetterBoxPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId())) {
+        if (!letterBoxPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId())) {
             throw new UnauthorizedLetterAccessException();
         }
 
-        boolean isReplied = checkReplyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
-        List<LetterKeyword> keywords = loadLetterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
+        boolean isReplied = replyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
+        List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
         String profile = userPersistencePort.findById(query.userId()).getImageUrl();
-        Letter letter = loadLetterPersistencePort.loadById(query.letterId())
+        Letter letter = letterPersistencePort.loadById(query.letterId())
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
 
         return LetterWithKeywordsDetailResponse.of(letter, keywords, query.userId(), profile, isReplied);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    @Transactional
-    public void delete(LetterWithKeywordsDeleteCommand command) {
-        deleteLetterPersistencePort.softDelete(command.letterId(), command.userId(), command.boxType());
-        deleteLetterKeywordPersistencePort.softDelete(command.letterId());
-        deleteLetterBoxPersistencePort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
+    public String getLabel(Long letterId) {
+        return letterPersistencePort.loadById(letterId)
+                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER)).getLabel();
     }
 
+    @Transactional
     @Override
-    public Letter getLetter(String letterId) {
-        return null;
+    public void delete(LetterWithKeywordsDeleteCommand command) {
+        Optional<Letter> letter = letterPersistencePort.loadById(command.letterId());
+        validateLetterOwnerShip(letter, command.userId());
+
+        letterPersistencePort.softDelete(command.letterId());
+        letterKeywordPersistencePort.softDelete(command.letterId());
+        letterBoxPersistencePort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
     }
 
     @Override
     public Long softBlock(Long letterId) {
-        return 0L;
+        Letter letter = letterPersistencePort.loadById(letterId)
+                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
+        letterPersistencePort.softBlock(letter.getId());
+        return letter.getUserId();
+    }
+
+    private void validateLetterOwnerShip(Optional<Letter> letter, Long userId) {
+        if (letter.isEmpty() || !letter.get().getUserId().equals(userId)) {
+            throw new LetterAuthorMismatchException();
+        }
     }
 }

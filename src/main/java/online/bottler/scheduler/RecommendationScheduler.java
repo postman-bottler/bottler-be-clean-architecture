@@ -9,9 +9,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.letter.application.port.in.RecommendUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import online.bottler.letter.application.AsyncRecommendationService;
 import online.bottler.letter.application.RedisLetterService;
 import online.bottler.letter.application.LetterService;
 import online.bottler.notification.application.request.RecommendNotificationCommand;
@@ -23,11 +23,12 @@ import online.bottler.user.application.UserService;
 @Slf4j
 public class RecommendationScheduler {
 
-    private final AsyncRecommendationService asyncRecommendationService;
+//    private final AsyncRecommendationService asyncRecommendationService;
     private final UserService userService;
     private final RedisLetterService redisLetterService;
     private final NotificationService notificationService;
     private final LetterService letterService;
+    private final RecommendUseCase recommendUseCase;
 
     @Value("${scheduler.batch-size}")
     private int batchSize;
@@ -46,7 +47,7 @@ public class RecommendationScheduler {
                 log.info("사용자 배치 처리 시작 (크기: {}): {}", batch.size(), batch);
 
                 List<CompletableFuture<String>> futures = batch.stream().map(userId -> CompletableFuture.supplyAsync(
-                                () -> asyncRecommendationService.processRecommendationForUser(userId), executorService))
+                                () -> recommendUseCase.generate(userId), executorService))
                         .toList();
 
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))

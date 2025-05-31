@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 import online.bottler.letter.application.port.out.RedisLetterRepository;
-import online.bottler.letter.utiil.RedisLetterKeyUtil;
+import online.bottler.letter.util.RedisLetterKeyUtil;
 import online.bottler.reply.application.ReplyType;
 
 @Slf4j
