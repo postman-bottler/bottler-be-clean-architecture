@@ -36,6 +36,9 @@ public interface LetterJpaRepository extends JpaRepository<LetterEntity, Long> {
     @Query("SELECT MAX(l.id) FROM LetterEntity l WHERE l.isDeleted = false")
     Long findMaxId();
 
+    @Query("SELECT l.id FROM LetterEntity l WHERE l.userId = :userId AND l.isDeleted = false")
+    List<Long> findIdsByUserId(Long userId);
+
     @Query("SELECT l.id FROM LetterEntity l WHERE l.isDeleted = false AND l.id >= :randomId AND l.id NOT IN :excludedIds ORDER BY l.id LIMIT :count")
     List<Long> getRandomIds(int count, Long randomId, List<Long> excludedIds);
 }

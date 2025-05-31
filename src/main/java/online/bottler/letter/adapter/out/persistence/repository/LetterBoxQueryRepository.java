@@ -11,9 +11,9 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QReplyLetterEntity;
+import online.bottler.letter.adapter.out.persistence.model.LetterSummaryProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
 
@@ -23,7 +23,7 @@ public class LetterBoxQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<LetterSummaryResponse> fetchLetters(Long userId, BoxType boxType, Pageable pageable) {
+    public List<LetterSummaryProjection> fetchLetterSummariesByUserIdAndBoxType(Long userId, BoxType boxType, Pageable pageable) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
         QLetterEntity letter = QLetterEntity.letterEntity;
         QReplyLetterEntity replyLetter = QReplyLetterEntity.replyLetterEntity;
@@ -35,7 +35,7 @@ public class LetterBoxQueryRepository {
 
         return queryFactory
                 .select(Projections.constructor(
-                        LetterSummaryResponse.class,
+                        LetterSummaryProjection.class,
                         letterBox.letterId,
                         letterTitle,
                         letterLabel,

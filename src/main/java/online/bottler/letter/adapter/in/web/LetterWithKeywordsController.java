@@ -12,10 +12,8 @@ import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
 import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsDeleteRequest;
 import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsRequest;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
-import online.bottler.letter.application.port.in.CreateLetterWithKeywordsUseCase;
-import online.bottler.letter.application.port.in.DeleteLetterWithKeywordsUseCase;
-import online.bottler.letter.application.port.in.GetLetterWithKeywordsDetailUseCase;
-import online.bottler.letter.application.port.in.GetRecommendedLettersUseCase;
+import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
+import online.bottler.letter.application.port.in.RecommendUseCase;
 import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,27 +34,24 @@ import online.bottler.letter.application.response.LetterRecommendSummaryResponse
 @Tag(name = "키워드 편지", description = "키워드 편지 API")
 public class LetterWithKeywordsController {
 
-    private final CreateLetterWithKeywordsUseCase createLetterWithKeywordsUseCase;
-    private final GetLetterWithKeywordsDetailUseCase getLetterWithKeywordsDetailUseCase;
-    private final GetRecommendedLettersUseCase getRecommendedLettersUseCase;
-    private final DeleteLetterWithKeywordsUseCase deleteLetterWithKeywordsUseCase;
+    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
+    private final RecommendUseCase recommendUseCase;
 
     @Operation(summary = "키워드 편지 생성", description = "새로운 키워드 편지를 생성합니다.")
     @PostMapping
     @LetterValidationMetaData(message = "키워드 편지 유효성 검사 실패", errorStatus = LETTER_VALIDATION_ERROR)
     public ApiResponse<LetterWithKeywordsResponse> createLetter(
-            @RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest,
-            BindingResult bindingResult,
+            @RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest, BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(
-                createLetterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
+                letterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
     }
 
     @Operation(summary = "키워드 편지 상세 조회", description = "편지 ID로 키워드 편지의 상세 정보를 조회합니다.")
     @GetMapping("/detail/{letterId}")
     public ApiResponse<LetterWithKeywordsDetailResponse> getLetterDetail(@PathVariable Long letterId,
                                                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(getLetterWithKeywordsDetailUseCase.getDetail(
+        return ApiResponse.onSuccess(letterWithKeywordsUseCase.getDetail(
                 LetterWithKeywordsDetailQuery.of(letterId, userDetails.getUserId())));
     }
 
@@ -64,14 +59,15 @@ public class LetterWithKeywordsController {
     @GetMapping("/recommend")
     public ApiResponse<List<LetterRecommendSummaryResponse>> getRecommendLetters(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(getRecommendedLettersUseCase.getRecommended(userDetails.getUserId()));
+        return ApiResponse.onSuccess(recommendUseCase.getRecommended(userDetails.getUserId()));
     }
 
     @Operation(summary = "키워드 편지 삭제", description = "키워드 편지ID, BoxType 송수신(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")
     @DeleteMapping
-    public ApiResponse<String> deleteLetter(@RequestBody @Valid LetterWithKeywordsDeleteRequest letterWithKeywordsDeleteRequest,
-                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        deleteLetterWithKeywordsUseCase.delete(letterWithKeywordsDeleteRequest.toCommand(userDetails.getUserId()));
+    public ApiResponse<String> deleteLetter(
+            @RequestBody @Valid LetterWithKeywordsDeleteRequest letterWithKeywordsDeleteRequest,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteRequest.toCommand(userDetails.getUserId()));
         return ApiResponse.onSuccess("키워드 편지를 삭제했습니다.");
     }
 }

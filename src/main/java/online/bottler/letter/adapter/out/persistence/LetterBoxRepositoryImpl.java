@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import online.bottler.letter.adapter.out.persistence.repository.LetterBoxJpaRepository;
 import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import online.bottler.letter.application.response.LetterSummaryResponse;
@@ -36,10 +35,11 @@ public class LetterBoxRepositoryImpl implements LetterBoxRepository {
 
     @Override
     public Page<LetterSummaryResponse> findLetters(Long userId, Pageable pageable, BoxType boxType) {
-        List<LetterSummaryResponse> letterSummaryResponses = letterBoxQueryRepository.fetchLetters(userId,
-                boxType, pageable);
-        long total = countLetters(userId, boxType);
-        return new PageImpl<>(letterSummaryResponses, pageable, total);
+//        List<LetterSummaryResponse> letterSummaryResponses = letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(userId,
+//                boxType, pageable);
+//        long total = countLetters(userId, boxType);
+//        return new PageImpl<>(letterSummaryResponses, pageable, total);
+        return null;
     }
 
     @Override

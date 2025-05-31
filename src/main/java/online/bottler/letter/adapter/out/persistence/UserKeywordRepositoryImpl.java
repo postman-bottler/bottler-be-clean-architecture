@@ -2,7 +2,6 @@ package online.bottler.letter.adapter.out.persistence;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.adapter.out.persistence.repository.UserKeywordJdbcRepository;
 import online.bottler.letter.adapter.out.persistence.repository.UserKeywordJpaRepository;
 import org.springframework.stereotype.Repository;
 import online.bottler.letter.application.port.out.UserKeywordRepository;
@@ -14,7 +13,6 @@ import online.bottler.letter.adapter.out.persistence.entity.UserKeywordEntity;
 public class UserKeywordRepositoryImpl implements UserKeywordRepository {
 
     private final UserKeywordJpaRepository jpaRepository;
-    private final UserKeywordJdbcRepository jdbcRepository;
 
     @Override
     public List<UserKeyword> findUserKeywordsByUserId(Long userId) {
@@ -23,12 +21,13 @@ public class UserKeywordRepositoryImpl implements UserKeywordRepository {
 
     @Override
     public void replaceKeywordsByUserId(List<UserKeyword> userKeywords, Long userId) {
-        jdbcRepository.deleteAllByUserId(userId);
-        jdbcRepository.batchInsertKeywords(userKeywords);
+//        jdbcRepository.deleteAllByUserId(userId);
+//        jdbcRepository.batchInsertKeywords(userKeywords);
     }
 
     @Override
     public List<String> findKeywordsByUserId(Long userId) {
-        return jpaRepository.findKeywordsByUserId(userId);
+//        return jpaRepository.findKeywordsByUserId(userId);
+        return null;
     }
 }
