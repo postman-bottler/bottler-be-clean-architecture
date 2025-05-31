@@ -3,6 +3,7 @@ package online.bottler.letter.application;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.user.application.port.out.UserPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import online.bottler.letter.application.port.out.LetterKeywordRepository;
@@ -21,7 +22,6 @@ import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
 import online.bottler.letter.exception.LetterNotFoundException;
 import online.bottler.letter.exception.UnauthorizedLetterAccessException;
-import online.bottler.user.application.repository.UserRepository;
 
 @Slf4j
 @Service
@@ -32,7 +32,7 @@ public class LetterService {
     private final LetterKeywordRepository letterKeywordRepository;
     private final LetterBoxRepository letterBoxRepository;
     private final ReplyLetterRepository replyLetterRepository;
-    private final UserRepository userRepository;
+    private final UserPersistencePort userRepository;
     private final RedisLetterService redisLetterService;
 
     //done

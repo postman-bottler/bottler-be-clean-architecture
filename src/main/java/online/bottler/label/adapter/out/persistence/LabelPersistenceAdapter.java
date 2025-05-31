@@ -10,9 +10,9 @@ import online.bottler.label.adapter.out.persistence.repository.UserLabelJpaRepos
 import online.bottler.label.domain.Label;
 import online.bottler.label.domain.LabelType;
 import online.bottler.label.application.port.out.LabelPersistencePort;
+import online.bottler.user.adapter.out.persistence.entity.UserEntity;
+import online.bottler.user.adapter.out.persistence.repository.UserJpaRepository;
 import online.bottler.user.domain.User;
-import online.bottler.user.infra.UserJpaRepository;
-import online.bottler.user.infra.entity.UserEntity;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

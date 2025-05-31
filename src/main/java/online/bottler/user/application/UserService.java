@@ -10,15 +10,16 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import online.bottler.auth.JwtTokenProvider;
 import online.bottler.global.exception.ApplicationException;
-import online.bottler.label.application.repository.LabelRepository;
+import online.bottler.label.application.port.out.LabelPersistencePort;
 import online.bottler.label.domain.Label;
 import online.bottler.letter.application.LetterBoxService;
 import online.bottler.letter.application.RedisLetterService;
 import online.bottler.letter.application.command.LetterBoxCommand;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterType;
-import online.bottler.notification.application.NotificationService;
+import online.bottler.notification.application.port.NotificationUseCase;
 import online.bottler.slack.SlackConstant;
 import online.bottler.slack.SlackService;
 import online.bottler.user.application.command.AuthEmailCommand;
@@ -39,7 +40,6 @@ import online.bottler.user.domain.EmailForm;
 import online.bottler.user.domain.ProfileImage;
 import online.bottler.user.domain.RefreshToken;
 import online.bottler.user.domain.User;
-import online.bottler.user.adapter.in.web.auth.JwtTokenProvider;
 import online.bottler.user.application.port.in.BanUseCase;
 import online.bottler.user.application.port.in.EmailUseCase;
 import online.bottler.user.application.port.in.UserUseCase;
@@ -71,10 +71,11 @@ public class UserService implements UserUseCase {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailUseCase emailUseCase;
     private final SlackService slackService;
-    private final NotificationService notificationService;
+//    private final NotificationService notificationService;
+    private final NotificationUseCase notificationUseCase;
     private final RedisLetterService redisLetterService;
     private final LetterBoxService letterBoxService;
-    private final LabelRepository labelRepository;
+    private final LabelPersistencePort labelPersistencePort;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int CODE_LENGTH = 8;
@@ -306,7 +307,7 @@ public class UserService implements UserUseCase {
         if (user.checkBan()) {
             banUseCase.banUser(user);
             slackService.sendSlackMessage(SlackConstant.BAN, userId);
-            notificationService.sendBanNotification(userId);
+            notificationUseCase.sendBanNotification(userId);
         }
         userPersistencePort.updateWarningCount(user);
     }
@@ -334,15 +335,14 @@ public class UserService implements UserUseCase {
     public void giveDefaultLabelsToNewUser(User storedUser) {
         List<Long> defaultLabelIds = List.of(1L, 2L);
         for (Long labelId : defaultLabelIds) {
-            Label label = labelRepository.findLabelByLabelId(labelId);
+            Label label = labelPersistencePort.findLabelByLabelId(labelId);
             giveLabelToUser(storedUser, label);
         }
     }
 
     private void giveLabelToUser(User user, Label label) {
-        labelRepository.updateOwnedCount(label);
+        labelPersistencePort.updateOwnedCount(label);
 
-        //오류나서 주석 처리
-//        labelRepository.createUserLabel(user, label);
+        labelPersistencePort.createUserLabel(user, label);
     }
 }

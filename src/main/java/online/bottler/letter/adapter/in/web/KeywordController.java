@@ -2,6 +2,7 @@ package online.bottler.letter.adapter.in.web;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import online.bottler.auth.CustomUserDetails;
 import online.bottler.letter.application.port.in.CreateUserKeywordsUseCase;
 import online.bottler.letter.application.port.in.GetAllKeywordsUseCase;
 import online.bottler.letter.application.port.in.GetFrequentKeywordsUseCase;
@@ -17,7 +18,6 @@ import online.bottler.global.response.ApiResponse;
 import online.bottler.letter.adapter.in.web.request.UserKeywordRequest;
 import online.bottler.letter.application.response.FrequentKeywordsDTO;
 import online.bottler.letter.application.response.UserKeywordResponse;
-import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor

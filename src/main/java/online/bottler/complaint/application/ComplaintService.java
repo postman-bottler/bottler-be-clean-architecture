@@ -5,13 +5,12 @@ import online.bottler.complaint.application.port.*;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.ComplaintType;
 import online.bottler.complaint.domain.Complaints;
-import online.bottler.letter.application.LetterService;
-import online.bottler.letter.application.ReplyLetterService;
+import online.bottler.letter.application.port.in.BlockLetterUseCase;
+import online.bottler.letter.application.port.in.BlockReplyLetterUseCase;
 import online.bottler.mapletter.application.BlockMapLetterType;
-import online.bottler.mapletter.application.MapLetterService;
-import online.bottler.notification.application.NotificationService;
-import online.bottler.notification.domain.NotificationType;
-import online.bottler.user.application.UserService;
+import online.bottler.mapletter.application.port.in.MapLetterUseCase;
+import online.bottler.notification.application.port.NotificationUseCase;
+import online.bottler.user.application.port.in.UserUseCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +22,11 @@ public class ComplaintService implements ComplaintUseCase {
     private final KeywordReplyComplaintPersistencePort keywordReplyComplaintPersistencePort;
     private final MapReplyComplaintPersistencePort mapReplyComplaintPersistencePort;
 
-    private final NotificationService notificationService;
-    private final LetterService letterService;
-    private final ReplyLetterService replyLetterService;
-    private final MapLetterService mapLetterService;
-    private final UserService userService;
+    private final NotificationUseCase notificationUseCase;
+    private final BlockLetterUseCase blockLetterUseCase;
+    private final BlockReplyLetterUseCase blockReplyLetterUseCase;
+    private final MapLetterUseCase mapLetterUseCase;
+    private final UserUseCase userUseCase;
 
     @Override
     @Transactional
@@ -48,16 +47,16 @@ public class ComplaintService implements ComplaintUseCase {
 
     private void sendWarningToWriter(ComplaintType type, Long letterId) {
         Long writerId = blockLetter(type, letterId);
-        notificationService.sendNotification(NotificationType.WARNING, writerId, letterId, null);
-        userService.updateWarningCount(writerId);
+        notificationUseCase.sendWarningNotification(writerId);
+        userUseCase.updateWarningCount(writerId);
     }
 
     private Long blockLetter(ComplaintType type, Long letterId) {
         return switch (type) {
-            case MAP_LETTER -> mapLetterService.letterBlock(BlockMapLetterType.MAP_LETTER, letterId);
-            case MAP_REPLY_LETTER -> mapLetterService.letterBlock(BlockMapLetterType.REPLY, letterId);
-            case KEYWORD_LETTER -> letterService.softBlockLetter(letterId);
-            case KEYWORD_REPLY_LETTER -> replyLetterService.softBlockLetter(letterId);
+            case MAP_LETTER -> mapLetterUseCase.letterBlock(BlockMapLetterType.MAP_LETTER, letterId);
+            case MAP_REPLY_LETTER -> mapLetterUseCase.letterBlock(BlockMapLetterType.REPLY, letterId);
+            case KEYWORD_LETTER -> blockLetterUseCase.softBlock(letterId);
+            case KEYWORD_REPLY_LETTER -> blockReplyLetterUseCase.softBlock(letterId);
         };
     }
 

@@ -11,7 +11,6 @@ import online.bottler.mapletter.application.response.FindMapLetterResponse;
 import online.bottler.mapletter.application.response.FindReceivedMapLetterResponse;
 import online.bottler.mapletter.domain.MapLetter;
 import org.springframework.data.domain.Page;
-import online.bottler.notification.application.dto.request.NotificationLabelRequestDTO;
 
 public interface MapLetterUseCase {
     MapLetter createPublicMapLetter(CreatePublicMapLetterCommand createPublicMapLetterCommand, Long userId);
@@ -35,6 +34,4 @@ public interface MapLetterUseCase {
     void deleteReceivedMapLetters(DeleteMapLettersCommand deleteMapLettersCommand, Long userId);
 
     Long letterBlock(BlockMapLetterType type, Long letterId);
-
-    List<NotificationLabelRequestDTO> getLabels(List<Long> ids);
 }

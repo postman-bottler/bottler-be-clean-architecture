@@ -47,7 +47,7 @@ public class Label {
         this.ownedCount++;
     }
 
-    public LabelResponse toLabelResponseDTO() {
+    public LabelResponse toLabelResponse() {
         return new LabelResponse(this.labelId, this.imageUrl);
     }
 

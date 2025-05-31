@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.label.adapter.in.web.request.LabelRequest;
 import online.bottler.label.application.port.in.LabelUseCase;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import online.bottler.global.response.ApiResponse;
-import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor

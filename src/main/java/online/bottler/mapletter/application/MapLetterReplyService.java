@@ -4,7 +4,6 @@ import static online.bottler.mapletter.application.DeleteLetterType.MAP;
 import static online.bottler.mapletter.application.DeleteLetterType.REPLY;
 import static online.bottler.notification.domain.NotificationType.MAP_REPLY;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -158,5 +157,10 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
             String title = "Re: " + sourceLetter.getTitle();
             return FindAllReceivedReplyLetterResponse.from(replyMapLetter, title, MAP);
         });
+    }
+
+    @Transactional(readOnly = true)
+    public CheckReplyMapLetterResponse checkReplyMapLetter(Long letterId, Long userId) {
+        return new CheckReplyMapLetterResponse(replyMapLetterPersistencePort.findByLetterIdAndUserId(letterId, userId));
     }
 }

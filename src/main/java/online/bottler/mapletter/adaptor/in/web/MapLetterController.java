@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
@@ -21,7 +22,6 @@ import online.bottler.mapletter.adaptor.in.web.request.CreatePublicMapLetterRequ
 import online.bottler.mapletter.adaptor.in.web.request.CreateTargetMapLetterRequest;
 import online.bottler.mapletter.adaptor.in.web.request.DeleteMapLettersRequest;
 import online.bottler.mapletter.application.response.MapLetterPageResponse;
-import online.bottler.user.auth.CustomUserDetails;
 
 @RestController
 @RequestMapping("/map")
