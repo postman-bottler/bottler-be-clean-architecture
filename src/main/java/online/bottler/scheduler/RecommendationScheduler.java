@@ -9,11 +9,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.RecommendUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import online.bottler.letter.application.RedisLetterService;
-import online.bottler.letter.application.LetterService;
 import online.bottler.notification.application.request.RecommendNotificationCommand;
 import online.bottler.notification.application.NotificationService;
 import online.bottler.user.application.UserService;
@@ -23,11 +22,9 @@ import online.bottler.user.application.UserService;
 @Slf4j
 public class RecommendationScheduler {
 
-//    private final AsyncRecommendationService asyncRecommendationService;
     private final UserService userService;
-    private final RedisLetterService redisLetterService;
     private final NotificationService notificationService;
-    private final LetterService letterService;
+    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
     private final RecommendUseCase recommendUseCase;
 
     @Value("${scheduler.batch-size}")
@@ -79,7 +76,7 @@ public class RecommendationScheduler {
 
         List<RecommendNotificationCommand> notifications = new ArrayList<>();
         for (List<Long> batch : batches) {
-            batch.forEach(userId -> redisLetterService.updateRecommendationsFromTemp(userId)
+            batch.forEach(userId -> recommendUseCase.updateFromTemp(userId)
                     .ifPresent(recommendId -> notifications.add(createRecommendNotification(userId, recommendId))));
         }
 
@@ -102,7 +99,7 @@ public class RecommendationScheduler {
     }
 
     private RecommendNotificationCommand createRecommendNotification(Long userId, Long recommendId) {
-        return RecommendNotificationCommand.of(userId, recommendId, letterService.findLetter(recommendId).getLabel());
+        return RecommendNotificationCommand.of(userId, recommendId, letterWithKeywordsUseCase.getLabel(recommendId));
     }
 
     private void handleFutureResult(CompletableFuture<String> future) {
