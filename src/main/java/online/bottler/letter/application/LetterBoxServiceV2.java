@@ -47,12 +47,12 @@ public class LetterBoxServiceV2 implements LetterBoxUseCase {
 
     @Override
     public Page<LetterSummaryResponse> getReceivedLetters(CommonPageRequest commonPageRequest, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageRequest.toPageable(), BoxType.SEND);
+        return getLetterBoxSummaries(userId, commonPageRequest.toPageable(), BoxType.RECEIVE);
     }
 
     @Override
     public Page<LetterSummaryResponse> getSentLetters(CommonPageRequest commonPageRequest, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageRequest.toPageable(), BoxType.RECEIVE);
+        return getLetterBoxSummaries(userId, commonPageRequest.toPageable(), BoxType.SEND);
     }
 
     @Transactional
@@ -150,7 +150,7 @@ public class LetterBoxServiceV2 implements LetterBoxUseCase {
 
             if (!replyIds.isEmpty()) {
                 replyLetterPersistencePort.softDeleteByIds(replyIds);
-                letterBoxPersistencePort.deleteByCondition(letterIds, LetterType.REPLY_LETTER, BoxType.NONE);
+                letterBoxPersistencePort.deleteByCondition(replyIds, LetterType.REPLY_LETTER, BoxType.NONE);
             }
         }
 
