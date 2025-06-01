@@ -9,7 +9,6 @@ import online.bottler.letter.application.port.in.LetterKeywordUseCase;
 import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.application.response.FrequentKeywordsResponse;
-import online.bottler.letter.domain.Letter;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -22,7 +21,7 @@ public class LetterKeywordServiceV2 implements LetterKeywordUseCase {
 
     @Override
     public FrequentKeywordsResponse getTopFrequent(Long userId) {
-        List<Long> letterIds = letterPersistencePort.loadAllByUserId(userId).stream().map(Letter::getId).toList();
+        List<Long> letterIds = letterPersistencePort.loadIdsByUserId(userId);
         if (letterIds.isEmpty()) {
             log.warn("사용자의 편지 ID가 없음: userId={}", userId);
             return FrequentKeywordsResponse.from(Collections.emptyList());
