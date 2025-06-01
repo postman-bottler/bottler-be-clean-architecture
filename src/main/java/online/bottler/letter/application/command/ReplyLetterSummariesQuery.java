@@ -1,9 +1,9 @@
 package online.bottler.letter.application.command;
 
-import online.bottler.letter.adapter.in.web.request.PageRequest;
+import online.bottler.letter.adapter.in.web.request.CommonPageRequest;
 
-public record ReplyLetterSummariesQuery(Long letterId, PageRequest pageRequest, Long userId) {
-    public static ReplyLetterSummariesQuery of(Long letterId, PageRequest pageRequest, Long userId) {
-        return null;
+public record ReplyLetterSummariesQuery(Long letterId, CommonPageRequest commonPageRequest, Long userId) {
+    public static ReplyLetterSummariesQuery of(Long letterId, CommonPageRequest commonPageRequest, Long userId) {
+        return new ReplyLetterSummariesQuery(letterId, commonPageRequest, userId);
     }
 }
