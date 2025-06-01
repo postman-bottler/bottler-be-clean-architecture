@@ -57,10 +57,7 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
         while (result.size() < count && tryCount < 5) {
             long randomId = random.nextLong(1L, maxId + 1);
-
-            List<Long> partial = letterJpaRepository.getRandomIds(count, randomId, excludedIds);
-
-            result.addAll(partial);
+            result.addAll(letterJpaRepository.getRandomIds(count, randomId, excludedIds));
             tryCount++;
         }
 

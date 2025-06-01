@@ -15,12 +15,9 @@ import lombok.NoArgsConstructor;
 import online.bottler.letter.domain.LetterKeyword;
 
 @Entity
-@Table(
-        name = "letter_keyword",
-        indexes = @Index(name = "idx_letterkeyword_keyword_isdeleted_letter",
-                columnList = "keyword, isDeleted, letterId"),
-        uniqueConstraints = @UniqueConstraint(name = "uq_letter_keyword", columnNames = {"letterId", "keyword"})
-)
+@Table(name = "letter_keyword",
+        indexes = @Index(name = "idx_letterkeyword_keyword_isdeleted_letter", columnList = "keyword, isDeleted, letterId"),
+        uniqueConstraints = @UniqueConstraint(name = "uq_letter_keyword", columnNames = {"letterId", "keyword"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LetterKeywordEntity {
 

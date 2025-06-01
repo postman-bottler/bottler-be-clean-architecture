@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 import online.bottler.letter.domain.RecommendedLetter;
 
 @Entity
-@Table(
-        name = "recommended_letter",
-        uniqueConstraints = @UniqueConstraint(name = "uq_user_letter", columnNames = {"userId", "letterId"})
-)
+@Table(name = "recommended_letter",
+        uniqueConstraints = @UniqueConstraint(name = "uq_user_letter", columnNames = {"userId", "letterId"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecommendedLetterEntity {
 
@@ -44,10 +42,6 @@ public class RecommendedLetterEntity {
     }
 
     public RecommendedLetter toDomain() {
-        return RecommendedLetter.of(
-                id,
-                userId,
-                letterId
-        );
+        return RecommendedLetter.of(id, userId, letterId);
     }
 }

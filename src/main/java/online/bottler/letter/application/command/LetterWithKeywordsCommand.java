@@ -9,9 +9,7 @@ public record LetterWithKeywordsCommand(Letter letter, List<String> keywords) {
     public static LetterWithKeywordsCommand of(Long userId, String title, String content, String font, String paper,
                                                String label, List<String> keywords) {
         return new LetterWithKeywordsCommand(
-                Letter.create(userId, LetterContent.of(title, content, font, paper, label)),
-                keywords
-        );
+                Letter.create(userId, LetterContent.of(title, content, font, paper, label)), keywords);
     }
 
     public Letter toLetter() {

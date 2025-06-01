@@ -7,8 +7,7 @@ import online.bottler.letter.domain.LetterType;
 
 public record LetterBoxCommand(Long userId, Long letterId, LetterType letterType, BoxType boxType,
                                LocalDateTime createdAt) {
-    public static LetterBoxCommand of(Long userId, Long letterId,
-                                      LetterType letterType, BoxType boxType,
+    public static LetterBoxCommand of(Long userId, Long letterId, LetterType letterType, BoxType boxType,
                                       LocalDateTime createdAt) {
         return new LetterBoxCommand(userId, letterId, letterType, boxType, createdAt);
     }

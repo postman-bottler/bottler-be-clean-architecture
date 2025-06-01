@@ -38,8 +38,8 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
-    public void createForDeveloperLetter(Long letterId, Long userId) {
-        save(letterId, userId, LetterType.LETTER, BoxType.RECEIVE, LocalDateTime.now());
+    public void createForDeveloperLetter(List<Long> letterIds, Long userId) {
+        letterIds.forEach(letterId -> save(letterId, userId, LetterType.LETTER, BoxType.RECEIVE, LocalDateTime.now()));
     }
 
     @Override

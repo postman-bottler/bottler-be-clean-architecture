@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserKeywordServiceV2 implements UserKeywordUseCase {
+public class UserKeywordService implements UserKeywordUseCase {
 
     private final UserKeywordPersistencePort userKeywordPersistencePort;
 

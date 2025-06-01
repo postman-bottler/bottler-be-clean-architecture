@@ -34,8 +34,7 @@ public class RecommendationScheduler {
     private int parallelism;
 
     public void processAllUserRecommendations() {
-        List<Long> userIds = userService.getAllUserIds();
-        List<List<Long>> batches = createBatches(userIds);
+        List<List<Long>> batches = createBatches(userService.getAllUserIds());
 
         ExecutorService executorService = Executors.newFixedThreadPool(parallelism);
 
@@ -71,8 +70,7 @@ public class RecommendationScheduler {
     }
 
     public void updateAllRecommendations() {
-        List<Long> userIds = userService.getAllUserIds();
-        List<List<Long>> batches = createBatches(userIds);
+        List<List<Long>> batches = createBatches(userService.getAllUserIds());
 
         List<RecommendNotificationCommand> notifications = new ArrayList<>();
         for (List<Long> batch : batches) {

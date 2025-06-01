@@ -41,9 +41,7 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     public LetterWithKeywordsResponse create(LetterWithKeywordsCommand command) {
         Letter letter = letterPersistencePort.create(command.toLetter());
 
-        List<LetterKeyword> letterKeywords = LetterKeyword.createList(letter.getId(), command.toKeywords());
-        letterKeywordPersistencePort.createAll(letterKeywords);
-
+        letterKeywordPersistencePort.createAll(LetterKeyword.createList(letter.getId(), command.toKeywords()));
         letterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
 
         return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, command.keywords()));
@@ -56,11 +54,11 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
             throw new UnauthorizedLetterAccessException();
         }
 
-        boolean isReplied = replyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
-        List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
-        String profile = userPersistencePort.findById(query.userId()).getImageUrl();
         Letter letter = letterPersistencePort.loadById(query.letterId())
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
+        List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
+        String profile = userPersistencePort.findById(query.userId()).getImageUrl();
+        boolean isReplied = replyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
 
         return LetterWithKeywordsDetailResponse.of(letter, keywords, query.userId(), profile, isReplied);
     }

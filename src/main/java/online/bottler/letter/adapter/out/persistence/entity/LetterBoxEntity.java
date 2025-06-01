@@ -18,11 +18,8 @@ import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterType;
 
 @Entity
-@Table(
-        name = "letter_box",
-        indexes = @Index(name = "idx_letterbox_user_box_createdat",
-                columnList = "userId, boxType, createdAt DESC")
-)
+@Table(name = "letter_box",
+        indexes = @Index(name = "idx_letterbox_user_box_createdat", columnList = "userId, boxType, createdAt DESC"))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LetterBoxEntity {
 

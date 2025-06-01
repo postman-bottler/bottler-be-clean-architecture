@@ -2,7 +2,6 @@ package online.bottler.user.application;
 
 import jakarta.mail.MessagingException;
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -14,11 +13,8 @@ import online.bottler.auth.JwtTokenProvider;
 import online.bottler.global.exception.ApplicationException;
 import online.bottler.label.application.port.out.LabelPersistencePort;
 import online.bottler.label.domain.Label;
-import online.bottler.letter.application.LetterBoxService;
-import online.bottler.letter.application.RedisLetterService;
-import online.bottler.letter.application.command.LetterBoxCommand;
-import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterType;
+import online.bottler.letter.application.port.in.LetterBoxUseCase;
+import online.bottler.letter.application.port.in.RecommendUseCase;
 import online.bottler.notification.application.port.NotificationUseCase;
 import online.bottler.slack.SlackConstant;
 import online.bottler.slack.SlackService;
@@ -73,8 +69,8 @@ public class UserService implements UserUseCase {
     private final SlackService slackService;
 //    private final NotificationService notificationService;
     private final NotificationUseCase notificationUseCase;
-    private final RedisLetterService redisLetterService;
-    private final LetterBoxService letterBoxService;
+    private final RecommendUseCase recommendUseCase;
+    private final LetterBoxUseCase letterBoxUseCase;
     private final LabelPersistencePort labelPersistencePort;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -91,15 +87,8 @@ public class UserService implements UserUseCase {
 //        giveDefaultLabelsToNewUser(storedUser);
 
         List<Long> randomDevelopLetter = findRandomDevelopLetter();
-        redisLetterService.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
-        randomDevelopLetter.forEach(
-                letterId -> letterBoxService.saveLetter(
-                        LetterBoxCommand.of(
-                                storedUser.getUserId(), letterId, LetterType.LETTER,
-                                BoxType.RECEIVE, LocalDateTime.now()
-                        )
-                )
-        );
+        recommendUseCase.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
+        letterBoxUseCase.save(randomDevelopLetter, storedUser.getUserId());
     }
 
     private List<Long> findRandomDevelopLetter() {

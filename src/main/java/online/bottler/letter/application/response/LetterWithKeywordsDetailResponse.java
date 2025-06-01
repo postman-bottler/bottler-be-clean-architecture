@@ -18,7 +18,8 @@ public record LetterWithKeywordsDetailResponse(
         boolean isReplied,
         LocalDateTime createdAt
 ) {
-    public static LetterWithKeywordsDetailResponse of(Letter letter, List<LetterKeyword> letterKeywords, Long currentUserId,
+    public static LetterWithKeywordsDetailResponse of(Letter letter, List<LetterKeyword> letterKeywords,
+                                                      Long currentUserId,
                                                       String profile, boolean isReplied) {
         return new LetterWithKeywordsDetailResponse(
                 letter.getId(),
