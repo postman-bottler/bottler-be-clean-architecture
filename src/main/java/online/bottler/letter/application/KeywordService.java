@@ -2,23 +2,21 @@ package online.bottler.letter.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import online.bottler.letter.application.port.in.KeywordUseCase;
+import online.bottler.letter.application.port.out.KeywordPersistencePort;
 import online.bottler.letter.application.response.KeywordResponse;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import online.bottler.letter.application.port.out.KeywordRepository;
 import online.bottler.letter.domain.Keyword;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
-public class KeywordService {
+public class KeywordService implements KeywordUseCase {
 
-    private final KeywordRepository keywordRepository;
+    private final KeywordPersistencePort keywordPersistencePort;
 
-    @Transactional(readOnly = true)
-    public KeywordResponse getKeywords() {
-        List<Keyword> keywords = keywordRepository.getKeywords();
+    @Override
+    public KeywordResponse getAll() {
+        List<Keyword> keywords = keywordPersistencePort.getKeywords();
         return KeywordResponse.from(keywords);
     }
 }

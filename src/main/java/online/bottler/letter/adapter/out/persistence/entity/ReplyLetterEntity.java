@@ -17,11 +17,9 @@ import online.bottler.letter.domain.LetterContent;
 import online.bottler.letter.domain.ReplyLetter;
 
 @Entity
-@Table(
-        name = "reply_letters",
+@Table(name = "reply_letters",
         indexes = @Index(name = "idx_replyletter_isdeleted_id", columnList = ("isDeleted, id")),
-        uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"senderId"})
-)
+        uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"senderId"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReplyLetterEntity {
 

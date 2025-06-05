@@ -16,10 +16,8 @@ import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterContent;
 
 @Entity
-@Table(
-        name = "letters",
-        indexes = @Index(name = "idx_letter_isdeleted_id", columnList = ("isDeleted, id"))
-)
+@Table(name = "letters",
+        indexes = @Index(name = "idx_letter_isdeleted_id", columnList = ("isDeleted, id")))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LetterEntity {
 

@@ -7,7 +7,7 @@ import online.bottler.letter.application.response.LetterSummaryResponse;
 import org.springframework.data.domain.Page;
 
 public interface LetterBoxUseCase {
-    void save(Long letterId, Long userId);
+    void save(List<Long> letterId, Long userId);
 
     Page<LetterSummaryResponse> getAllLetters(CommonPageRequest commonPageRequest, Long userId);
 
