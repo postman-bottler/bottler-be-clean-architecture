@@ -7,11 +7,15 @@ import online.bottler.mapletter.application.response.FindAllReceivedReplyLetterR
 import online.bottler.mapletter.application.response.FindAllReplyMapLettersResponse;
 import online.bottler.mapletter.application.response.FindAllSentReplyMapLetterResponse;
 import online.bottler.mapletter.application.response.OneReplyLetterResponse;
+import online.bottler.mapletter.domain.MapLetter;
 import online.bottler.mapletter.domain.ReplyMapLetter;
 import org.springframework.data.domain.Page;
 
 public interface MapLetterReplyUseCase {
-    ReplyMapLetter createReplyMapLetter(CreateReplyMapLetterCommand createReplyMapLetterCommand, Long userId);
+    ReplyMapLetter createReplyMapLetter(CreateReplyMapLetterCommand createReplyMapLetterCommand, Long userId,
+                                        MapLetter mapLetter);
+
+    MapLetter findSourceMapLetter(Long LetterId);
 
     Page<FindAllReplyMapLettersResponse> findAllReplyMapLetters(int page, int size, Long letterId, Long userId);
 

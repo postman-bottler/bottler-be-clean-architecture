@@ -1,10 +1,14 @@
 package online.bottler.mapletter.application;
 
+import static online.bottler.notification.domain.NotificationType.MAP_REPLY;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import online.bottler.global.exception.ApplicationException;
+import online.bottler.mapletter.application.command.CreateReplyMapLetterCommand;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
 import online.bottler.mapletter.application.port.in.MapLetterArchiveUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterProximityUseCase;
@@ -13,7 +17,9 @@ import online.bottler.mapletter.application.port.in.MapLetterUseCase;
 import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
 import online.bottler.mapletter.domain.MapLetter;
+import online.bottler.mapletter.domain.ReplyMapLetter;
 import online.bottler.mapletter.domain.policy.MapLetterPolicy;
+import online.bottler.notification.application.port.NotificationUseCase;
 import online.bottler.user.application.port.in.UserUseCase;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +32,7 @@ public class MapLetterFacade {
     private final UserUseCase userUseCase;
     private final MapLetterReplyUseCase mapLetterReplyUseCase;
     private final MapLetterProximityUseCase mapLetterProximityUseCase;
+    private final NotificationUseCase notificationUseCase;
 
     public OneLetterResponse findArchiveOneLetter(Long letterId, Long userId) {
         MapLetter mapLetter = mapLetterUseCase.findById(letterId);
@@ -103,5 +110,16 @@ public class MapLetterFacade {
                     return FindNearbyLettersResponse.from(letter, nickname);
                 })
                 .toList();
+    }
+
+    public ReplyMapLetter createReplyMapLetter(CreateReplyMapLetterCommand createReplyMapLetterCommand, Long userId) {
+        MapLetter source = mapLetterReplyUseCase.findSourceMapLetter(createReplyMapLetterCommand.sourceLetter());
+        ReplyMapLetter saveLetter = mapLetterReplyUseCase.createReplyMapLetter(createReplyMapLetterCommand, userId,
+                source);
+
+        notificationUseCase.sendLetterNotification(MAP_REPLY, source.getCreateUserId(), saveLetter.getReplyLetterId(),
+                saveLetter.getLabel());
+
+        return saveLetter;
     }
 }

@@ -252,6 +252,7 @@ public class MapLetterService implements MapLetterUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MapLetter findById(Long id) {
         return mapLetterPersistencePort.findById(id);
     }
