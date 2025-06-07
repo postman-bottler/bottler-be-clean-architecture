@@ -256,6 +256,14 @@ public class MapLetterService implements MapLetterUseCase {
         return mapLetterPersistencePort.findById(id);
     }
 
+    @Override
+    @Transactional
+    public void targetUserUpdateRead(Long userId, MapLetter mapLetter) {
+        if (mapLetter.isTargetUser(userId)) {
+            mapLetterPersistencePort.updateRead(mapLetter);
+        }
+    }
+
     void validMaxPage(int maxPage, int nowPage) {
         if (maxPage < nowPage) {
             throw new ApplicationException("페이지가 존재하지 않습니다.");

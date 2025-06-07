@@ -3,6 +3,7 @@ package online.bottler.mapletter.application;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
 import online.bottler.mapletter.application.port.in.MapLetterArchiveUseCase;
@@ -65,5 +66,42 @@ public class MapLetterFacade {
 
         String profileImg = userUseCase.getProfileImageUrlById(mapLetter.getCreateUserId());
         return OneLetterResponse.from(mapLetter, profileImg, false, false, false);
+    }
+
+    public OneLetterResponse findOneMapLetter(Long letterId, Long userId, BigDecimal latitude, BigDecimal longitude) {
+        MapLetter mapLetter = mapLetterUseCase.findById(letterId);
+        Double distance = mapLetterProximityUseCase.findDistance(latitude, longitude, letterId);
+
+        mapLetter.validateFindOneMapLetter(MapLetterPolicy.VIEW_DISTANCE, distance);
+        mapLetter.validateAccess(userId);
+
+        mapLetterUseCase.targetUserUpdateRead(userId, mapLetter);
+
+        String profileImg = userUseCase.getProfileImageUrlById(mapLetter.getCreateUserId());
+        boolean isReplied = mapLetterReplyUseCase.hasReplyForMapLetter(letterId, userId).isReplied();
+        boolean isArchived = mapLetterArchiveUseCase.isArchived(letterId, userId);
+
+        return OneLetterResponse.from(mapLetter, profileImg, Objects.equals(mapLetter.getCreateUserId(), userId),
+                isReplied, isArchived);
+    }
+
+    public List<FindNearbyLettersResponse> findNearByMapLetters(BigDecimal latitude, BigDecimal longitude,
+                                                                Long userId) {
+        List<MapLetterAndDistance> letters = mapLetterProximityUseCase.findLettersByUserLocation(latitude, longitude,
+                userId);
+
+        List<Long> userIds = letters.stream()
+                .map(MapLetterAndDistance::getCreateUserId)
+                .distinct()
+                .toList();
+
+        Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
+
+        return letters.stream()
+                .map(letter -> {
+                    String nickname = nicknamesByIds.get(letter.getCreateUserId());
+                    return FindNearbyLettersResponse.from(letter, nickname);
+                })
+                .toList();
     }
 }

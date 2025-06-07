@@ -36,4 +36,6 @@ public interface MapLetterUseCase {
     Long letterBlock(BlockMapLetterType type, Long letterId);
 
     MapLetter findById(Long id);
+
+    void targetUserUpdateRead(Long userId, MapLetter mapLetter);
 }
