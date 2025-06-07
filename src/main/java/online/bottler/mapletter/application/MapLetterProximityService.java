@@ -50,16 +50,28 @@ public class MapLetterProximityService implements MapLetterProximityUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FindNearbyLettersResponse> findNearByMapLetters(
-            BigDecimal latitude, BigDecimal longitude, Long userId) {
+    public List<FindNearbyLettersResponse> findNearByMapLetters(BigDecimal latitude, BigDecimal longitude,
+                                                                Long userId) {
         List<MapLetterAndDistance> letters = mapLetterPersistencePort.findLettersByUserLocation(latitude, longitude,
                 userId);
 
         return letters.stream()
                 .map(letter -> {
-                            String nickname = userService.getNicknameById(letter.getCreateUserId()); //TODO: UserService에 getNicknamesByIds 생성하기
+                            String nickname = userService.getNicknameById(
+                                    letter.getCreateUserId()); //TODO: UserService에 getNicknamesByIds 생성하기
                             return FindNearbyLettersResponse.from(letter, nickname);
                         }
                 ).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Double findDistance(BigDecimal latitude, BigDecimal longitude, Long letterId) {
+        return mapLetterPersistencePort.findDistanceByLatitudeAndLongitudeAndLetterId(latitude, longitude, letterId);
+    }
+
+    @Override
+    public List<MapLetterAndDistance> findGuestNearByMapLetters(BigDecimal latitude, BigDecimal longitude) {
+        return mapLetterPersistencePort.guestFindLettersByUserLocation(latitude, longitude);
     }
 }

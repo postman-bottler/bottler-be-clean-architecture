@@ -1,5 +1,6 @@
 package online.bottler.user.adapter.out.persistence.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.Optional;
 import online.bottler.user.adapter.out.persistence.entity.UserEntity;
@@ -25,4 +26,7 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByEmailAndProvider(String kakaoId, Provider provider);
 
     Optional<UserEntity> findByNickname(String nickname);
+
+    @Query("SELECT userId, nickname FROM UserEntity WHERE userId IN :ids")
+    List<Object[]> getIdAndNicknameByUserIdIn(List<Long> ids);
 }

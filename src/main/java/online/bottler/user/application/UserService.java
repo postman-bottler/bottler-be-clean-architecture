@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,7 +68,7 @@ public class UserService implements UserUseCase {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailUseCase emailUseCase;
     private final SlackService slackService;
-//    private final NotificationService notificationService;
+    //    private final NotificationService notificationService;
     private final NotificationUseCase notificationUseCase;
     private final RecommendUseCase recommendUseCase;
     private final LetterBoxUseCase letterBoxUseCase;
@@ -106,7 +107,8 @@ public class UserService implements UserUseCase {
     @Transactional
     public void createDeveloper(SignUpCommand signUpCommand) {
         String profileImageUrl = profileImagePersistencePort.findProfileImage();
-        User user = User.createDeveloper(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()), signUpCommand.nickname(), profileImageUrl);
+        User user = User.createDeveloper(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
+                signUpCommand.nickname(), profileImageUrl);
         userPersistencePort.save(user);
     }
 
@@ -178,7 +180,8 @@ public class UserService implements UserUseCase {
         if (!passwordEncoder.matches(changePasswordCommand.existingPassword(), user.getPassword())) {
             throw new ApplicationException("비밀번호가 일치하지 않습니다.");
         }
-        userPersistencePort.updatePassword(user.getUserId(), passwordEncoder.encode(changePasswordCommand.newPassword()));
+        userPersistencePort.updatePassword(user.getUserId(),
+                passwordEncoder.encode(changePasswordCommand.newPassword()));
     }
 
     @Transactional
@@ -319,6 +322,18 @@ public class UserService implements UserUseCase {
     @Transactional
     public void deleteEmailCode(AuthEmailCommand authEmailCommand) {
         emailCodePersistencePort.deleteByEmail(authEmailCommand.email());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, String> getNicknamesByIds(List<Long> ids) {
+        List<Object[]> getIdAndNicknames = userPersistencePort.findIdAndNicknameByUserIdIn(ids);
+
+        return getIdAndNicknames.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (String) row[1]
+                ));
     }
 
     public void giveDefaultLabelsToNewUser(User storedUser) {

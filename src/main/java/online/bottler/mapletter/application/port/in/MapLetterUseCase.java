@@ -34,4 +34,6 @@ public interface MapLetterUseCase {
     void deleteReceivedMapLetters(DeleteMapLettersCommand deleteMapLettersCommand, Long userId);
 
     Long letterBlock(BlockMapLetterType type, Long letterId);
+
+    MapLetter findById(Long id);
 }

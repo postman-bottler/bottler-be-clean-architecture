@@ -13,7 +13,5 @@ public interface MapLetterArchiveUseCase {
 
     void deleteArchivedLetter(DeleteArchivedLettersCommand deleteArchivedLettersCommand, Long userId);
 
-    OneLetterResponse findArchiveOneLetter(Long letterId, Long userId);
-
     boolean isArchived(Long letterId, Long userId);
 }

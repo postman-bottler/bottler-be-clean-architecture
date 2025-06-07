@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.mapletter.adaptor.in.web.MapLetterProximityController.Coordinates;
-import online.bottler.mapletter.application.port.in.MapLetterGuestUseCase;
+import online.bottler.mapletter.application.MapLetterFacade;
 import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MapLetterGuestController {
 
-    private final MapLetterGuestUseCase mapLetterGuestUseCase;
     private final MapLetterProximityController mapLetterProximityController;
+    private final MapLetterFacade mapLetterFacade;
 
     @GetMapping()
     @Operation(summary = "로그인 하지 않은 유저 주변 편지 조회", description = "로그인 하지 않은 유저의 반경 500m 내 퍼블릭 편지 조회")
@@ -28,7 +28,7 @@ public class MapLetterGuestController {
                                                                                   @RequestParam String longitude) {
         Coordinates coordinates = mapLetterProximityController.parseCoordinates(latitude, longitude);
         return ApiResponse.onSuccess(
-                mapLetterGuestUseCase.guestFindNearByMapLetters(coordinates.latitude(), coordinates.longitude()));
+                mapLetterFacade.guestFindNearByMapLetters(coordinates.latitude(), coordinates.longitude()));
     }
 
     @GetMapping("/{letterId}")
@@ -37,7 +37,7 @@ public class MapLetterGuestController {
                                                                 @RequestParam String longitude,
                                                                 @PathVariable Long letterId) {
         Coordinates coordinates = mapLetterProximityController.parseCoordinates(latitude, longitude);
-        return ApiResponse.onSuccess(mapLetterGuestUseCase.guestFindOneMapLetter(
-                letterId, coordinates.latitude(), coordinates.longitude()));
+        return ApiResponse.onSuccess(
+                mapLetterFacade.guestFindOneMapLetter(letterId, coordinates.latitude(), coordinates.longitude()));
     }
 }

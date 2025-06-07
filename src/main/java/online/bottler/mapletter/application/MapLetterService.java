@@ -251,6 +251,11 @@ public class MapLetterService implements MapLetterUseCase {
         return null;
     }
 
+    @Override
+    public MapLetter findById(Long id) {
+        return mapLetterPersistencePort.findById(id);
+    }
+
     void validMaxPage(int maxPage, int nowPage) {
         if (maxPage < nowPage) {
             throw new ApplicationException("페이지가 존재하지 않습니다.");

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.mapletter.adaptor.in.web.request.DeleteArchivedLettersRequest;
+import online.bottler.mapletter.application.MapLetterFacade;
 import online.bottler.mapletter.application.port.in.MapLetterArchiveUseCase;
 import online.bottler.mapletter.application.response.FindAllArchiveLettersResponse;
 import online.bottler.mapletter.application.response.MapLetterPageResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MapLetterArchiveController {
 
     private final MapLetterArchiveUseCase mapLetterArchiveUseCase;
+    private final MapLetterFacade mapLetterFacade;
 
     @PostMapping("/{letterId}")
     @Operation(summary = "편지 보관", description = "로그인 필수. 퍼블릭 편지를 보관한다.")
@@ -61,6 +63,6 @@ public class MapLetterArchiveController {
     public ApiResponse<OneLetterResponse> findArchiveOneLetter(@PathVariable Long letterId,
                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterArchiveUseCase.findArchiveOneLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterFacade.findArchiveOneLetter(letterId, userId));
     }
 }

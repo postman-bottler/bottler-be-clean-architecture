@@ -1,6 +1,8 @@
 package online.bottler.user.adapter.out.persistence;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.AdaptorException;
@@ -121,5 +123,10 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         UserEntity userEntity = userJpaRepository.findByNickname(nickname)
                 .orElseThrow(() -> new AdaptorException("해당 닉네임에 대한 유저를 찾을 수 없습니다."));
         return UserEntity.toDomain(userEntity);
+    }
+
+    @Override
+    public List<Object[]> findIdAndNicknameByUserIdIn(List<Long> ids) {
+        return userJpaRepository.getIdAndNicknameByUserIdIn(ids);
     }
 }
