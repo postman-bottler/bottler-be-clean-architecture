@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class PaperPersistenceAdaptor implements PaperPersistencePort {
+public class PaperPersistenceAdapter implements PaperPersistencePort {
     private final PaperJpaRepository paperJpaRepository;
 
     @Override

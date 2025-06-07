@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ReplyRecentCacheAdaptor implements RecentReplyCachePort {
+public class ReplyRecentCacheAdapter implements RecentReplyCachePort {
 
     private final ReplyLetterRedisRepository replyLetterRedisRepository;
 

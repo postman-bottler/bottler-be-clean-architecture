@@ -16,7 +16,7 @@ import online.bottler.mapletter.application.port.out.ReplyMapLetterPersistencePo
 
 @Repository
 @RequiredArgsConstructor
-public class ReplyMapLetterPersistenceAdaptor implements ReplyMapLetterPersistencePort {
+public class ReplyMapLetterPersistenceAdapter implements ReplyMapLetterPersistencePort {
     private final ReplyMapLetterJpaRepository replyMapLetterJpaRepository;
     private final EntityManager em;
 

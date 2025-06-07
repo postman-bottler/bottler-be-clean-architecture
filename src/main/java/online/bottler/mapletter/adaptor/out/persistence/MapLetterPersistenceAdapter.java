@@ -18,7 +18,7 @@ import online.bottler.mapletter.application.port.out.MapLetterPersistencePort;
 
 @Repository
 @RequiredArgsConstructor
-public class MapLetterPersistenceAdaptor implements MapLetterPersistencePort {
+public class MapLetterPersistenceAdapter implements MapLetterPersistencePort {
     private final MapLetterJpaRepository mapLetterJpaRepository;
 
     @Override
