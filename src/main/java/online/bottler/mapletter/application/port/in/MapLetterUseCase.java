@@ -5,25 +5,20 @@ import online.bottler.mapletter.application.BlockMapLetterType;
 import online.bottler.mapletter.application.command.CreatePublicMapLetterCommand;
 import online.bottler.mapletter.application.command.CreateTargetMapLetterCommand;
 import online.bottler.mapletter.application.command.DeleteMapLettersCommand;
-import online.bottler.mapletter.application.response.FindAllReceivedLetterResponse;
-import online.bottler.mapletter.application.response.FindAllSentMapLetterResponse;
-import online.bottler.mapletter.application.response.FindMapLetterResponse;
-import online.bottler.mapletter.application.response.FindReceivedMapLetterResponse;
+import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
+import online.bottler.mapletter.application.dto.FindSentMapLetter;
 import online.bottler.mapletter.domain.MapLetter;
 import org.springframework.data.domain.Page;
 
 public interface MapLetterUseCase {
     MapLetter createPublicMapLetter(CreatePublicMapLetterCommand createPublicMapLetterCommand, Long userId);
 
-    MapLetter createTargetMapLetter(CreateTargetMapLetterCommand createTargetMapLetterCommand, Long userId);
+    MapLetter createTargetMapLetter(CreateTargetMapLetterCommand createTargetMapLetterCommand, Long userId,
+                                    Long targetUserId);
 
-    Page<FindMapLetterResponse> findSentMapLetters(int page, int size, Long userId);
+    Page<FindSentMapLetter> findSentLetters(int page, int size, Long userId);
 
-    Page<FindReceivedMapLetterResponse> findReceivedMapLetters(int page, int size, Long userId);
-
-    Page<FindAllSentMapLetterResponse> findAllSentMapLetters(int page, int size, Long userId);
-
-    Page<FindAllReceivedLetterResponse> findAllReceivedLetters(int page, int size, Long userId);
+    Page<FindReceivedMapLetterDTO> findReceivedMapLetters(int page, int size, Long userId);
 
     void deleteMapLetter(List<Long> letters, Long userId);
 
@@ -38,4 +33,8 @@ public interface MapLetterUseCase {
     MapLetter findById(Long id);
 
     void targetUserUpdateRead(Long userId, MapLetter mapLetter);
+
+    Page<MapLetter> findActiveByCreateUserId(int page, int size, Long userId);
+
+    Page<MapLetter> findActiveLetter(int page, int size, Long userId);
 }
