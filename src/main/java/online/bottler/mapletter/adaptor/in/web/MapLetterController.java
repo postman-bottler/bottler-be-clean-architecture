@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
+import online.bottler.mapletter.application.MapLetterCreateFacade;
 import online.bottler.mapletter.application.MapLetterFacade;
 import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
@@ -33,6 +34,7 @@ public class MapLetterController {
     private final MapLetterUseCase mapLetterUseCase;
     private final MapLetterReplyUseCase mapLetterReplyUseCase;
     private final MapLetterFacade mapLetterFacade;
+    private final MapLetterCreateFacade mapLetterCreateFacade;
 
     @PostMapping("/public")
     @Operation(summary = "지도 퍼블릭 편지 생성", description = "로그인 필수. 제목 없으면 무제로 넣어주세요.")
@@ -61,7 +63,7 @@ public class MapLetterController {
         }
 
         Long userId = userDetails.getUserId();
-        mapLetterFacade.createTargetMapLetter(createTargetMapLetterRequest.toCommand(), userId);
+        mapLetterCreateFacade.createTargetMapLetter(createTargetMapLetterRequest.toCommand(), userId);
         return ApiResponse.onCreateSuccess("타겟 편지 생성이 성공되었습니다.");
     }
 

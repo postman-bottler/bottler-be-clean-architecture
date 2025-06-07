@@ -8,6 +8,7 @@ import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
 import online.bottler.mapletter.adaptor.in.web.request.CreateReplyMapLetterRequest;
 import online.bottler.mapletter.adaptor.in.web.request.DeleteReplyMapLettersRequest;
+import online.bottler.mapletter.application.MapLetterCreateFacade;
 import online.bottler.mapletter.application.MapLetterFacade;
 import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.response.CheckReplyMapLetterResponse;
@@ -32,6 +33,7 @@ public class MapLetterReplyController {
 
     private final MapLetterReplyUseCase mapLetterReplyUseCase;
     private final MapLetterFacade mapLetterFacade;
+    private final MapLetterCreateFacade mapLetterCreateFacade;
 
     @PostMapping("/reply")
     @Operation(summary = "답장 편지 생성", description = "로그인 필수. 지도편지 답장을 생성한다.")
@@ -44,7 +46,7 @@ public class MapLetterReplyController {
         }
 
         Long userId = userDetails.getUserId();
-        mapLetterFacade.createReplyMapLetter(createReplyMapLetterRequestDTO.toCommand(), userId);
+        mapLetterCreateFacade.createReplyMapLetter(createReplyMapLetterRequestDTO.toCommand(), userId);
         return ApiResponse.onCreateSuccess("답장 편지 생성이 성공되었습니다.");
     }
 

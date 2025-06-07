@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.mapletter.adaptor.out.persistence.repository.ReplyLetterRedisRepository;
 import online.bottler.mapletter.application.port.out.RecentReplyCachePort;
+import online.bottler.mapletter.domain.policy.MapLetterPolicy;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -12,7 +13,6 @@ public class ReplyRecentCacheAdapter implements RecentReplyCachePort {
 
     private final ReplyLetterRedisRepository replyLetterRedisRepository;
 
-    private static final int REDIS_SAVED_REPLY = 6;
     private static final String RECENT_REPLY_KEY_PREFIX = "REPLY:";
 
     @Override
@@ -23,7 +23,7 @@ public class ReplyRecentCacheAdapter implements RecentReplyCachePort {
     @Override
     public void saveRecentReply(Long userId, String type, Long letterId, String labelUrl) {
         replyLetterRedisRepository.saveRecentReply(createKey(userId), createValue(type, letterId, labelUrl),
-                REDIS_SAVED_REPLY);
+                MapLetterPolicy.REDIS_SAVED_REPLY);
     }
 
     @Override

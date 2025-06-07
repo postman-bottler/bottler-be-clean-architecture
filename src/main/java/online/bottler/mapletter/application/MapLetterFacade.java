@@ -2,8 +2,6 @@ package online.bottler.mapletter.application;
 
 import static online.bottler.mapletter.application.DeleteLetterType.MAP;
 import static online.bottler.mapletter.application.DeleteLetterType.REPLY;
-import static online.bottler.notification.domain.NotificationType.MAP_REPLY;
-import static online.bottler.notification.domain.NotificationType.TARGET_LETTER;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -11,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import online.bottler.mapletter.application.command.CreateReplyMapLetterCommand;
-import online.bottler.mapletter.application.command.CreateTargetMapLetterCommand;
 import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
 import online.bottler.mapletter.application.dto.FindSentMapLetter;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
@@ -29,9 +25,7 @@ import online.bottler.mapletter.application.response.OneLetterResponse;
 import online.bottler.mapletter.application.validator.PageValidator;
 import online.bottler.mapletter.domain.MapLetter;
 import online.bottler.mapletter.domain.MapLetterType;
-import online.bottler.mapletter.domain.ReplyMapLetter;
 import online.bottler.mapletter.domain.policy.MapLetterPolicy;
-import online.bottler.notification.application.port.NotificationUseCase;
 import online.bottler.user.application.port.in.UserUseCase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,7 +41,6 @@ public class MapLetterFacade {
     private final UserUseCase userUseCase;
     private final MapLetterReplyUseCase mapLetterReplyUseCase;
     private final MapLetterProximityUseCase mapLetterProximityUseCase;
-    private final NotificationUseCase notificationUseCase;
 
     public OneLetterResponse findArchiveOneLetter(Long letterId, Long userId) {
         MapLetter mapLetter = mapLetterUseCase.findById(letterId);
@@ -125,17 +118,6 @@ public class MapLetterFacade {
                     return FindNearbyLettersResponse.from(letter, nickname);
                 })
                 .toList();
-    }
-
-    public ReplyMapLetter createReplyMapLetter(CreateReplyMapLetterCommand createReplyMapLetterCommand, Long userId) {
-        MapLetter source = mapLetterReplyUseCase.findSourceMapLetter(createReplyMapLetterCommand.sourceLetter());
-        ReplyMapLetter saveLetter = mapLetterReplyUseCase.createReplyMapLetter(createReplyMapLetterCommand, userId,
-                source);
-
-        notificationUseCase.sendLetterNotification(MAP_REPLY, source.getCreateUserId(), saveLetter.getReplyLetterId(),
-                saveLetter.getLabel());
-
-        return saveLetter;
     }
 
     public Page<FindMapLetterResponse> findSentMapLetters(int page, int size, Long userId) {
@@ -221,12 +203,5 @@ public class MapLetterFacade {
             return FindAllReceivedLetterResponse.from(letter, sendUserNickname, sendUserProfileImg,
                     MAP);
         });
-    }
-
-    public MapLetter createTargetMapLetter(CreateTargetMapLetterCommand createTargetMapLetterCommand, Long userId) {
-        Long targetUserId = userUseCase.getUserIdByNickname(createTargetMapLetterCommand.target());
-        MapLetter save = mapLetterUseCase.createTargetMapLetter(createTargetMapLetterCommand, userId, targetUserId);
-        notificationUseCase.sendLetterNotification(TARGET_LETTER, targetUserId, save.getId(), save.getLabel());
-        return mapLetterUseCase.createTargetMapLetter(createTargetMapLetterCommand, userId, targetUserId);
     }
 }
