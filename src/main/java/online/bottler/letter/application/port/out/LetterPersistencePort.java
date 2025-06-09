@@ -11,8 +11,6 @@ public interface LetterPersistencePort {
 
     List<Letter> loadAllByIds(List<Long> letterIds);
 
-    List<Letter> loadAllByUserId(Long userId);
-
     List<Long> loadIdsByUserId(Long userId);
 
     List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds);

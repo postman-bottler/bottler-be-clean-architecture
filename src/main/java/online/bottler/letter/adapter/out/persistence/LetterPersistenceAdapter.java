@@ -33,11 +33,6 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public List<Letter> loadAllByUserId(Long userId) {
-        return LetterEntity.toDomainList(letterJpaRepository.findAllByUserId(userId));
-    }
-
-    @Override
     public List<Long> loadIdsByUserId(Long userId) {
         return letterJpaRepository.findIdsByUserId(userId);
     }
@@ -57,6 +52,9 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
         while (result.size() < count && tryCount < 5) {
             long randomId = random.nextLong(1L, maxId + 1);
+//            if (!excludedIds.contains(randomId) && !result.contains(randomId)) {
+//                result.add(randomId);
+//            }
             result.addAll(letterJpaRepository.getRandomIds(count, randomId, excludedIds));
             tryCount++;
         }

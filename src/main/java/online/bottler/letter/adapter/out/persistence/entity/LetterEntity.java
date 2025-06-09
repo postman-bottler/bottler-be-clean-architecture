@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterContent;
+import online.bottler.letter.domain.LetterStatus;
 
 @Entity
 @Table(name = "letters",
@@ -65,8 +66,8 @@ public class LetterEntity {
     }
 
     public Letter toDomain() {
-        return Letter.of(id, userId, LetterContent.of(title, content, font, paper, label), isDeleted, isBlocked,
-                createdAt);
+        return Letter.of(id, userId, LetterContent.of(title, content, font, paper, label),
+                LetterStatus.create(isDeleted, isBlocked), createdAt);
     }
 
     public static List<Letter> toDomainList(List<LetterEntity> letterEntities) {

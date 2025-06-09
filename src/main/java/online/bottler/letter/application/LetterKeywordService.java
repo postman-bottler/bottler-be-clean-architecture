@@ -10,6 +10,7 @@ import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.application.response.FrequentKeywordsResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -19,6 +20,7 @@ public class LetterKeywordService implements LetterKeywordUseCase {
     private final LetterPersistencePort letterPersistencePort;
     private final LetterKeywordPersistencePort letterKeywordPersistencePort;
 
+    @Transactional(readOnly = true)
     @Override
     public FrequentKeywordsResponse getTopFrequent(Long userId) {
         List<Long> letterIds = letterPersistencePort.loadIdsByUserId(userId);

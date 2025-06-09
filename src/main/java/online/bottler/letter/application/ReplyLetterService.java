@@ -38,35 +38,41 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     private final DeleteRecentReplyCachePort deleteRecentReplyCachePort;
     private final NotificationService notificationService;
 
+    @Transactional
     @Override
-    public ReplyLetterResponse create(ReplyLetterCommand command) {
-        if (checkIsReplied(command.letterId(), command.userId())) {
+    public ReplyLetterResponse create(ReplyLetterCommand replyLetterCommand) {
+        if (checkIsReplied(replyLetterCommand.letterId(), replyLetterCommand.userId())) {
             throw new DuplicateReplyLetterException();
         }
 
-        Letter letter = letterPersistencePort.loadById(command.letterId())
+        Letter letter = letterPersistencePort.loadById(replyLetterCommand.letterId())
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
 
         ReplyLetter replyLetter = replyLetterPersistencePort.create(
-                ReplyLetter.create(command.userId(), command.letterContent(), command.letterId(), letter.getUserId()));
+                ReplyLetter.create(replyLetterCommand.userId(), replyLetterCommand.letterContent(),
+                        replyLetterCommand.letterId(), letter.getUserId(), letter.getTitle()));
 
         letterBoxPersistencePort.createForReplyLetter(replyLetter.getLetterId(), replyLetter.getUserId(),
                 replyLetter.getReceiverId(), replyLetter.getCreatedAt());
 
         pushRecentReplyCachePort.push(replyLetter.getId(), replyLetter.getLabel(), replyLetter.getReceiverId());
+
         notificationService.sendLetterNotification(KEYWORD_REPLY, replyLetter.getReceiverId(), replyLetter.getId(),
                 replyLetter.getLabel());
 
         return ReplyLetterResponse.from(replyLetter);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery query) {
-        validateLetterInUserBox(query.letterId(), query.userId());
-        return replyLetterPersistencePort.loadSummariesByLetterIdAndReceiverId(query.letterId(), query.userId(),
-                query.commonPageRequest().toPageable()).map(ReplyLetterSummaryResponse::from);
+    public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
+        validateLetterInUserBox(replyLetterSummariesQuery.letterId(), replyLetterSummariesQuery.userId());
+        return replyLetterPersistencePort.loadSummariesByLetterIdAndReceiverId(replyLetterSummariesQuery.letterId(),
+                        replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.commonPageRequest().toPageable())
+                .map(ReplyLetterSummaryResponse::from);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ReplyLetterDetailResponse getDetail(Long id, Long userId) {
         validateLetterInUserBox(id, userId);
@@ -74,11 +80,13 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     }
 
     @Override
-    public void softDelete(ReplyLetterDeleteCommand command) {
-        replyLetterPersistencePort.softDelete(command.id());
-        letterBoxPersistencePort.delete(command.id(), LetterType.REPLY_LETTER, command.boxType());
+    public void softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
+        ReplyLetter replyLetter = findReplyLetter(replyLetterDeleteCommand.id());
 
-        ReplyLetter replyLetter = findReplyLetter(command.id());
+        replyLetterPersistencePort.softDelete(replyLetterDeleteCommand.id());
+        letterBoxPersistencePort.delete(replyLetterDeleteCommand.id(), LetterType.REPLY_LETTER,
+                replyLetterDeleteCommand.boxType());
+
         deleteRecentReplyCachePort.delete(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
     }
 
@@ -86,8 +94,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     public Long softBlock(Long id) {
         replyLetterPersistencePort.softBlock(id);
-        ReplyLetter replyLetter = findReplyLetter(id);
-        return replyLetter.getUserId();
+        return findReplyLetter(id).getUserId();
     }
 
 
@@ -101,7 +108,6 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     }
 
     private void validateLetterInUserBox(Long letterId, Long userId) {
-        //타입 구분 필요
         boolean isLetterInUserBox = letterBoxPersistencePort.existsByLetterIdAndUserId(letterId, userId);
         if (!isLetterInUserBox) {
             throw new UnauthorizedLetterAccessException();

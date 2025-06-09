@@ -6,7 +6,6 @@ import lombok.Getter;
 
 @Getter
 public class LetterKeyword {
-
     private Long id;
     private final Long letterId;
     private final String keyword;

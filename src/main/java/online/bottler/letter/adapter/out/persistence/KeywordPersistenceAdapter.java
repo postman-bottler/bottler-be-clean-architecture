@@ -16,7 +16,6 @@ public class KeywordPersistenceAdapter implements KeywordPersistencePort {
 
     @Override
     public List<Keyword> getKeywords() {
-        List<KeywordEntity> keywords = keywordJpaRepository.findAll();
-        return KeywordEntity.toDomainList(keywords);
+        return KeywordEntity.toDomainList(keywordJpaRepository.findAll());
     }
 }

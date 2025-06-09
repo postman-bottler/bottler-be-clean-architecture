@@ -38,60 +38,88 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     @Transactional
     @Override
-    public LetterWithKeywordsResponse create(LetterWithKeywordsCommand command) {
-        Letter letter = letterPersistencePort.create(command.toLetter());
-
-        letterKeywordPersistencePort.createAll(LetterKeyword.createList(letter.getId(), command.toKeywords()));
-        letterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
-
-        return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, command.keywords()));
+    public LetterWithKeywordsResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
+        Letter letter = createLetterWithKeywords(letterWithKeywordsCommand);
+        createLetterBox(letter);
+        return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, letterWithKeywordsCommand.keywords()));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery query) {
-        if (!letterBoxPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId())) {
-            throw new UnauthorizedLetterAccessException();
-        }
+    public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
+        validateUserPermission(letterWithKeywordsDetailQuery);
 
-        Letter letter = letterPersistencePort.loadById(query.letterId())
-                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
-        List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(query.letterId());
-        String profile = userPersistencePort.findById(query.userId()).getImageUrl();
-        boolean isReplied = replyLetterPersistencePort.existsByLetterIdAndUserId(query.letterId(), query.userId());
+        Letter letter = loadLetterById(letterWithKeywordsDetailQuery.letterId());
 
-        return LetterWithKeywordsDetailResponse.of(letter, keywords, query.userId(), profile, isReplied);
+        List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(
+                letterWithKeywordsDetailQuery.letterId());
+
+        String profile = userPersistencePort.findById(letterWithKeywordsDetailQuery.userId()).getImageUrl();
+
+        boolean isReplied = replyLetterPersistencePort.existsByLetterIdAndUserId(
+                letterWithKeywordsDetailQuery.letterId(), letterWithKeywordsDetailQuery.userId());
+
+        return LetterWithKeywordsDetailResponse.of(letter, keywords, letterWithKeywordsDetailQuery.userId(), profile,
+                isReplied);
     }
 
     @Transactional(readOnly = true)
     @Override
     public String getLabel(Long letterId) {
-        return letterPersistencePort.loadById(letterId)
-                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER)).getLabel();
+        return loadLetterById(letterId).getLabel();
     }
 
     @Transactional
     @Override
-    public void delete(LetterWithKeywordsDeleteCommand command) {
-        Optional<Letter> letter = letterPersistencePort.loadById(command.letterId());
-        validateLetterOwnerShip(letter, command.userId());
+    public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
+        Optional<Letter> letter = letterPersistencePort.loadById(letterWithKeywordsDeleteCommand.letterId());
+        validateLetterOwnerShip(letter, letterWithKeywordsDeleteCommand.userId());
 
-        letterPersistencePort.softDelete(command.letterId());
-        letterKeywordPersistencePort.softDelete(command.letterId());
-        letterBoxPersistencePort.delete(command.letterId(), LetterType.LETTER, BoxType.NONE);
+        deleteLetterWithKeywords(letterWithKeywordsDeleteCommand);
+        deleteLetterBox(letterWithKeywordsDeleteCommand);
     }
 
+    @Transactional
     @Override
     public Long softBlock(Long letterId) {
-        Letter letter = letterPersistencePort.loadById(letterId)
-                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
+        Letter letter = loadLetterById(letterId);
         letterPersistencePort.softBlock(letter.getId());
         return letter.getUserId();
     }
 
-    private void validateLetterOwnerShip(Optional<Letter> letter, Long userId) {
-        if (letter.isEmpty() || !letter.get().getUserId().equals(userId)) {
-            throw new LetterAuthorMismatchException();
+    private Letter createLetterWithKeywords(LetterWithKeywordsCommand letterWithKeywordsCommand) {
+        Letter letter = letterPersistencePort.create(letterWithKeywordsCommand.toLetter());
+        letterKeywordPersistencePort.createAll(
+                LetterKeyword.createList(letter.getId(), letterWithKeywordsCommand.toKeywords()));
+        return letter;
+    }
+
+    private void createLetterBox(Letter letter) {
+        letterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
+    }
+
+    private Letter loadLetterById(Long letterId) {
+        return letterPersistencePort.loadById(letterId)
+                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
+    }
+
+    private void validateUserPermission(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
+        if (!letterBoxPersistencePort.existsByLetterIdAndUserId(letterWithKeywordsDetailQuery.letterId(),
+                letterWithKeywordsDetailQuery.userId())) {
+            throw new UnauthorizedLetterAccessException();
         }
+    }
+
+    private void deleteLetterBox(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
+        letterBoxPersistencePort.delete(letterWithKeywordsDeleteCommand.letterId(), LetterType.LETTER, BoxType.NONE);
+    }
+
+    private void deleteLetterWithKeywords(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
+        letterPersistencePort.softDelete(letterWithKeywordsDeleteCommand.letterId());
+        letterKeywordPersistencePort.softDelete(letterWithKeywordsDeleteCommand.letterId());
+    }
+
+    private void validateLetterOwnerShip(Optional<Letter> letter, Long userId) {
+        letter.filter(l -> l.getUserId().equals(userId)).orElseThrow(LetterAuthorMismatchException::new);
     }
 }

@@ -48,7 +48,7 @@ public class RecommendationController {
     @PostMapping("/update")
     public ResponseEntity<String> updateRecommendationsFromTemp() {
         try {
-            userService.getAllUserIds().forEach(recommendUseCase::updateFromTemp);
+            userService.getAllUserIds().forEach(recommendUseCase::updateRecommendationsFromTemp);
             return ResponseEntity.ok("추천 키워드 편지 변경 완료");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to update recommendations: " + e.getMessage());

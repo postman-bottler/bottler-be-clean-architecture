@@ -15,5 +15,5 @@ public interface RecommendUseCase {
 
     List<Long> fetchTempRecommendations(Long userId);
 
-    Optional<Long> updateFromTemp(Long userId);
+    Optional<Long> updateRecommendationsFromTemp(Long userId);
 }
