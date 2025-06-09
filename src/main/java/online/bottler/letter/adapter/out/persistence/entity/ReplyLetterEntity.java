@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import online.bottler.letter.domain.LetterContent;
+import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.ReplyLetter;
 
 @Entity
@@ -75,7 +76,7 @@ public class ReplyLetterEntity {
 
     public ReplyLetter toDomain() {
         return ReplyLetter.of(id, senderId, LetterContent.of(title, content, font, paper, label),
-                isDeleted, isBlocked, letterId, receiverId, createdAt);
+                LetterStatus.create(isDeleted, isBlocked), createdAt, letterId, receiverId);
     }
 
     public static List<ReplyLetter> toDomainList(List<ReplyLetterEntity> replyLetterEntities) {
