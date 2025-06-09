@@ -34,12 +34,9 @@ public class RecommendationScheduler {
     private int parallelism;
 
     public void processAllUserRecommendations() {
-        List<List<Long>> batches = createBatches(userService.getAllUserIds());
-
         ExecutorService executorService = Executors.newFixedThreadPool(parallelism);
-
         try {
-            for (List<Long> batch : batches) {
+            for (List<Long> batch : createBatches(userService.getAllUserIds())) {
                 log.info("사용자 배치 처리 시작 (크기: {}): {}", batch.size(), batch);
 
                 List<CompletableFuture<String>> futures = batch.stream().map(userId -> CompletableFuture.supplyAsync(
@@ -48,33 +45,37 @@ public class RecommendationScheduler {
 
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                         .thenRun(() -> futures.forEach(this::handleFutureResult))
-                        .exceptionally(ex -> {
-                            log.error("배치 처리 중 예외 발생: {}", ex.getMessage(), ex);
+                        .handle((result, ex) -> {
+                            if (ex != null) {
+                                log.error("배치 처리 중 예외 발생: {}", ex.getMessage(), ex);
+                            } else {
+                                log.info("배치 처리 성공");
+                            }
                             return null;
                         }).join();
-
-                log.info("사용자 배치 처리 완료: {}", batch);
             }
         } finally {
-            executorService.shutdown();
-            try {
-                if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
-                    log.warn("ExecutorService가 30초 내에 종료되지 않아 강제 종료합니다.");
-                    executorService.shutdownNow();
-                }
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                log.error("ExecutorService 종료 중 인터럽트 발생: {}", ie.getMessage(), ie);
+            shutdownExecutorService(executorService);
+        }
+    }
+
+    private void shutdownExecutorService(ExecutorService executorService) {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+                log.warn("ExecutorService가 30초 내에 종료되지 않아 강제 종료합니다.");
+                executorService.shutdownNow();
             }
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.error("ExecutorService 종료 중 인터럽트 발생: {}", ie.getMessage(), ie);
         }
     }
 
     public void updateAllRecommendations() {
-        List<List<Long>> batches = createBatches(userService.getAllUserIds());
-
         List<RecommendNotificationCommand> notifications = new ArrayList<>();
-        for (List<Long> batch : batches) {
-            batch.forEach(userId -> recommendUseCase.updateFromTemp(userId)
+        for (List<Long> batch : createBatches(userService.getAllUserIds())) {
+            batch.forEach(userId -> recommendUseCase.updateRecommendationsFromTemp(userId)
                     .ifPresent(recommendId -> notifications.add(createRecommendNotification(userId, recommendId))));
         }
 
@@ -91,7 +92,7 @@ public class RecommendationScheduler {
     private List<List<Long>> createBatches(List<Long> items) {
         List<List<Long>> batches = new ArrayList<>();
         for (int i = 0; i < items.size(); i += batchSize) {
-            batches.add(items.subList(i, Math.min(items.size(), i + batchSize)));
+            batches.add(new ArrayList<>(items.subList(i, Math.min(items.size(), i + batchSize))));
         }
         return batches;
     }

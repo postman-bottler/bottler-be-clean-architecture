@@ -38,24 +38,22 @@ public class RecommendService implements RecommendUseCase {
     private final UserKeywordPersistencePort userKeywordPersistencePort;
     private final RecommendedLetterPersistencePort recommendedLetterPersistencePort;
 
+    @Transactional
     @Override
     public void saveDeveloperLetter(Long userId, List<Long> recommendations) {
         recommendationCachePort.saveDeveloperLetter(userId, recommendations);
     }
 
+    @Transactional
     @Override
     public String generate(Long userId) {
         log.info("사용자 [{}]의 추천 작업을 시작합니다.", userId);
 
         try {
-            List<String> keywords = userKeywordPersistencePort.loadKeywords(userId);
-            List<Long> letterIds = recommendedLetterPersistencePort.findRecommendedLettersByUserId(userId);
-
-            if (log.isDebugEnabled()) {
-                log.debug("사용자 [{}]의 키워드: {}, 추천 받았던 편지: {}", userId, keywords, letterIds);
-            }
-
-            List<Long> recommendedLetters = getRecommendedLetters(keywords, letterIds, recommendationCandidateLimit);
+            List<String> userKeywords = loadUserKeywords(userId);
+            List<Long> letterIds = findRecommendationLettersByUserId(userId);
+            List<Long> recommendedLetters = getRecommendedLetters(userKeywords, letterIds,
+                    recommendationCandidateLimit);
             recommendationCachePort.saveTempRecommendations(userId, recommendedLetters);
 
             log.info("사용자 [{}]의 추천 작업이 성공적으로 완료되었습니다.", userId);
@@ -70,10 +68,13 @@ public class RecommendService implements RecommendUseCase {
     @Override
     public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
         List<Long> letterIds = letterCachePort.fetchActiveByUserId(userId);
+
         if (letterIds == null || letterIds.isEmpty()) {
             return Collections.emptyList();
         }
+
         List<Letter> letters = letterPersistencePort.loadAllByIds(letterIds);
+
         if (letters.size() != letterIds.size()) {
             throw new LetterNotFoundException(LetterType.LETTER);
         }
@@ -91,34 +92,35 @@ public class RecommendService implements RecommendUseCase {
         return recommendationCachePort.fetchTempRecommendations(userId);
     }
 
+    @Transactional
     @Override
-    public Optional<Long> updateFromTemp(Long userId) {
-        List<Long> tempRecommendations = recommendationCachePort.fetchTempRecommendations(userId);
+    public Optional<Long> updateRecommendationsFromTemp(Long userId) {
+        Optional<Long> recommendId = findFirstValidLetter(fetchTempRecommendations(userId));
 
-        Optional<Long> recommendId = findFirstValidLetter(tempRecommendations);
         if (recommendId.isEmpty()) {
             log.info("userId={}에 대한 유효한 추천이 없음. 추천을 건너뜁니다.", userId);
             return Optional.empty();
         }
 
-        recommendationCachePort.updateActiveRecommendations(userId, recommendId.get());
-        letterBoxPersistencePort.createForRecommendedLetter(recommendId.get(), userId);
-        recommendedLetterPersistencePort.create(RecommendedLetter.create(userId, recommendId.get()));
-
+        updateRecommendation(userId, recommendId);
         return recommendId;
+    }
+
+    private List<String> loadUserKeywords(Long userId) {
+        return userKeywordPersistencePort.loadKeywords(userId);
+    }
+
+    private List<Long> findRecommendationLettersByUserId(Long userId) {
+        return recommendedLetterPersistencePort.findRecommendedLettersByUserId(userId);
     }
 
     private List<Long> getRecommendedLetters(List<String> userKeywords, List<Long> letterIds, int limit) {
         log.debug("추천 편지 조회 요청: userKeywords={}, 제외할 letterIds={}, 추천 개수 limit={}", userKeywords, letterIds, limit);
 
-        List<Long> recommendedLetters = letterKeywordPersistencePort.loadMatchedLetters(userKeywords, letterIds,
-                limit);
+        List<Long> recommendedLetters = letterKeywordPersistencePort.loadMatchedLetters(userKeywords, letterIds, limit);
 
         if (recommendedLetters.size() < limit) {
-            int remaining = limit - recommendedLetters.size();
-            List<Long> randomLetterIds = letterPersistencePort.fetchRandomLetterIdsExcluding(remaining,
-                    letterIds);
-            recommendedLetters.addAll(randomLetterIds);
+            recommendedLetters.addAll(getRandomLetterIds(limit - recommendedLetters.size(), letterIds));
         }
 
         if (recommendedLetters.isEmpty()) {
@@ -128,6 +130,10 @@ public class RecommendService implements RecommendUseCase {
         }
 
         return recommendedLetters;
+    }
+
+    private List<Long> getRandomLetterIds(int remaining, List<Long> letterIds) {
+        return letterPersistencePort.fetchRandomLetterIdsExcluding(remaining, letterIds);
     }
 
     private Optional<Long> findFirstValidLetter(List<Long> recommendations) {
@@ -149,4 +155,9 @@ public class RecommendService implements RecommendUseCase {
         return letterPersistencePort.existsById(letterId);
     }
 
+    private void updateRecommendation(Long userId, Optional<Long> recommendId) {
+        recommendationCachePort.updateActiveRecommendations(userId, recommendId.get());
+        letterBoxPersistencePort.createForRecommendedLetter(recommendId.get(), userId);
+        recommendedLetterPersistencePort.create(RecommendedLetter.create(userId, recommendId.get()));
+    }
 }
