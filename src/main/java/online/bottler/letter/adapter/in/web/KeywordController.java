@@ -29,9 +29,9 @@ public class KeywordController {
 
     @Operation(summary = "유저 키워드 등록", description = "유저가 설정한 키워드로 변경합니다.")
     @PostMapping
-    public ApiResponse<String> createKeywords(@RequestBody UserKeywordRequest request,
+    public ApiResponse<String> createKeywords(@RequestBody UserKeywordRequest userKeywordRequest,
                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
-        userKeywordUseCase.create(request.toCommand(userDetails.getUserId()));
+        userKeywordUseCase.create(userKeywordRequest.toCommand(userDetails.getUserId()));
         return ApiResponse.onSuccess("사용자 키워드를 생성하였습니다.");
     }
 
