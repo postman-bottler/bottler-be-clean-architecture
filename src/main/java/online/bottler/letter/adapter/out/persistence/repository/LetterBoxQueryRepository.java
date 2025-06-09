@@ -55,17 +55,6 @@ public class LetterBoxQueryRepository {
                 .fetch();
     }
 
-    public List<Long> findReceivedLetterIdsByUserId(Long userId) {
-        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        BooleanBuilder condition = buildFetchCondition(userId, BoxType.RECEIVE);
-
-        return queryFactory
-                .select(letterBox.letterId)
-                .from(letterBox)
-                .where(condition)
-                .fetch();
-    }
-
     public long countLetters(Long userId, BoxType boxType) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
         BooleanBuilder condition = buildFetchCondition(userId, boxType);
