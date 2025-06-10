@@ -23,13 +23,13 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public Optional<Letter> loadById(Long letterId) {
-        return letterJpaRepository.findById(letterId).map(LetterEntity::toDomain);
+    public Optional<Letter> loadById(Long id) {
+        return letterJpaRepository.findById(id).map(LetterEntity::toDomain);
     }
 
     @Override
-    public List<Letter> loadAllByIds(List<Long> letterIds) {
-        return LetterEntity.toDomainList(letterJpaRepository.findAllByIds(letterIds));
+    public List<Letter> loadAllByIds(List<Long> ids) {
+        return LetterEntity.toDomainList(letterJpaRepository.findAllByIds(ids));
     }
 
     @Override
@@ -52,9 +52,6 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
         while (result.size() < count && tryCount < 5) {
             long randomId = random.nextLong(1L, maxId + 1);
-//            if (!excludedIds.contains(randomId) && !result.contains(randomId)) {
-//                result.add(randomId);
-//            }
             result.addAll(letterJpaRepository.getRandomIds(count, randomId, excludedIds));
             tryCount++;
         }
@@ -63,13 +60,13 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public void softDelete(Long letterId) {
-        letterJpaRepository.softDeleteById(letterId);
+    public void softDelete(Long id) {
+        letterJpaRepository.softDeleteById(id);
     }
 
     @Override
-    public void softDeleteByIds(List<Long> letterIds) {
-        letterJpaRepository.softDeleteByIds(letterIds);
+    public void softDeleteByIds(List<Long> ids) {
+        letterJpaRepository.softDeleteByIds(ids);
     }
 
     @Override
@@ -78,7 +75,7 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public boolean existsById(Long letterId) {
-        return letterJpaRepository.existsById(letterId);
+    public boolean existsById(Long id) {
+        return letterJpaRepository.existsById(id);
     }
 }
