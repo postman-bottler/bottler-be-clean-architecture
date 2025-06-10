@@ -21,7 +21,7 @@ public interface ReplyLetterJpaRepository extends JpaRepository<ReplyLetterEntit
     Optional<ReplyLetterEntity> findById(@NotNull Long id);
 
     @Query("SELECT r FROM ReplyLetterEntity r WHERE r.id IN :replyLetterIds AND r.isDeleted = false")
-    List<ReplyLetterEntity> findAllByIds(List<Long> replyLetterIds);
+    List<ReplyLetterEntity> findAllByIds(List<Long> ids);
 
     @Query("SELECT r.id FROM ReplyLetterEntity r WHERE r.senderId = :senderId AND r.isDeleted = false")
     List<Long> findIdsBySenderId(Long senderId);
