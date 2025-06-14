@@ -6,9 +6,13 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PushMessage {
-    private String token;
+    private Device device;
 
     private String title;
 
     private String content;
+
+    public String getDeviceToken() {
+        return device.getToken();
+    }
 }

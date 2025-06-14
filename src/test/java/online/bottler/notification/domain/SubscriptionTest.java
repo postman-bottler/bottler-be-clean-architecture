@@ -21,7 +21,7 @@ public class SubscriptionTest {
 
         // then
         assertThat(subscription.getUserId()).isEqualTo(1L);
-        assertThat(subscription.getToken()).isEqualTo("token");
+        assertThat(subscription.getDevice()).isEqualTo(new Device(token));
     }
 
     @DisplayName("알림을 보낼 메시지를 생성한다.")
@@ -36,7 +36,7 @@ public class SubscriptionTest {
         PushMessage pushMessage = subscription.makeMessage(NEW_LETTER);
 
         // then
-        assertThat(pushMessage.getToken()).isEqualTo(token);
+        assertThat(pushMessage.getDevice()).isEqualTo(new Device(token));
         assertThat(pushMessage.getTitle()).isEqualTo(NEW_LETTER.getTitle());
         assertThat(pushMessage.getContent()).isEqualTo(NEW_LETTER.getContent());
     }

@@ -1,10 +1,6 @@
 package online.bottler.notification.adapter.out.persistence;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,13 +19,14 @@ public class SubscriptionEntity {
 
     private Long userId;
 
-    private String token;
+    @Embedded
+    private EmbeddedDevice device;
 
     public static SubscriptionEntity from(Subscription subscription) {
         return SubscriptionEntity.builder()
                 .id(subscription.getId())
                 .userId(subscription.getUserId())
-                .token(subscription.getToken())
+                .device(new EmbeddedDevice(subscription.getDevice()))
                 .build();
     }
 
@@ -37,7 +34,7 @@ public class SubscriptionEntity {
         return Subscription.builder()
                 .id(id)
                 .userId(userId)
-                .token(token)
+                .device(device.toDomain())
                 .build();
     }
 }

@@ -10,18 +10,18 @@ public class Subscription {
 
     private Long userId;
 
-    private String token;
+    private Device device;
 
     public static Subscription create(Long userId, String token) {
         return Subscription.builder()
                 .userId(userId)
-                .token(token)
+                .device(new Device(token))
                 .build();
     }
 
     public PushMessage makeMessage(NotificationType type) {
         return PushMessage.builder()
-                .token(token)
+                .device(device)
                 .title(type.getTitle())
                 .content(type.getContent())
                 .build();

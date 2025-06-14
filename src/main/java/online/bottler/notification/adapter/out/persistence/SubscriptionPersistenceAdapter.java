@@ -2,6 +2,7 @@ package online.bottler.notification.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
 import online.bottler.notification.application.port.SubscriptionPersistencePort;
+import online.bottler.notification.domain.Device;
 import online.bottler.notification.domain.Subscription;
 import online.bottler.notification.domain.Subscriptions;
 import org.springframework.stereotype.Repository;
@@ -41,12 +42,12 @@ public class SubscriptionPersistenceAdapter implements SubscriptionPersistencePo
     }
 
     @Override
-    public void deleteByToken(String token) {
-        repository.deleteByToken(token);
+    public void deleteByDevice(Device device) {
+        repository.deleteByDevice(new EmbeddedDevice(device));
     }
 
     @Override
-    public Boolean isDuplicate(Subscription subscription) {
-        return repository.existsByUserIdAndToken(subscription.getUserId(), subscription.getToken());
+    public Boolean checkDeviceDuplicate(Device device) {
+        return repository.existsByDevice(new EmbeddedDevice(device));
     }
 }

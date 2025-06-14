@@ -5,6 +5,7 @@ import online.bottler.global.exception.ApplicationException;
 import online.bottler.notification.application.response.SubscriptionResponse;
 import online.bottler.notification.application.port.SubscriptionUseCase;
 import online.bottler.notification.application.port.SubscriptionPersistencePort;
+import online.bottler.notification.domain.Device;
 import online.bottler.notification.domain.Subscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +17,11 @@ public class SubscriptionService implements SubscriptionUseCase {
 
     @Transactional
     public SubscriptionResponse subscribe(Long userId, String token) {
-        Subscription subscribe = Subscription.create(userId, token);
-        if (subscriptionPersistencePort.isDuplicate(subscribe)) {
+        Subscription subscription = Subscription.create(userId, token);
+        if (subscriptionPersistencePort.checkDeviceDuplicate(subscription.getDevice())) {
             throw new ApplicationException("해당 기기는 이미 알림이 허용되어 있습니다.");
         }
-        Subscription save = subscriptionPersistencePort.save(subscribe);
+        Subscription save = subscriptionPersistencePort.save(subscription);
         return SubscriptionResponse.from(save);
     }
 
@@ -31,6 +32,6 @@ public class SubscriptionService implements SubscriptionUseCase {
 
     @Transactional
     public void unsubscribe(String token) {
-        subscriptionPersistencePort.deleteByToken(token);
+        subscriptionPersistencePort.deleteByDevice(new Device(token));
     }
 }
