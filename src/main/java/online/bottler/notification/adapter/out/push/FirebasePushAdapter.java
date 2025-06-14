@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import online.bottler.notification.application.PushNotificationPort;
+import online.bottler.notification.application.port.PushNotificationPort;
 import online.bottler.notification.domain.PushMessages;
 
 @Slf4j

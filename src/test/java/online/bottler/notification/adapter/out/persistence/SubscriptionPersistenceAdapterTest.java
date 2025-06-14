@@ -3,6 +3,7 @@ package online.bottler.notification.adapter.out.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import online.bottler.notification.domain.Device;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ class SubscriptionPersistenceAdapterTest {
 
         // then
         assertThat(save.getUserId()).isEqualTo(1L);
-        assertThat(save.getToken()).isEqualTo("token");
+        assertThat(save.getDevice()).isEqualTo(new Device("token"));
         assertThat(save.getId()).isNotNull();
     }
 
@@ -110,13 +111,14 @@ class SubscriptionPersistenceAdapterTest {
     void deleteByToken() {
         // given
         String token = "token1";
+        Device device = new Device("token1");
         Subscription subscription1 = Subscription.create(1L, token);
         Subscription subscription2 = Subscription.create(1L, "token2");
         subscriptionPersistenceAdapter.save(subscription1);
         subscriptionPersistenceAdapter.save(subscription2);
 
         // when
-        subscriptionPersistenceAdapter.deleteByToken(token);
+        subscriptionPersistenceAdapter.deleteByDevice(device);
 
         // then
         Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(1L);
@@ -127,14 +129,14 @@ class SubscriptionPersistenceAdapterTest {
 
     @DisplayName("이미 구독된 유저의 기기라면, true를 반환한다.")
     @Test
-    void isDuplicateWithDuplicateSubscription() {
+    void checkDeviceDuplicateWithDuplicateSubscription() {
         // given
         Subscription subscription = Subscription.create(1L, "token");
         Subscription duplicateSubscription = Subscription.create(1L, "token");
         subscriptionPersistenceAdapter.save(subscription);
 
         // when
-        Boolean result = subscriptionPersistenceAdapter.isDuplicate(duplicateSubscription);
+        Boolean result = subscriptionPersistenceAdapter.checkDeviceDuplicate(duplicateSubscription.getDevice());
 
         // then
         assertThat(result).isTrue();
@@ -142,14 +144,14 @@ class SubscriptionPersistenceAdapterTest {
 
     @DisplayName("저장되지 않은 구독 정보라면, false를 반환한다.")
     @Test
-    void isDuplicate() {
+    void checkDeviceDuplicate() {
         // given
         Subscription subscription = Subscription.create(1L, "token1");
         Subscription notDuplicateSubscription = Subscription.create(1L, "token2");
         subscriptionPersistenceAdapter.save(subscription);
 
         // when
-        Boolean result = subscriptionPersistenceAdapter.isDuplicate(notDuplicateSubscription);
+        Boolean result = subscriptionPersistenceAdapter.checkDeviceDuplicate(notDuplicateSubscription.getDevice());
 
         // then
         assertThat(result).isFalse();

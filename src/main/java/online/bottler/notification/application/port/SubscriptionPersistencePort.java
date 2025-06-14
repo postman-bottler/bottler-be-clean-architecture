@@ -1,5 +1,6 @@
 package online.bottler.notification.application.port;
 
+import online.bottler.notification.domain.Device;
 import online.bottler.notification.domain.Subscription;
 import online.bottler.notification.domain.Subscriptions;
 
@@ -12,7 +13,7 @@ public interface SubscriptionPersistencePort {
 
     void deleteAllByUserId(Long userId);
 
-    void deleteByToken(String token);
+    void deleteByDevice(Device device);
 
-    Boolean isDuplicate(Subscription subscription);
+    Boolean checkDeviceDuplicate(Device device);
 }

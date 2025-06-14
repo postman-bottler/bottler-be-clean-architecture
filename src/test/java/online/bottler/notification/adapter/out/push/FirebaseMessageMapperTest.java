@@ -6,6 +6,7 @@ import static org.assertj.core.groups.Tuple.tuple;
 import com.google.firebase.messaging.Message;
 import java.util.List;
 
+import online.bottler.notification.domain.Device;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ class FirebaseMessageMapperTest {
 
     private PushMessage createPushMessage(String token, String title, String content) {
         return PushMessage.builder()
-                .token(token)
+                .device(new Device(token))
                 .title(title)
                 .content(content)
                 .build();

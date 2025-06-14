@@ -1,4 +1,4 @@
-package online.bottler.notification.application;
+package online.bottler.notification.application.port;
 
 import online.bottler.notification.domain.PushMessages;
 

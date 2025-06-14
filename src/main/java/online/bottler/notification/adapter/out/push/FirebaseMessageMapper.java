@@ -22,7 +22,7 @@ public class FirebaseMessageMapper {
 
     private Message mapToFirebaseMessage(PushMessage message) {
         return Message.builder()
-                .setToken(message.getToken())
+                .setToken(message.getDeviceToken())
                 .setNotification(Notification.builder()
                         .setTitle(message.getTitle())
                         .setBody(message.getContent())

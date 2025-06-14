@@ -2,6 +2,7 @@ package online.bottler.notification.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.notification.application.port.PushNotificationPort;
 import online.bottler.notification.application.request.RecommendNotificationCommand;
 import online.bottler.notification.application.response.NotificationResponse;
 import online.bottler.notification.application.response.UnreadNotificationResponse;

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import online.bottler.notification.application.port.SubscriptionPersistencePort;
+import online.bottler.notification.domain.Device;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,6 +62,6 @@ public class SubscriptionServiceTest {
         subscriptionService.unsubscribe(token);
 
         // THEN
-        verify(subscriptionRepository, times(1)).deleteByToken(token);
+        verify(subscriptionRepository, times(1)).deleteByDevice(new Device(token));
     }
 }
