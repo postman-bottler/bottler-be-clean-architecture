@@ -20,6 +20,9 @@ public class SubscriptionEntity {
     private Long userId;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "token", column = @Column(name = "token"))
+    })
     private EmbeddedDevice device;
 
     public static SubscriptionEntity from(Subscription subscription) {
