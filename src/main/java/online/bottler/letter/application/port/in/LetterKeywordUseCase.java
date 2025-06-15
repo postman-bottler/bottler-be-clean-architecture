@@ -1,7 +1,7 @@
 package online.bottler.letter.application.port.in;
 
-import online.bottler.letter.application.response.FrequentKeywordsResponse;
+import java.util.List;
 
 public interface LetterKeywordUseCase {
-    FrequentKeywordsResponse getTopFrequent(Long userId);
+    List<String> getTopFrequent(List<Long> letterIds, Long userId);
 }

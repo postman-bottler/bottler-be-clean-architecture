@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class Letter extends BaseEntity {
+public class Letter extends BaseDomain {
     private final Long userId;
     private final LetterContent letterContent;
     private final LetterStatus letterStatus;

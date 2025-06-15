@@ -1,4 +1,4 @@
-package online.bottler.letter.application;
+package online.bottler.letter.application.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,21 +8,14 @@ import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.BlockLetterUseCase;
 import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
-import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
-import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
-import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
-import online.bottler.letter.application.response.LetterWithKeywordsResponse;
-import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.LetterWithKeywords;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
 import online.bottler.letter.exception.LetterNotFoundException;
-import online.bottler.letter.exception.UnauthorizedLetterAccessException;
-import online.bottler.user.application.port.out.UserPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,35 +25,20 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     private final LetterPersistencePort letterPersistencePort;
     private final LetterKeywordPersistencePort letterKeywordPersistencePort;
-    private final LetterBoxPersistencePort letterBoxPersistencePort;
-    private final ReplyLetterPersistencePort replyLetterPersistencePort;
-    private final UserPersistencePort userPersistencePort;
 
     @Transactional
     @Override
-    public LetterWithKeywordsResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
-        Letter letter = createLetterWithKeywords(letterWithKeywordsCommand);
-        createLetterBox(letter);
-        return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, letterWithKeywordsCommand.keywords()));
+    public Letter create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
+        return createLetterWithKeywords(letterWithKeywordsCommand);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
-        validateUserPermission(letterWithKeywordsDetailQuery);
-
+    public LetterWithKeywords get(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
         Letter letter = loadLetterById(letterWithKeywordsDetailQuery.letterId());
-
         List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(
                 letterWithKeywordsDetailQuery.letterId());
-
-        String profile = userPersistencePort.findById(letterWithKeywordsDetailQuery.userId()).getImageUrl();
-
-        boolean isReplied = replyLetterPersistencePort.existsByLetterIdAndUserId(
-                letterWithKeywordsDetailQuery.letterId(), letterWithKeywordsDetailQuery.userId());
-
-        return LetterWithKeywordsDetailResponse.of(letter, keywords, letterWithKeywordsDetailQuery.userId(), profile,
-                isReplied);
+        return LetterWithKeywords.create(letter, keywords.stream().map(LetterKeyword::getKeyword).toList());
     }
 
     @Transactional(readOnly = true)
@@ -74,16 +52,32 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
         Optional<Letter> letter = letterPersistencePort.loadById(letterWithKeywordsDeleteCommand.letterId());
         validateLetterOwnerShip(letter, letterWithKeywordsDeleteCommand.userId());
-
         deleteLetterWithKeywords(letterWithKeywordsDeleteCommand);
-        deleteLetterBox(letterWithKeywordsDeleteCommand);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Letter getLetter(Long letterId) {
+        return loadLetterById(letterId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Long> getLetterIdsByUserId(Long userId) {
+        return letterPersistencePort.loadIdsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Letter> loadAllByIds(List<Long> letterIds) {
+        return letterPersistencePort.loadAllByIds(letterIds);
     }
 
     @Transactional
     @Override
     public Long softBlock(Long letterId) {
         Letter letter = loadLetterById(letterId);
-        letterPersistencePort.softBlock(letter.getId());
+        letterPersistencePort.softBlock(loadLetterById(letterId).getId());
         return letter.getUserId();
     }
 
@@ -94,24 +88,9 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         return letter;
     }
 
-    private void createLetterBox(Letter letter) {
-        letterBoxPersistencePort.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
-    }
-
     private Letter loadLetterById(Long letterId) {
         return letterPersistencePort.loadById(letterId)
                 .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
-    }
-
-    private void validateUserPermission(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
-        if (!letterBoxPersistencePort.existsByLetterIdAndUserId(letterWithKeywordsDetailQuery.letterId(),
-                letterWithKeywordsDetailQuery.userId())) {
-            throw new UnauthorizedLetterAccessException();
-        }
-    }
-
-    private void deleteLetterBox(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
-        letterBoxPersistencePort.delete(letterWithKeywordsDeleteCommand.letterId(), LetterType.LETTER, BoxType.NONE);
     }
 
     private void deleteLetterWithKeywords(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {

@@ -1,0 +1,82 @@
+package online.bottler.letter.application.facade;
+
+import static online.bottler.notification.domain.NotificationType.KEYWORD_REPLY;
+
+import lombok.RequiredArgsConstructor;
+import online.bottler.letter.application.command.ReplyLetterCommand;
+import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
+import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
+import online.bottler.letter.application.port.in.LetterBoxUseCase;
+import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
+import online.bottler.letter.application.port.in.RecentReplyForLetterUseCase;
+import online.bottler.letter.application.port.in.ReplyLetterUseCase;
+import online.bottler.letter.application.response.ReplyLetterDetailResponse;
+import online.bottler.letter.application.response.ReplyLetterResponse;
+import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
+import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterType;
+import online.bottler.letter.domain.ReplyLetter;
+import online.bottler.letter.exception.DuplicateReplyLetterException;
+import online.bottler.letter.exception.UnauthorizedLetterAccessException;
+import online.bottler.notification.application.NotificationService;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Component
+@RequiredArgsConstructor
+public class ReplyLetterFacade {
+
+    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
+    private final ReplyLetterUseCase replyLetterUseCase;
+    private final NotificationService notificationService;
+    private final LetterBoxUseCase letterBoxUseCase;
+    private final RecentReplyForLetterUseCase recentReplyForLetterUseCase;
+
+    @Transactional
+    public ReplyLetterResponse create(ReplyLetterCommand replyLetterCommand) {
+        if (replyLetterUseCase.isReplied(replyLetterCommand.letterId(), replyLetterCommand.userId())) {
+            throw new DuplicateReplyLetterException();
+        }
+
+        Letter letter = letterWithKeywordsUseCase.getLetter(replyLetterCommand.letterId());
+        ReplyLetter replyLetter = replyLetterUseCase.create(replyLetterCommand, letter.getUserId(), letter.getTitle());
+        letterBoxUseCase.createForReplyLetter(replyLetter.getLetterId(), replyLetter.getUserId(),
+                replyLetter.getReceiverId(), replyLetter.getCreatedAt());
+
+        recentReplyForLetterUseCase.push(replyLetter.getId(), replyLetter.getLabel(), replyLetter.getReceiverId());
+
+        notificationService.sendLetterNotification(KEYWORD_REPLY, replyLetter.getReceiverId(), replyLetter.getId(),
+                replyLetter.getLabel());
+
+        return ReplyLetterResponse.from(replyLetter);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
+        validateUserAccess(replyLetterSummariesQuery.letterId(), replyLetterSummariesQuery.userId());
+        return replyLetterUseCase.getSummaries(replyLetterSummariesQuery).map(ReplyLetterSummaryResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public ReplyLetterDetailResponse getDetail(Long id, Long userId) {
+        validateUserAccess(id, userId);
+        ReplyLetter replyLetter = replyLetterUseCase.get(id);
+        boolean isReplied = replyLetterUseCase.isReplied(id, userId);
+        return ReplyLetterDetailResponse.from(replyLetter, isReplied);
+    }
+
+    @Transactional
+    public void softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
+        ReplyLetter replyLetter = replyLetterUseCase.softDelete(replyLetterDeleteCommand);
+        letterBoxUseCase.deleteLetter(replyLetterDeleteCommand.id(), LetterType.REPLY_LETTER,
+                replyLetterDeleteCommand.boxType());
+        recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
+    }
+
+    private void validateUserAccess(Long letterId, Long userId) {
+        if (letterBoxUseCase.isAccessDenied(letterId, userId)) {
+            throw new UnauthorizedLetterAccessException();
+        }
+    }
+}

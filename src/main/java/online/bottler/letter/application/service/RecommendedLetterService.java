@@ -1,4 +1,4 @@
-package online.bottler.letter.application;
+package online.bottler.letter.application.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;

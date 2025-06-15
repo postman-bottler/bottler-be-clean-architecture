@@ -10,6 +10,7 @@ import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRe
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
+import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -43,8 +44,9 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
-    public List<LetterSummaryProjection> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
-        return letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(userId, boxType, pageable);
+    public List<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
+        return LetterSummaryProjection.toDomainList(
+                letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(userId, boxType, pageable));
     }
 
     @Override

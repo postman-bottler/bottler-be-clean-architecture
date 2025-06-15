@@ -59,7 +59,7 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public void softDeleteByIds(List<Long> replyIds) {
-        replyLetterJpaRepository.softDeleteByIds(replyIds);
+    public void softDeleteByIds(List<Long> ids) {
+        replyLetterJpaRepository.softDeleteByIds(ids);
     }
 }
