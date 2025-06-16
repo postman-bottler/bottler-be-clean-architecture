@@ -8,8 +8,8 @@ import org.springframework.data.domain.Sort;
 public record CommonPageCommand(Integer page, Integer size, String sort) {
 
     public CommonPageCommand {
-        page = (page == null) ? 1 : page;
-        size = (size == null) ? 9 : size;
+        page = (page == null || page < 1) ? 1 : page;
+        size = (size == null || size < 1) ? 9 : size;
         sort = (sort == null || sort.isBlank()) ? "createdAt" : sort;
 
         SortField.validateSort(sort);

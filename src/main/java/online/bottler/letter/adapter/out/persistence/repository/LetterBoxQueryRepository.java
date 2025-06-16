@@ -12,6 +12,8 @@ import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QReplyLetterEntity;
 import online.bottler.letter.adapter.out.persistence.model.LetterSummaryProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import online.bottler.letter.domain.BoxType;
@@ -23,7 +25,7 @@ public class LetterBoxQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<LetterSummaryProjection> fetchLetterSummariesByUserIdAndBoxType(Long userId, BoxType boxType, Pageable pageable) {
+    public Page<LetterSummaryProjection> fetchLetterSummariesByUserIdAndBoxType(Long userId, BoxType boxType, Pageable pageable) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
         QLetterEntity letter = QLetterEntity.letterEntity;
         QReplyLetterEntity replyLetter = QReplyLetterEntity.replyLetterEntity;
@@ -33,7 +35,7 @@ public class LetterBoxQueryRepository {
 
         BooleanBuilder condition = buildFetchCondition(userId, boxType);
 
-        return queryFactory
+        List<LetterSummaryProjection> letterSummaryProjections = queryFactory
                 .select(Projections.constructor(
                         LetterSummaryProjection.class,
                         letterBox.letterId,
@@ -53,6 +55,10 @@ public class LetterBoxQueryRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        long total = countLetters(userId, boxType);
+
+        return new PageImpl<>(letterSummaryProjections, pageable, total);
     }
 
     public long countLetters(Long userId, BoxType boxType) {

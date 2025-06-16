@@ -28,8 +28,8 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public List<Letter> loadAllByIds(List<Long> ids) {
-        return LetterEntity.toDomainList(letterJpaRepository.findAllByIds(ids));
+    public List<Letter> loadAllIncludingDeletedByIds(List<Long> ids) {
+        return LetterEntity.toDomainList(letterJpaRepository.findAllIncludingDeletedByIds(ids));
     }
 
     @Override

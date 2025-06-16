@@ -21,6 +21,7 @@ import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterDeleteKey;
 import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,19 +79,19 @@ public class LetterBoxService implements LetterBoxUseCase {
 
     @Transactional(readOnly = true)
     @Override
-    public List<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
+    public Page<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
         return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), BoxType.NONE);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<LetterSummary> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId) {
+    public Page<LetterSummary> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId) {
         return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), BoxType.RECEIVE);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<LetterSummary> getSentLetters(CommonPageCommand commonPageCommand, Long userId) {
+    public Page<LetterSummary> getSentLetters(CommonPageCommand commonPageCommand, Long userId) {
         return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), BoxType.SEND);
     }
 
@@ -131,14 +132,8 @@ public class LetterBoxService implements LetterBoxUseCase {
         return !letterBoxPersistencePort.existsByLetterIdAndUserId(letterId, userId);
     }
 
-    private List<LetterSummary> getLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
+    private Page<LetterSummary> getLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
         return letterBoxPersistencePort.loadLetterBoxSummaries(userId, pageable, boxType);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public long countLetters(Long userId, BoxType boxType) {
-        return letterBoxPersistencePort.countLetters(userId, boxType);
     }
 
     private void deleteLettersByLetterTypeAndBoxType(LetterDeleteKey key, List<Long> ids, Long userId) {

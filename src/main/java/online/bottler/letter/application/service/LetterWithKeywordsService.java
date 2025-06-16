@@ -69,8 +69,8 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     @Transactional(readOnly = true)
     @Override
-    public List<Letter> loadAllByIds(List<Long> letterIds) {
-        return letterPersistencePort.loadAllByIds(letterIds);
+    public List<Letter> loadAllIncludingDeletedByIds(List<Long> letterIds) {
+        return letterPersistencePort.loadAllIncludingDeletedByIds(letterIds);
     }
 
     @Transactional

@@ -48,7 +48,7 @@ public class LetterWithKeywordsFacade {
         }
 
         LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.get(letterWithKeywordsDetailQuery);
-        String profile = userUseCase.findById(letterWithKeywordsDetailQuery.userId()).getImageUrl();
+        String profile = userUseCase.findById(letterWithKeywords.getUserId()).getImageUrl();
         boolean isReplied = replyLetterUseCase.isReplied(letterWithKeywordsDetailQuery.letterId(), letterWithKeywordsDetailQuery.userId());
 
         return LetterWithKeywordsDetailResponse.of(letterWithKeywords, letterWithKeywordsDetailQuery.userId(), profile, isReplied);
@@ -57,7 +57,7 @@ public class LetterWithKeywordsFacade {
     @Transactional(readOnly = true)
     public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
         List<Long> recommendedLetterIds = recommendUseCase.getRecommended(userId);
-        List<Letter> letters = letterWithKeywordsUseCase.loadAllByIds(recommendedLetterIds);
+        List<Letter> letters = letterWithKeywordsUseCase.loadAllIncludingDeletedByIds(recommendedLetterIds);
         return LetterRecommendSummaryResponse.fromList(letters);
     }
 

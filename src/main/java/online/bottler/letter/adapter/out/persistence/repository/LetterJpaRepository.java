@@ -16,7 +16,7 @@ public interface LetterJpaRepository extends JpaRepository<LetterEntity, Long> {
     Optional<LetterEntity> findById(@NotNull Long id);
 
     @Query("SELECT l FROM LetterEntity l WHERE l.id IN :ids")
-    List<LetterEntity> findAllByIds(List<Long> ids);
+    List<LetterEntity> findAllIncludingDeletedByIds(List<Long> ids);
 
     @Modifying
     @Query("UPDATE LetterEntity l SET l.isDeleted = true WHERE l.id IN :ids")

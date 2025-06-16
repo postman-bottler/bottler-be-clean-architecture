@@ -7,6 +7,7 @@ import online.bottler.letter.application.command.LetterDeleteCommand;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
+import org.springframework.data.domain.Page;
 
 public interface LetterBoxUseCase {
     void save(List<Long> letterId, Long userId);
@@ -15,11 +16,11 @@ public interface LetterBoxUseCase {
 
     void createForReplyLetter(Long letterId, Long userId, Long receiverId, LocalDateTime createdAt);
 
-    List<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId);
+    Page<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId);
 
-    List<LetterSummary> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId);
+    Page<LetterSummary> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId);
 
-    List<LetterSummary> getSentLetters(CommonPageCommand commonPageCommand, Long userId);
+    Page<LetterSummary> getSentLetters(CommonPageCommand commonPageCommand, Long userId);
 
     void deleteLetter(Long letterId, LetterType letterType, BoxType boxType);
 
@@ -32,8 +33,6 @@ public interface LetterBoxUseCase {
     void deleteAllSentLetters(Long userId);
 
     boolean isAccessDenied(Long letterId, Long userId);
-
-    long countLetters(Long userId, BoxType boxType);
 
     void deleteAllLettersByBoxType(BoxType boxType, Long userId);
 }

@@ -20,5 +20,5 @@ public interface LetterWithKeywordsUseCase {
 
     List<Long> getLetterIdsByUserId(Long userId);
 
-    List<Letter> loadAllByIds(List<Long> recommendedLetterIds);
+    List<Letter> loadAllIncludingDeletedByIds(List<Long> recommendedLetterIds);
 }

@@ -6,9 +6,7 @@ import online.bottler.letter.application.command.CommonPageCommand;
 import online.bottler.letter.application.command.LetterDeleteCommand;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.response.LetterSummaryResponse;
-import online.bottler.letter.domain.BoxType;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,27 +18,17 @@ public class LetterBoxFacade {
 
     @Transactional(readOnly = true)
     public Page<LetterSummaryResponse> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
-        List<LetterSummaryResponse> responses = LetterSummaryResponse.fromList(
-                letterBoxUseCase.getAllLetters(commonPageCommand, userId));
-        long count = letterBoxUseCase.countLetters(userId, BoxType.NONE);
-        return new PageImpl<>(responses, commonPageCommand.toPageable(), count);
+        return letterBoxUseCase.getAllLetters(commonPageCommand, userId).map(LetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
     public Page<LetterSummaryResponse> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId) {
-        List<LetterSummaryResponse> responses = LetterSummaryResponse.fromList(
-                letterBoxUseCase.getReceivedLetters(commonPageCommand, userId));
-        long count = letterBoxUseCase.countLetters(userId, BoxType.RECEIVE);
-        // new PageImpl 메서드 분리 ㄱㅊ
-        return new PageImpl<>(responses, commonPageCommand.toPageable(), count);
+        return letterBoxUseCase.getReceivedLetters(commonPageCommand, userId).map(LetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
     public Page<LetterSummaryResponse> getSentLetters(CommonPageCommand commonPageCommand, Long userId) {
-        List<LetterSummaryResponse> responses = LetterSummaryResponse.fromList(
-                letterBoxUseCase.getSentLetters(commonPageCommand, userId));
-        long count = letterBoxUseCase.countLetters(userId, BoxType.SEND);
-        return new PageImpl<>(responses, commonPageCommand.toPageable(), count);
+        return letterBoxUseCase.getSentLetters(commonPageCommand, userId).map(LetterSummaryResponse::from);
     }
 
     @Transactional

@@ -12,6 +12,7 @@ import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -44,9 +45,10 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
-    public List<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
-        return LetterSummaryProjection.toDomainList(
-                letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(userId, boxType, pageable));
+    public Page<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
+        Page<LetterSummaryProjection> letterSummaryProjections = letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(
+                userId, boxType, pageable);
+        return letterSummaryProjections.map(LetterSummaryProjection::toDomain);
     }
 
     @Override
@@ -72,11 +74,6 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     @Override
     public void deleteByConditionAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId) {
         letterBoxQueryRepository.deleteByConditionAndUserId(ids, LetterType.LETTER, boxType, userId);
-    }
-
-    @Override
-    public long countLetters(Long userId, BoxType boxType) {
-        return letterBoxQueryRepository.countLetters(userId, boxType);
     }
 
     private void save(Long letterId, Long userId, LetterType letterType, BoxType boxType, LocalDateTime createdAt) {
