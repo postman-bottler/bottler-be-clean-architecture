@@ -1,27 +1,24 @@
 package online.bottler.letter.application.strategy;
 
+import static online.bottler.letter.domain.BoxType.NONE;
+import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
+
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.port.out.DeleteRecentReplyCachePort;
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
-import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
 
     private final ReplyLetterPersistencePort replyLetterPersistencePort;
     private final LetterBoxPersistencePort letterBoxPersistencePort;
     private final DeleteRecentReplyCachePort deleteRecentReplyCachePort;
-
-    public ReplyLetterDeleteStrategySend(ReplyLetterPersistencePort replyLetterPersistencePort,
-                                         LetterBoxPersistencePort letterBoxPersistencePort,
-                                         DeleteRecentReplyCachePort deleteRecentReplyCachePort) {
-        this.replyLetterPersistencePort = replyLetterPersistencePort;
-        this.letterBoxPersistencePort = letterBoxPersistencePort;
-        this.deleteRecentReplyCachePort = deleteRecentReplyCachePort;
-    }
 
     @Override
     public void deleteLetters(List<Long> ids, Long userId) {
@@ -32,7 +29,7 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
                 replyLetter.getId(), replyLetter.getLabel()));
 
         replyLetterPersistencePort.softDeleteByIds(ids);
-        letterBoxPersistencePort.deleteByCondition(ids, LetterType.REPLY_LETTER, BoxType.NONE);
+        letterBoxPersistencePort.deleteByCondition(ids, REPLY_LETTER, NONE);
     }
 
     private void validateReplyLetterOwnerShip(Long userId, List<ReplyLetter> replyLetters) {

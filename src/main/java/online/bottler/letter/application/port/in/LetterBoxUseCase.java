@@ -33,6 +33,4 @@ public interface LetterBoxUseCase {
     void deleteAllSentLetters(Long userId);
 
     boolean isAccessDenied(Long letterId, Long userId);
-
-    void deleteAllLettersByBoxType(BoxType boxType, Long userId);
 }

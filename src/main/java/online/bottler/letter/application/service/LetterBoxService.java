@@ -1,24 +1,27 @@
 package online.bottler.letter.application.service;
 
+import static online.bottler.letter.domain.BoxType.NONE;
+import static online.bottler.letter.domain.BoxType.RECEIVE;
+import static online.bottler.letter.domain.BoxType.SEND;
+import static online.bottler.letter.domain.LetterType.LETTER;
+import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.CommonPageCommand;
 import online.bottler.letter.application.command.LetterDeleteCommand;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
-import online.bottler.letter.application.port.out.DeleteRecentReplyCachePort;
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
-import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
 import online.bottler.letter.application.strategy.LetterDeleteStrategy;
-import online.bottler.letter.application.strategy.LetterDeleteStrategyReceive;
-import online.bottler.letter.application.strategy.LetterDeleteStrategySend;
-import online.bottler.letter.application.strategy.ReplyLetterDeleteStrategyReceive;
-import online.bottler.letter.application.strategy.ReplyLetterDeleteStrategySend;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterDeleteKey;
+import online.bottler.letter.domain.LetterDeleteValues;
 import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
@@ -27,37 +30,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class LetterBoxService implements LetterBoxUseCase {
 
     private final LetterBoxPersistencePort letterBoxPersistencePort;
     private final LetterPersistencePort letterPersistencePort;
     private final ReplyLetterPersistencePort replyLetterPersistencePort;
-
-    private final Map<BoxType, LetterDeleteStrategy> letterDeleteStrategyMap;
-    private final Map<BoxType, LetterDeleteStrategy> replyLetterDeleteStrategyMap;
-
-    public LetterBoxService(LetterBoxPersistencePort letterBoxPersistencePort,
-                            LetterPersistencePort letterPersistencePort,
-                            ReplyLetterPersistencePort replyLetterPersistencePort,
-                            LetterKeywordPersistencePort letterKeywordPersistencePort,
-                            DeleteRecentReplyCachePort deleteRecentReplyCachePort) {
-        this.letterBoxPersistencePort = letterBoxPersistencePort;
-        this.letterPersistencePort = letterPersistencePort;
-        this.replyLetterPersistencePort = replyLetterPersistencePort;
-
-        this.letterDeleteStrategyMap = new HashMap<>();
-        letterDeleteStrategyMap.put(BoxType.SEND,
-                new LetterDeleteStrategySend(letterPersistencePort, letterKeywordPersistencePort,
-                        letterBoxPersistencePort));
-        letterDeleteStrategyMap.put(BoxType.RECEIVE, new LetterDeleteStrategyReceive(letterBoxPersistencePort));
-
-        this.replyLetterDeleteStrategyMap = new HashMap<>();
-        replyLetterDeleteStrategyMap.put(BoxType.SEND,
-                new ReplyLetterDeleteStrategySend(replyLetterPersistencePort, letterBoxPersistencePort,
-                        deleteRecentReplyCachePort));
-        replyLetterDeleteStrategyMap.put(BoxType.RECEIVE,
-                new ReplyLetterDeleteStrategyReceive(letterBoxPersistencePort));
-    }
+    private final Map<LetterDeleteKey, LetterDeleteStrategy> strategyMap;
 
     @Transactional
     @Override
@@ -80,19 +59,19 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional(readOnly = true)
     @Override
     public Page<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), BoxType.NONE);
+        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), NONE);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<LetterSummary> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), BoxType.RECEIVE);
+        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), RECEIVE);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<LetterSummary> getSentLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), BoxType.SEND);
+        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), SEND);
     }
 
     @Transactional
@@ -104,26 +83,26 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional
     @Override
     public void deleteLetters(List<LetterDeleteCommand> letterDeleteCommands, Long userId) {
-        LetterDeleteCommand.groupByLetterTypeAndBoxType(letterDeleteCommands)
-                .forEach((key, values) -> deleteLettersByLetterTypeAndBoxType(key, values.letterIds(), userId));
+        groupByLetterDeleteKey(letterDeleteCommands)
+                .forEach((key, values) -> deleteLettersByLetterDeleteKey(key, values.letterIds(), userId));
     }
 
     @Transactional
     @Override
     public void deleteAllLetters(Long userId) {
-        deleteAllLettersByBoxType(BoxType.NONE, userId);
+        deleteAllLettersByBoxType(NONE, userId);
     }
 
     @Transactional
     @Override
     public void deleteAllReceivedLetters(Long userId) {
-        deleteAllLettersByBoxType(BoxType.RECEIVE, userId);
+        deleteAllLettersByBoxType(RECEIVE, userId);
     }
 
     @Transactional
     @Override
     public void deleteAllSentLetters(Long userId) {
-        deleteAllLettersByBoxType(BoxType.SEND, userId);
+        deleteAllLettersByBoxType(SEND, userId);
     }
 
     @Transactional(readOnly = true)
@@ -136,31 +115,44 @@ public class LetterBoxService implements LetterBoxUseCase {
         return letterBoxPersistencePort.loadLetterBoxSummaries(userId, pageable, boxType);
     }
 
-    private void deleteLettersByLetterTypeAndBoxType(LetterDeleteKey key, List<Long> ids, Long userId) {
-        getDeleteStrategy(key.letterType(), key.boxType()).deleteLetters(ids, userId);
+    private Map<LetterDeleteKey, LetterDeleteValues> groupByLetterDeleteKey(
+            List<LetterDeleteCommand> commands) {
+        Map<LetterDeleteKey, LetterDeleteValues> groupedLetters = new HashMap<>();
+
+        commands.stream()
+                .filter(command -> command.letterType() != LetterType.NONE && command.boxType() != NONE)
+                .forEach(command -> {
+                    LetterDeleteKey key = LetterDeleteKey.of(command.letterType(), command.boxType());
+                    groupedLetters.computeIfAbsent(key, k -> new LetterDeleteValues(new ArrayList<>()))
+                            .letterIds().add(command.letterId());
+                });
+
+        return groupedLetters;
     }
 
-    @Transactional
-    @Override
-    public void deleteAllLettersByBoxType(BoxType boxType, Long userId) {
-        if (boxType == BoxType.NONE || boxType == BoxType.SEND) {
-            deleteLettersForType(LetterType.LETTER, boxType, userId);
-            deleteLettersForType(LetterType.REPLY_LETTER, boxType, userId);
+    private void deleteLettersByLetterDeleteKey(LetterDeleteKey letterDeleteKey, List<Long> ids, Long userId) {
+        getDeleteStrategy(letterDeleteKey).deleteLetters(ids, userId);
+    }
+
+    private void deleteAllLettersByBoxType(BoxType boxType, Long userId) {
+        if (boxType == NONE || boxType == SEND) {
+            deleteLettersForType(LetterDeleteKey.of(LETTER, boxType), userId);
+            deleteLettersForType(LetterDeleteKey.of(REPLY_LETTER, boxType), userId);
         }
 
-        if (boxType == BoxType.NONE || boxType == BoxType.RECEIVE) {
-            letterBoxPersistencePort.deleteAllByUserIdAndBoxType(userId, BoxType.RECEIVE);
+        if (boxType == NONE || boxType == RECEIVE) {
+            letterBoxPersistencePort.deleteAllByUserIdAndBoxType(userId, RECEIVE);
         }
     }
 
-    private void deleteLettersForType(LetterType letterType, BoxType boxType, Long userId) {
-        List<Long> ids = getLetterIdsByType(letterType, userId);
+    private void deleteLettersForType(LetterDeleteKey letterDeleteKey, Long userId) {
+        List<Long> ids = getLetterIdsByLetterType(letterDeleteKey.letterType(), userId);
         if (!ids.isEmpty()) {
-            getDeleteStrategy(letterType, boxType).deleteLetters(ids, userId);
+            getDeleteStrategy(letterDeleteKey).deleteLetters(ids, userId);
         }
     }
 
-    private List<Long> getLetterIdsByType(LetterType letterType, Long userId) {
+    private List<Long> getLetterIdsByLetterType(LetterType letterType, Long userId) {
         return switch (letterType) {
             case LETTER -> letterPersistencePort.loadIdsByUserId(userId);
             case REPLY_LETTER -> replyLetterPersistencePort.loadIdsByUserId(userId);
@@ -168,11 +160,7 @@ public class LetterBoxService implements LetterBoxUseCase {
         };
     }
 
-    private LetterDeleteStrategy getDeleteStrategy(LetterType letterType, BoxType boxType) {
-        return switch (letterType) {
-            case LETTER -> letterDeleteStrategyMap.get(boxType);
-            case REPLY_LETTER -> replyLetterDeleteStrategyMap.get(boxType);
-            default -> throw new IllegalArgumentException("Unsupported letter type");
-        };
+    private LetterDeleteStrategy getDeleteStrategy(LetterDeleteKey key) {
+        return strategyMap.get(key);
     }
 }

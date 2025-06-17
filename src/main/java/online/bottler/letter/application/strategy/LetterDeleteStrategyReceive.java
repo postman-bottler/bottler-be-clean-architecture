@@ -1,19 +1,20 @@
 package online.bottler.letter.application.strategy;
 
-import java.util.List;
-import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
-import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterType;
+import static online.bottler.letter.domain.BoxType.RECEIVE;
+import static online.bottler.letter.domain.LetterType.LETTER;
 
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
 public class LetterDeleteStrategyReceive implements LetterDeleteStrategy {
     private final LetterBoxPersistencePort letterBoxPersistencePort;
 
-    public LetterDeleteStrategyReceive(LetterBoxPersistencePort letterBoxPersistencePort) {
-        this.letterBoxPersistencePort = letterBoxPersistencePort;
-    }
-
     @Override
     public void deleteLetters(List<Long> ids, Long userId) {
-        letterBoxPersistencePort.deleteByConditionAndUserId(ids, LetterType.LETTER, BoxType.RECEIVE, userId);
+        letterBoxPersistencePort.deleteByConditionAndUserId(ids, LETTER, RECEIVE, userId);
     }
 }
