@@ -1,5 +1,8 @@
 package online.bottler.letter.application.facade;
 
+import static online.bottler.letter.domain.BoxType.NONE;
+import static online.bottler.letter.domain.LetterType.LETTER;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +16,7 @@ import online.bottler.letter.application.port.in.ReplyLetterUseCase;
 import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
-import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.Letter;
-import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.LetterWithKeywords;
 import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import online.bottler.user.application.port.in.UserUseCase;
@@ -64,6 +65,6 @@ public class LetterWithKeywordsFacade {
     @Transactional
     public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
         letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteCommand);
-        letterBoxUseCase.deleteLetter(letterWithKeywordsDeleteCommand.letterId(), LetterType.LETTER, BoxType.NONE);
+        letterBoxUseCase.deleteLetter(letterWithKeywordsDeleteCommand.letterId(), LETTER, NONE);
     }
 }

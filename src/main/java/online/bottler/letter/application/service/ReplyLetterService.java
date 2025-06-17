@@ -1,5 +1,7 @@
 package online.bottler.letter.application.service;
 
+import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
+
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.ReplyLetterCommand;
 import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
@@ -7,7 +9,6 @@ import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
 import online.bottler.letter.application.port.in.BlockReplyLetterUseCase;
 import online.bottler.letter.application.port.in.ReplyLetterUseCase;
 import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
-import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.LetterNotFoundException;
 import org.springframework.data.domain.Page;
@@ -63,6 +64,6 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     private ReplyLetter findReplyLetter(Long id) {
         return replyLetterPersistencePort.loadById(id)
-                .orElseThrow(() -> new LetterNotFoundException(LetterType.REPLY_LETTER));
+                .orElseThrow(() -> new LetterNotFoundException(REPLY_LETTER));
     }
 }

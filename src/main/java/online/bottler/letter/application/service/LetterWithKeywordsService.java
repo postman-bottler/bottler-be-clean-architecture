@@ -1,5 +1,7 @@
 package online.bottler.letter.application.service;
 
+import static online.bottler.letter.domain.LetterType.LETTER;
+
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +14,6 @@ import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterKeyword;
-import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.LetterWithKeywords;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
 import online.bottler.letter.exception.LetterNotFoundException;
@@ -90,7 +91,7 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     private Letter loadLetterById(Long letterId) {
         return letterPersistencePort.loadById(letterId)
-                .orElseThrow(() -> new LetterNotFoundException(LetterType.LETTER));
+                .orElseThrow(() -> new LetterNotFoundException(LETTER));
     }
 
     private void deleteLetterWithKeywords(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
