@@ -1,6 +1,7 @@
 package online.bottler.letter.adapter.out.persistence;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +30,9 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
     @Override
     public List<Letter> loadAllIncludingDeletedByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
         return LetterEntity.toDomainList(letterJpaRepository.findAllIncludingDeletedByIds(ids));
     }
 
