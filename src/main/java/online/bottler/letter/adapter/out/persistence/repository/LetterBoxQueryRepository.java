@@ -65,12 +65,12 @@ public class LetterBoxQueryRepository {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
         BooleanBuilder condition = buildFetchCondition(userId, boxType);
 
-        return queryFactory
-                .select(letterBox.id)
+        Long count = queryFactory
+                .select(letterBox.id.count())
                 .from(letterBox)
                 .where(condition)
-                .fetch()
-                .size();
+                .fetchOne();
+        return count != null ? count : 0L;
     }
 
     public void deleteByCondition(List<Long> letterIds, LetterType letterType, BoxType boxType) {
