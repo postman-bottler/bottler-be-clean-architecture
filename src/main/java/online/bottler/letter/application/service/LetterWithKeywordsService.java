@@ -3,7 +3,6 @@ package online.bottler.letter.application.service;
 import static online.bottler.letter.domain.LetterType.LETTER;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.LetterWithKeywordsCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand;
@@ -37,9 +36,9 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     @Override
     public LetterWithKeywords get(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
         Letter letter = loadLetterById(letterWithKeywordsDetailQuery.letterId());
-        List<LetterKeyword> keywords = letterKeywordPersistencePort.loadKeywordsByLetterId(
+        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadKeywordsByLetterId(
                 letterWithKeywordsDetailQuery.letterId());
-        return LetterWithKeywords.create(letter, keywords.stream().map(LetterKeyword::getKeyword).toList());
+        return LetterWithKeywords.create(letter, letterKeywords.stream().map(LetterKeyword::getKeyword).toList());
     }
 
     @Transactional(readOnly = true)
@@ -51,8 +50,12 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     @Transactional
     @Override
     public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
-        Optional<Letter> letter = letterPersistencePort.loadById(letterWithKeywordsDeleteCommand.letterId());
-        validateLetterOwnerShip(letter, letterWithKeywordsDeleteCommand.userId());
+        Letter letter = loadLetterById(letterWithKeywordsDeleteCommand.letterId());
+
+        if (!letter.isOwner(letterWithKeywordsDeleteCommand.userId())) {
+            throw new LetterAuthorMismatchException();
+        }
+
         deleteLetterWithKeywords(letterWithKeywordsDeleteCommand);
     }
 
@@ -72,6 +75,12 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     @Override
     public List<Letter> loadAllIncludingDeletedByIds(List<Long> letterIds) {
         return letterPersistencePort.loadAllIncludingDeletedByIds(letterIds);
+    }
+
+    @Override
+    public void softDeleteByIds(List<Long> ids) {
+        letterPersistencePort.softDeleteByIds(ids);
+        letterKeywordPersistencePort.softDeleteByIds(ids);
     }
 
     @Transactional
@@ -97,9 +106,5 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     private void deleteLetterWithKeywords(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
         letterPersistencePort.softDelete(letterWithKeywordsDeleteCommand.letterId());
         letterKeywordPersistencePort.softDelete(letterWithKeywordsDeleteCommand.letterId());
-    }
-
-    private void validateLetterOwnerShip(Optional<Letter> letter, Long userId) {
-        letter.filter(l -> l.getUserId().equals(userId)).orElseThrow(LetterAuthorMismatchException::new);
     }
 }

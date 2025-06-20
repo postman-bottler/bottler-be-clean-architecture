@@ -2,6 +2,7 @@ package online.bottler.letter.application.service;
 
 import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.ReplyLetterCommand;
 import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
@@ -53,6 +54,22 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     public boolean isReplied(Long letterId, Long userId) {
         return replyLetterPersistencePort.existsByLetterIdAndUserId(letterId, userId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Long> getIdsByUserId(Long userId) {
+        return replyLetterPersistencePort.loadIdsByUserId(userId);
+    }
+
+    @Override
+    public void softDeleteByIds(List<Long> ids) {
+        replyLetterPersistencePort.softDeleteByIds(ids);
+    }
+
+    @Override
+    public List<ReplyLetter> getAllByIds(List<Long> ids) {
+        return replyLetterPersistencePort.loadAllByIds(ids);
     }
 
     @Transactional

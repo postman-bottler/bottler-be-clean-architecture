@@ -1,5 +1,6 @@
 package online.bottler.letter.application.port.in;
 
+import java.util.List;
 import online.bottler.letter.application.command.ReplyLetterCommand;
 import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
 import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
@@ -16,4 +17,10 @@ public interface ReplyLetterUseCase {
     ReplyLetter softDelete(ReplyLetterDeleteCommand command);
 
     boolean isReplied(Long letterId, Long userId);
+
+    List<Long> getIdsByUserId(Long userId);
+
+    void softDeleteByIds(List<Long> ids);
+
+    List<ReplyLetter> getAllByIds(List<Long> ids);
 }

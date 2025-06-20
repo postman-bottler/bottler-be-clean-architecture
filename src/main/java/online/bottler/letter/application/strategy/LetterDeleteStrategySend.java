@@ -5,22 +5,20 @@ import static online.bottler.letter.domain.LetterType.LETTER;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
-import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
-import online.bottler.letter.application.port.out.LetterPersistencePort;
+import online.bottler.letter.application.port.in.LetterBoxUseCase;
+import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class LetterDeleteStrategySend implements LetterDeleteStrategy {
-    private final LetterPersistencePort letterPersistencePort;
-    private final LetterKeywordPersistencePort letterKeywordPersistencePort;
-    private final LetterBoxPersistencePort letterBoxPersistencePort;
+
+    private final LetterBoxUseCase letterBoxUseCase;
+    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
 
     @Override
     public void deleteLetters(List<Long> ids, Long userId) {
-        letterPersistencePort.softDeleteByIds(ids);
-        letterKeywordPersistencePort.softDeleteByIds(ids);
-        letterBoxPersistencePort.deleteByCondition(ids, LETTER, NONE);
+        letterWithKeywordsUseCase.softDeleteByIds(ids);
+        letterBoxUseCase.deleteByType(ids, LETTER, NONE);
     }
 }
