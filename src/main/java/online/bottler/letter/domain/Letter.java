@@ -24,6 +24,10 @@ public class Letter extends BaseDomain {
         return new Letter(null, userId, letterContent, LetterStatus.create(false, false), LocalDateTime.now());
     }
 
+    public boolean isOwner(Long userId) {
+        return this.userId.equals(userId);
+    }
+
     public String getTitle() {
         return letterContent.getTitle();
     }

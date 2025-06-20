@@ -37,6 +37,10 @@ public class ReplyLetter {
         return "RE: [" + title + "]";
     }
 
+    public boolean isOwner(Long userId) {
+        return letter.getUserId().equals(userId);
+    }
+
     public Long getId() {
         return letter.getId();
     }
