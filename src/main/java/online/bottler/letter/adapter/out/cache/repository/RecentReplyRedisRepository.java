@@ -1,4 +1,4 @@
-package online.bottler.letter.adapter.out.persistence.repository;
+package online.bottler.letter.adapter.out.cache.repository;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;

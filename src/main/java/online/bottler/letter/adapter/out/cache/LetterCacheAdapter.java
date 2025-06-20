@@ -1,9 +1,9 @@
-package online.bottler.letter.adapter.out.persistence;
+package online.bottler.letter.adapter.out.cache;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import online.bottler.letter.adapter.out.persistence.repository.LetterRedisRepository;
+import online.bottler.letter.adapter.out.cache.repository.LetterRedisRepository;
 import online.bottler.letter.application.port.out.LetterCachePort;
 import org.springframework.stereotype.Repository;
 

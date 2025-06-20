@@ -1,8 +1,8 @@
-package online.bottler.letter.adapter.out.persistence;
+package online.bottler.letter.adapter.out.cache;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.adapter.out.persistence.repository.RecommendationRedisRepository;
+import online.bottler.letter.adapter.out.cache.repository.RecommendationRedisRepository;
 import online.bottler.letter.application.port.out.RecommendationCachePort;
 import org.springframework.stereotype.Repository;
 
