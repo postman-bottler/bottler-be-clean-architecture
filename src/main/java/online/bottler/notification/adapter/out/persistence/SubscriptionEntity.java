@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import online.bottler.notification.domain.Subscription;
 
 @Entity
-@Table(name = "subscription")
+@Table(name = "subscription", indexes = @Index(name = "user_token_idx", columnList = "userId, token"))
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
