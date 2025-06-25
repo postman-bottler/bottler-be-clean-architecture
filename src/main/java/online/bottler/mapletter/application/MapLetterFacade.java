@@ -9,6 +9,8 @@ import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
 import online.bottler.mapletter.application.dto.FindSentMapLetter;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
 import online.bottler.mapletter.application.port.in.MapLetterArchiveUseCase;
+import online.bottler.mapletter.application.port.in.MapLetterConvertUseCase;
+import online.bottler.mapletter.application.port.in.MapLetterExtractUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterProximityUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
@@ -32,6 +34,8 @@ public class MapLetterFacade {
     private final UserUseCase userUseCase;
     private final MapLetterReplyUseCase mapLetterReplyUseCase;
     private final MapLetterProximityUseCase mapLetterProximityUseCase;
+    private final MapLetterConvertUseCase mapLetterConvertUseCase;
+    private final MapLetterExtractUseCase mapLetterExtractUseCase;
 
     public OneLetterResponse findArchiveOneLetter(Long letterId, Long userId) {
         MapLetter mapLetter = mapLetterUseCase.findArchiveOneLetterById(letterId, userId);
@@ -41,10 +45,10 @@ public class MapLetterFacade {
     public List<FindNearbyLettersResponse> guestFindNearByMapLetters(BigDecimal latitude, BigDecimal longitude) {
         List<MapLetterAndDistance> letters = mapLetterProximityUseCase.findGuestNearByMapLetters(latitude, longitude);
 
-        Set<Long> userIds = mapLetterProximityUseCase.extractCreateUserIds(letters);
+        Set<Long> userIds = mapLetterExtractUseCase.extractCreateUserIds(letters);
         Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
 
-        return mapLetterProximityUseCase.convertToFindNearbyResponses(letters, nicknamesByIds);
+        return mapLetterConvertUseCase.convertToFindNearbyResponses(letters, nicknamesByIds);
     }
 
     public OneLetterResponse guestFindOneMapLetter(Long letterId, BigDecimal latitude, BigDecimal longitude) {
@@ -68,47 +72,49 @@ public class MapLetterFacade {
         List<MapLetterAndDistance> letters = mapLetterProximityUseCase.findLettersByUserLocation(latitude, longitude,
                 userId);
 
-        Set<Long> userIds = mapLetterProximityUseCase.extractCreateUserIds(letters);
+        Set<Long> userIds = mapLetterExtractUseCase.extractCreateUserIds(letters);
         Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
-        return mapLetterProximityUseCase.convertToFindNearbyResponses(letters, nicknamesByIds);
+        return mapLetterConvertUseCase.convertToFindNearbyResponses(letters, nicknamesByIds);
     }
 
     public Page<FindMapLetterResponse> findSentMapLetters(int page, int size, Long userId) {
         Page<FindSentMapLetter> sentLetters = mapLetterUseCase.findSentLetters(page, size, userId);
 
-        Set<Long> userIds = mapLetterUseCase.extractTargetUserIdsBySentMapLetters(sentLetters);
+        Set<Long> userIds = mapLetterExtractUseCase.extractTargetUserIdsBySentMapLetters(sentLetters);
         Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
 
-        return mapLetterUseCase.convertToFindMapLetterResponse(sentLetters, nicknamesByIds);
+        return mapLetterConvertUseCase.convertToFindMapLetterResponse(sentLetters, nicknamesByIds);
     }
 
     public Page<FindReceivedMapLetterResponse> findReceivedMapLetters(int page, int size, Long userId) {
         Page<FindReceivedMapLetterDTO> letters = mapLetterUseCase.findReceivedMapLetters(page, size, userId);
 
-        Set<Long> userIds = mapLetterUseCase.extractSentUserIdsByReceivedMapLetters(letters);
+        Set<Long> userIds = mapLetterExtractUseCase.extractSentUserIdsByReceivedMapLetters(letters);
         Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
         Map<Long, String> profileImageUrlsByIds = userUseCase.getProfileImageUrlsByIds(userIds);
 
-        return mapLetterUseCase.convertToFindReceivedMapLetterResponse(letters, nicknamesByIds, profileImageUrlsByIds);
+        return mapLetterConvertUseCase.convertToFindReceivedMapLetterResponse(letters, nicknamesByIds,
+                profileImageUrlsByIds);
     }
 
     public Page<FindAllSentMapLetterResponse> findAllSentMapLetters(int page, int size, Long userId) {
         Page<MapLetter> letters = mapLetterUseCase.findActiveByCreateUserId(page, size, userId);
 
-        Set<Long> userIds = mapLetterUseCase.extractTargetUserIdsByMapLetters(letters);
+        Set<Long> userIds = mapLetterExtractUseCase.extractTargetUserIdsByMapLetters(letters);
         Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
 
-        return mapLetterUseCase.convertToFindAllSentMapLetterResponse(letters, nicknamesByIds);
+        return mapLetterConvertUseCase.convertToFindAllSentMapLetterResponse(letters, nicknamesByIds);
     }
 
     public Page<FindAllReceivedLetterResponse> findAllReceivedLetters(int page, int size, Long userId) {
         Page<MapLetter> letters = mapLetterUseCase.findActiveLetter(page, size, userId);
 
-        Set<Long> userIds = mapLetterUseCase.extractCreateUserIdsByMapLetters(letters);
+        Set<Long> userIds = mapLetterExtractUseCase.extractCreateUserIdsByMapLetters(letters);
         Map<Long, String> nicknamesByIds = userUseCase.getNicknamesByIds(userIds);
         Map<Long, String> profileImageUrlsByIds = userUseCase.getProfileImageUrlsByIds(userIds);
 
-        return mapLetterUseCase.convertToFindAllReceivedLetterResponse(letters, nicknamesByIds, profileImageUrlsByIds);
+        return mapLetterConvertUseCase.convertToFindAllReceivedLetterResponse(letters, nicknamesByIds,
+                profileImageUrlsByIds);
     }
 
     private OneLetterResponse getOneLetterResponse(Long letterId, Long userId, MapLetter mapLetter) {
