@@ -326,10 +326,22 @@ public class UserService implements UserUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<Long, String> getNicknamesByIds(List<Long> ids) {
+    public Map<Long, String> getNicknamesByIds(Set<Long> ids) {
         List<Object[]> getIdAndNicknames = userPersistencePort.findIdAndNicknameByUserIdIn(ids);
 
         return getIdAndNicknames.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (String) row[1]
+                ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, String> getProfileImageUrlsByIds(Set<Long> ids) {
+        List<Object[]> getProfileImageUrls=userPersistencePort.findIdAndImageUrlByUserIdIn(ids);
+
+        return getProfileImageUrls.stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> (String) row[1]

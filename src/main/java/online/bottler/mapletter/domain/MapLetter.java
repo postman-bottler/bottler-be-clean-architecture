@@ -2,6 +2,7 @@ package online.bottler.mapletter.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -109,5 +110,9 @@ public class MapLetter {
         if (this.isRecipientDeleted()) {
             throw new DomainException("해당 편지는 이미 삭제되었습니다.");
         }
+    }
+
+    public boolean isCreated(Long userId) {
+        return Objects.equals(this.createUserId, userId);
     }
 }

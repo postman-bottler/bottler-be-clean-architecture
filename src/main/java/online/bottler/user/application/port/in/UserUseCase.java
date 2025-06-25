@@ -2,6 +2,7 @@ package online.bottler.user.application.port.in;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import online.bottler.user.application.command.AuthEmailCommand;
 import online.bottler.user.application.command.ChangePasswordCommand;
 import online.bottler.user.application.command.CheckDuplicateNicknameCommand;
@@ -64,5 +65,7 @@ public interface UserUseCase {
 
     void deleteEmailCode(AuthEmailCommand authEmailCommand);
 
-    Map<Long, String> getNicknamesByIds(List<Long> ids);
+    Map<Long, String> getNicknamesByIds(Set<Long> ids);
+
+    Map<Long, String> getProfileImageUrlsByIds(Set<Long> ids);
 }

@@ -2,6 +2,7 @@ package online.bottler.user.application.port.out;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import online.bottler.user.domain.Ban;
 import online.bottler.user.domain.User;
 
@@ -36,5 +37,7 @@ public interface UserPersistencePort {
 
     User findByNickname(String nickname);
 
-    List<Object[]> findIdAndNicknameByUserIdIn(List<Long> ids);
+    List<Object[]> findIdAndNicknameByUserIdIn(Set<Long> ids);
+
+    List<Object[]> findIdAndImageUrlByUserIdIn(Set<Long> ids);
 }

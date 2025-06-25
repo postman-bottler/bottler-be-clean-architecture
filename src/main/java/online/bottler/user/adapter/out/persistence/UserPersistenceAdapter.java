@@ -3,6 +3,7 @@ package online.bottler.user.adapter.out.persistence;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.AdaptorException;
@@ -126,7 +127,12 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     }
 
     @Override
-    public List<Object[]> findIdAndNicknameByUserIdIn(List<Long> ids) {
+    public List<Object[]> findIdAndNicknameByUserIdIn(Set<Long> ids) {
         return userJpaRepository.getIdAndNicknameByUserIdIn(ids);
+    }
+
+    @Override
+    public List<Object[]> findIdAndImageUrlByUserIdIn(Set<Long> ids) {
+        return userJpaRepository.getIdAndImageByUserIdIn(ids);
     }
 }

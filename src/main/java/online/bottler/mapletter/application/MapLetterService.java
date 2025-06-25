@@ -1,6 +1,14 @@
 package online.bottler.mapletter.application;
 
+import static online.bottler.mapletter.application.DeleteLetterType.MAP;
+import static online.bottler.mapletter.application.DeleteLetterType.REPLY;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.ApplicationException;
 import online.bottler.mapletter.application.command.CreatePublicMapLetterCommand;
@@ -9,7 +17,14 @@ import online.bottler.mapletter.application.command.DeleteMapLettersCommand;
 import online.bottler.mapletter.application.command.DeleteMapLettersCommand.LetterInfo;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
 import online.bottler.mapletter.application.port.out.ReplyMapLetterPersistencePort;
+import online.bottler.mapletter.application.response.FindAllReceivedLetterResponse;
+import online.bottler.mapletter.application.response.FindAllSentMapLetterResponse;
+import online.bottler.mapletter.application.response.FindMapLetterResponse;
+import online.bottler.mapletter.application.response.FindReceivedMapLetterResponse;
+import online.bottler.mapletter.application.validator.PageValidator;
+import online.bottler.mapletter.domain.MapLetterType;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
@@ -46,15 +61,36 @@ public class MapLetterService implements MapLetterUseCase {
     @Override
     @Transactional(readOnly = true)
     public Page<FindSentMapLetter> findSentLetters(int page, int size, Long userId) {
-        return mapLetterPersistencePort.findSentLettersByUserId(userId,
+        PageValidator.validMinPage(page);
+
+        Page<FindSentMapLetter> sentLettersByUserId = mapLetterPersistencePort.findSentLettersByUserId(userId,
                 PageRequest.of(page - 1, size));
+
+        if (sentLettersByUserId.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
+        }
+
+        PageValidator.validMaxPage(sentLettersByUserId.getTotalPages(), page);
+
+        return sentLettersByUserId;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<FindReceivedMapLetterDTO> findReceivedMapLetters(int page, int size, Long userId) {
-        return mapLetterPersistencePort.findActiveReceivedMapLettersByUserId(userId,
+        PageValidator.validMinPage(page);
+
+        Page<FindReceivedMapLetterDTO> letters = mapLetterPersistencePort.findActiveReceivedMapLettersByUserId(
+                userId,
                 PageRequest.of(page - 1, size));
+
+        if (letters.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
+        }
+
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
+
+        return letters;
     }
 
     @Override
@@ -176,12 +212,142 @@ public class MapLetterService implements MapLetterUseCase {
     @Override
     @Transactional(readOnly = true)
     public Page<MapLetter> findActiveByCreateUserId(int page, int size, Long userId) {
-        return mapLetterPersistencePort.findActiveByCreateUserId(userId, PageRequest.of(page - 1, size));
+        PageValidator.validMinPage(page);
+
+        Page<MapLetter> letters = mapLetterPersistencePort.findActiveByCreateUserId(userId,
+                PageRequest.of(page - 1, size));
+
+        if (letters.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
+        }
+
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
+        return letters;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<MapLetter> findActiveLetter(int page, int size, Long userId) {
-        return mapLetterPersistencePort.findActiveByTargetUserId(userId, PageRequest.of(page - 1, size));
+        PageValidator.validMinPage(page);
+
+        Page<MapLetter> letters = mapLetterPersistencePort.findActiveByTargetUserId(userId,
+                PageRequest.of(page - 1, size));
+
+        if (letters.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
+        }
+
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
+
+        return letters;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MapLetter findArchiveOneLetterById(Long letterId, Long userId) {
+        MapLetter letter = mapLetterPersistencePort.findById(letterId);
+        letter.validateAccess(userId);
+        return letter;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MapLetter findPublicMapLetterById(Long letterId) {
+        MapLetter letter = mapLetterPersistencePort.findById(letterId);
+        letter.validatePublicAccess();
+        return letter;
+    }
+
+    @Override
+    public Set<Long> extractTargetUserIdsBySentMapLetters(Page<FindSentMapLetter> sentLetters) {
+        return sentLetters.getContent().stream()
+                .filter(letter -> "TARGET".equals(letter.getType()))
+                .map(FindSentMapLetter::getTargetUser)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Page<FindMapLetterResponse> convertToFindMapLetterResponse(Page<FindSentMapLetter> sentLetters,
+                                                                      Map<Long, String> nicknamesByIds) {
+        return sentLetters.map(findSentMapLetter -> {
+            String targetUserNickname = null;
+            if ("TARGET".equals(findSentMapLetter.getType())) {
+                targetUserNickname = nicknamesByIds.get(findSentMapLetter.getTargetUser());
+            }
+
+            return FindMapLetterResponse.from(
+                    findSentMapLetter,
+                    targetUserNickname,
+                    "REPLY".equals(findSentMapLetter.getType()) ? REPLY : MAP
+            );
+        });
+    }
+
+    @Override
+    public Set<Long> extractSentUserIdsByReceivedMapLetters(Page<FindReceivedMapLetterDTO> letters) {
+        return letters.getContent().stream()
+                .filter(letter -> "TARGET".equals(letter.getType()))
+                .map(FindReceivedMapLetterDTO::getSenderId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Page<FindReceivedMapLetterResponse> convertToFindReceivedMapLetterResponse(
+            Page<FindReceivedMapLetterDTO> letters, Map<Long, String> nicknamesByIds,
+            Map<Long, String> profileImageUrlsByIds) {
+
+        return letters.map(letter->{
+            String senderNickname = null;
+            String senderProfileImageUrl = null;
+
+            if ("TARGET".equals(letter.getType())) {
+                senderNickname=nicknamesByIds.get(letter.getSenderId());
+                senderProfileImageUrl=profileImageUrlsByIds.get(letter.getSenderId());
+            }
+
+            return FindReceivedMapLetterResponse.from(letter,senderNickname, senderProfileImageUrl, MAP);
+        });
+    }
+
+    @Override
+    public Set<Long> extractTargetUserIdsByMapLetters(Page<MapLetter> letters) {
+        return letters.getContent().stream()
+                .filter(letter-> MapLetterType.PRIVATE.equals(letter.getType()))
+                .map(MapLetter::getTargetUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Page<FindAllSentMapLetterResponse> convertToFindAllSentMapLetterResponse(Page<MapLetter> letters,
+                                                                                    Map<Long, String> nicknamesByIds) {
+        return letters.map(mapLetter -> {
+            String targetUserNickname = null;
+            if (mapLetter.getType() == MapLetterType.PRIVATE) {
+                targetUserNickname = nicknamesByIds.get(mapLetter.getTargetUserId());
+            }
+            return FindAllSentMapLetterResponse.from(mapLetter, targetUserNickname, MAP);
+        });
+    }
+
+    @Override
+    public Set<Long> extractCreateUserIdsByMapLetters(Page<MapLetter> letters) {
+        return letters.getContent().stream()
+                .map(MapLetter::getCreateUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Page<FindAllReceivedLetterResponse> convertToFindAllReceivedLetterResponse(Page<MapLetter> letters,
+                                                                                      Map<Long, String> nicknamesByIds,
+                                                                                      Map<Long, String> profileImageUrlsByIds) {
+        return letters.map(letter -> {
+            String sendUserNickname = nicknamesByIds.get(letter.getCreateUserId());
+            String sendUserProfileImg = profileImageUrlsByIds.get(letter.getCreateUserId());
+            return FindAllReceivedLetterResponse.from(letter, sendUserNickname, sendUserProfileImg, MAP);
+        });
     }
 }

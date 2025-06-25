@@ -74,7 +74,7 @@ public class MapLetterReplyController {
     public ApiResponse<CheckReplyMapLetterResponse> checkReplyMapLetter(@PathVariable Long letterId,
                                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterReplyUseCase.hasReplyForMapLetter(letterId, userId));
+        return ApiResponse.onSuccess(mapLetterReplyUseCase.checkReplyMapLetter(letterId, userId));
     }
 
     @DeleteMapping("/reply")

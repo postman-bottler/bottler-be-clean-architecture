@@ -21,8 +21,6 @@ public interface MapLetterReplyUseCase {
 
     OneReplyLetterResponse findReplyMapLetter(Long letterId, Long userId);
 
-    CheckReplyMapLetterResponse hasReplyForMapLetter(Long letterId, Long userId);
-
     void deleteReplyMapLetter(DeleteReplyMapLettersCommand deleteReplyMapLettersCommand, Long userId);
 
     Page<FindAllSentReplyMapLetterResponse> findAllSentReplyMapLetters(int page, int size, Long userId);

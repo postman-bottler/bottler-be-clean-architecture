@@ -94,12 +94,6 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public CheckReplyMapLetterResponse hasReplyForMapLetter(Long letterId, Long userId) {
-        return new CheckReplyMapLetterResponse(replyMapLetterPersistencePort.findByLetterIdAndUserId(letterId, userId));
-    }
-
-    @Override
     @Transactional
     public void deleteReplyMapLetter(DeleteReplyMapLettersCommand deleteReplyMapLettersCommand, Long userId) {
         List<ReplyMapLetter> replyMapLetters = replyMapLetterPersistencePort.findByIds(
@@ -159,6 +153,7 @@ public class MapLetterReplyService implements MapLetterReplyUseCase {
         });
     }
 
+    @Override
     @Transactional(readOnly = true)
     public CheckReplyMapLetterResponse checkReplyMapLetter(Long letterId, Long userId) {
         return new CheckReplyMapLetterResponse(replyMapLetterPersistencePort.findByLetterIdAndUserId(letterId, userId));
