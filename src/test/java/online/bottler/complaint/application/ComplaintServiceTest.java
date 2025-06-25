@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Optional;
 import online.bottler.IdGenerator;
-import online.bottler.complaint.application.port.ComplaintPersistencePort;
 import online.bottler.complaint.application.port.KeywordComplaintPersistencePort;
 import online.bottler.complaint.application.port.KeywordReplyComplaintPersistencePort;
 import online.bottler.complaint.application.port.MapComplaintPersistencePort;
@@ -13,7 +12,6 @@ import online.bottler.complaint.application.port.MapReplyComplaintPersistencePor
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.ComplaintType;
 import online.bottler.global.exception.ApplicationException;
-import online.bottler.notification.domain.NotificationType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -60,7 +58,7 @@ class ComplaintServiceTest {
     @DisplayName("사용자가 이미 해당 편지를 신고한 경우, 예외가 발생한다.")
     @Test
     void duplicateComplaint() {
-        // given®
+        // given
         Long letterId = idGenerator.generateId();
         long reporterId = idGenerator.generateId();
         mapComplaintPersistencePort.save(Complaint.create(letterId, reporterId, "욕설 사용"));
@@ -102,9 +100,11 @@ class ComplaintServiceTest {
         // then
         switch (complaintType) {
             case MAP_LETTER -> Mockito.verify(mapComplaintPersistencePort).save(Mockito.any(Complaint.class));
-            case MAP_REPLY_LETTER -> Mockito.verify(mapReplyComplaintPersistencePort).save(Mockito.any(Complaint.class));
+            case MAP_REPLY_LETTER ->
+                    Mockito.verify(mapReplyComplaintPersistencePort).save(Mockito.any(Complaint.class));
             case KEYWORD_LETTER -> Mockito.verify(keywordComplaintPersistencePort).save(Mockito.any(Complaint.class));
-            case KEYWORD_REPLY_LETTER -> Mockito.verify(keywordReplyComplaintPersistencePort).save(Mockito.any(Complaint.class));
+            case KEYWORD_REPLY_LETTER ->
+                    Mockito.verify(keywordReplyComplaintPersistencePort).save(Mockito.any(Complaint.class));
             default -> throw new IllegalArgumentException("Unknown complaint type: " + complaintType);
         }
     }

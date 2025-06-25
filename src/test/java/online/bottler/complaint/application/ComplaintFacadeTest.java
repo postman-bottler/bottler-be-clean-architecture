@@ -125,7 +125,7 @@ public class ComplaintFacadeTest {
                     assertThat(response.id()).isNotNull();
                     assertThat(response.description()).isEqualTo("욕설 사용");
                 }),
-                dynamicTest("한 유저가 같은 키워드 답장 편지를 2회 이상 신고 시도할 경우, 예외가 발생한다.", () -> {
+                dynamicTest("한 유저가 같은 지도 편지를 2회 이상 신고 시도할 경우, 예외가 발생한다.", () -> {
                     // when then
                     assertThatThrownBy(() -> complaintFacade.complain(complaintCommand))
                             .isInstanceOf(ApplicationException.class);
@@ -133,7 +133,7 @@ public class ComplaintFacadeTest {
         );
     }
 
-    @DisplayName("지도 편지 시나리오")
+    @DisplayName("지도 답장 편지 시나리오")
     @TestFactory
     Collection<DynamicTest> complainMapReplyLetter() {
         // given
@@ -150,7 +150,7 @@ public class ComplaintFacadeTest {
                     assertThat(response.id()).isNotNull();
                     assertThat(response.description()).isEqualTo("욕설 사용");
                 }),
-                dynamicTest("한 유저가 같은 키워드 답장 편지를 2회 이상 신고 시도할 경우, 예외가 발생한다.", () -> {
+                dynamicTest("한 유저가 같은 지도 답장 편지를 2회 이상 신고 시도할 경우, 예외가 발생한다.", () -> {
                     // when then
                     assertThatThrownBy(() -> complaintFacade.complain(complaintCommand))
                             .isInstanceOf(ApplicationException.class);
