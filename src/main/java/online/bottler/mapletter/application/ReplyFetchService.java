@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.mapletter.application.port.in.ReplyFetchUseCase;
 import online.bottler.mapletter.application.port.out.RecentReplyCachePort;
+import online.bottler.mapletter.domain.policy.MapLetterPolicy;
 import org.springframework.stereotype.Service;
 import online.bottler.mapletter.application.dto.ReplyProjectDTO;
 import online.bottler.mapletter.application.port.out.ReplyMapLetterPersistencePort;
@@ -16,11 +17,9 @@ public class ReplyFetchService implements ReplyFetchUseCase {
     private final RecentReplyCachePort recentReplyCachePort;
     private final ReplyMapLetterPersistencePort replyMapLetterPersistencePort;
 
-    private static final int REDIS_SAVED_REPLY = 6;
-
     public void fetchRecentReply(Long userId) {
         List<Object> redisValues = recentReplyCachePort.getRecentReplies(userId);
-        int fetchItemSize = REDIS_SAVED_REPLY - (redisValues == null ? 0 : redisValues.size());
+        int fetchItemSize = MapLetterPolicy.REDIS_SAVED_REPLY - (redisValues == null ? 0 : redisValues.size());
 
         // Redis에 저장된 값이 부족하면 DB에서 조회 후 Redis에 저장
         if (fetchItemSize > 0) {

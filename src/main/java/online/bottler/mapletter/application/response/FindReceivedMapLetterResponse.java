@@ -3,6 +3,7 @@ package online.bottler.mapletter.application.response;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.Getter;
 import online.bottler.mapletter.application.DeleteLetterType;
 import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
 

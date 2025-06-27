@@ -2,16 +2,14 @@ package online.bottler.mapletter.application;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
 import online.bottler.mapletter.application.port.in.MapLetterProximityUseCase;
 import online.bottler.mapletter.application.port.out.MapLetterPersistencePort;
-import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
-import online.bottler.mapletter.application.response.OneLetterResponse;
 import online.bottler.mapletter.domain.MapLetter;
-import online.bottler.user.application.UserService;
+import online.bottler.mapletter.domain.policy.MapLetterPolicy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,45 +19,37 @@ import org.springframework.transaction.annotation.Transactional;
 public class MapLetterProximityService implements MapLetterProximityUseCase {
 
     private final MapLetterPersistencePort mapLetterPersistencePort;
-    private final MapLetterReplyService mapLetterReplyService;
-    private final MapLetterArchiveService mapLetterArchiveService;
-    private final UserService userService;
-
-    private static final double VIEW_DISTANCE = 15;
 
     @Override
-    @Transactional
-    public OneLetterResponse findOneMapLetter(Long letterId, Long userId, BigDecimal latitude, BigDecimal longitude) {
-        MapLetter mapLetter = mapLetterPersistencePort.findById(letterId);
-
-        Double distance = mapLetterPersistencePort.findDistanceByLatitudeAndLongitudeAndLetterId(
-                latitude, longitude, letterId);
-
-        mapLetter.validateFindOneMapLetter(VIEW_DISTANCE, distance);
-        mapLetter.validateAccess(userId);
-
-        if (mapLetter.isTargetUser(userId)) {
-            mapLetterPersistencePort.updateRead(mapLetter);
-        }
-
-        String profileImg = userService.getProfileImageUrlById(mapLetter.getCreateUserId());
-        return OneLetterResponse.from(mapLetter, profileImg, Objects.equals(mapLetter.getCreateUserId(), userId),
-                mapLetterReplyService.hasReplyForMapLetter(letterId, userId).isReplied(),
-                mapLetterArchiveService.isArchived(letterId, userId));
+    @Transactional(readOnly = true)
+    public List<MapLetterAndDistance> findLettersByUserLocation(BigDecimal latitude, BigDecimal longitude,
+                                                                Long userId) {
+        return mapLetterPersistencePort.findLettersByUserLocation(latitude, longitude, userId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<FindNearbyLettersResponse> findNearByMapLetters(
-            BigDecimal latitude, BigDecimal longitude, Long userId) {
-        List<MapLetterAndDistance> letters = mapLetterPersistencePort.findLettersByUserLocation(latitude, longitude,
-                userId);
+    public List<MapLetterAndDistance> findGuestNearByMapLetters(BigDecimal latitude, BigDecimal longitude) {
+        return mapLetterPersistencePort.guestFindLettersByUserLocation(latitude, longitude);
+    }
 
-        return letters.stream()
-                .map(letter -> {
-                            String nickname = userService.getNicknameById(letter.getCreateUserId()); //TODO: UserService에 getNicknamesByIds 생성하기
-                            return FindNearbyLettersResponse.from(letter, nickname);
-                        }
-                ).toList();
+    @Override
+    @Transactional(readOnly = true)
+    public void validateViewDistance(BigDecimal latitude, BigDecimal longitude, Long letterId, MapLetter mapLetter) {
+        Double distance = findDistance(latitude, longitude, letterId);
+        mapLetter.validateFindOneMapLetter(MapLetterPolicy.VIEW_DISTANCE, distance);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateMapLetterViewPermission(BigDecimal latitude, BigDecimal longitude, Long letterId,
+                                                MapLetter mapLetter, Long userId) {
+        Double distance = findDistance(latitude, longitude, letterId);
+        mapLetter.validateFindOneMapLetter(MapLetterPolicy.VIEW_DISTANCE, distance);
+        mapLetter.validateAccess(userId);
+    }
+
+    private Double findDistance(BigDecimal latitude, BigDecimal longitude, Long letterId) {
+        return mapLetterPersistencePort.findDistanceByLatitudeAndLongitudeAndLetterId(latitude, longitude, letterId);
     }
 }

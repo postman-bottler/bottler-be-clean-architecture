@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
+import online.bottler.mapletter.application.MapLetterFacade;
 import online.bottler.mapletter.application.port.in.MapLetterProximityUseCase;
 import online.bottler.mapletter.application.response.FindNearbyLettersResponse;
 import online.bottler.mapletter.application.response.OneLetterResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MapLetterProximityController {
 
     private final MapLetterProximityUseCase mapLetterProximityUseCase;
+    private final MapLetterFacade mapLetterFacade;
 
     @GetMapping("/{letterId}")
     @Operation(summary = "편지 상세 조회", description = "로그인 필수. 위경도 필수. 반경 15m 내 편지만 상세조회 가능. 내가 타겟인 편지와 퍼블릭 편지만 조회 가능. 나머지는 오류")
@@ -32,7 +34,7 @@ public class MapLetterProximityController {
                                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Coordinates coordinates = parseCoordinates(latitude, longitude);
         Long userId = userDetails.getUserId();
-        return ApiResponse.onSuccess(mapLetterProximityUseCase.findOneMapLetter(letterId, userId, coordinates.latitude,
+        return ApiResponse.onSuccess(mapLetterFacade.findOneMapLetter(letterId, userId, coordinates.latitude,
                 coordinates.longitude));
     }
 
@@ -45,7 +47,7 @@ public class MapLetterProximityController {
         Coordinates coordinates = parseCoordinates(latitude, longitude);
         Long userId = userDetails.getUserId();
         return ApiResponse.onSuccess(
-                mapLetterProximityUseCase.findNearByMapLetters(coordinates.latitude, coordinates.longitude, userId));
+                mapLetterFacade.findNearByMapLetters(coordinates.latitude, coordinates.longitude, userId));
     }
 
     record Coordinates(BigDecimal latitude, BigDecimal longitude) {

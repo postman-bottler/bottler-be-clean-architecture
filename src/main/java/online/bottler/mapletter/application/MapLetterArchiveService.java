@@ -11,10 +11,9 @@ import online.bottler.mapletter.application.port.in.MapLetterArchiveUseCase;
 import online.bottler.mapletter.application.port.out.MapLetterArchivePersistencePort;
 import online.bottler.mapletter.application.port.out.MapLetterPersistencePort;
 import online.bottler.mapletter.application.response.FindAllArchiveLettersResponse;
-import online.bottler.mapletter.application.response.OneLetterResponse;
+import online.bottler.mapletter.application.validator.PageValidator;
 import online.bottler.mapletter.domain.MapLetter;
 import online.bottler.mapletter.domain.MapLetterArchive;
-import online.bottler.user.application.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,10 +27,6 @@ public class MapLetterArchiveService implements MapLetterArchiveUseCase {
 
     private final MapLetterPersistencePort mapLetterPersistencePort;
     private final MapLetterArchivePersistencePort mapLetterArchivePersistencePort;
-    private final MapLetterService mapLetterService;
-    private final MapLetterReplyService mapLetterReplyService;
-    private final UserService userService;
-
 
     @Override
     @Transactional
@@ -52,7 +47,7 @@ public class MapLetterArchiveService implements MapLetterArchiveUseCase {
     @Override
     @Transactional(readOnly = true)
     public Page<FindAllArchiveLettersResponse> findArchiveLetters(int page, int size, Long userId) {
-        mapLetterService.validMinPage(page);
+        PageValidator.validMinPage(page);
         Page<FindAllArchiveLettersDTO> letters = mapLetterArchivePersistencePort.findAllById(userId,
                 PageRequest.of(page - 1, size));
 
@@ -60,7 +55,7 @@ public class MapLetterArchiveService implements MapLetterArchiveUseCase {
             return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
         }
 
-        mapLetterService.validMaxPage(letters.getTotalPages(), page);
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
         return letters.map(FindAllArchiveLettersDTO::toFindAllArchiveLettersResponse);
     }
 
@@ -79,17 +74,6 @@ public class MapLetterArchiveService implements MapLetterArchiveUseCase {
         }
 
         mapLetterArchivePersistencePort.deleteAllByIdInBatch(deleteArchivedLettersCommand.letterIds());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public OneLetterResponse findArchiveOneLetter(Long letterId, Long userId) {
-        MapLetter mapLetter = mapLetterPersistencePort.findById(letterId);
-        mapLetter.validateAccess(userId);
-
-        String profileImg = userService.getProfileImageUrlById(mapLetter.getCreateUserId());
-        return OneLetterResponse.from(mapLetter, profileImg, mapLetter.getCreateUserId() == userId,
-                mapLetterReplyService.checkReplyMapLetter(letterId, userId).isReplied(), isArchived(letterId, userId));
     }
 
     @Override

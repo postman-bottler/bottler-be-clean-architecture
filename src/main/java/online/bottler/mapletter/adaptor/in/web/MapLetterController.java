@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
+import online.bottler.mapletter.application.MapLetterCreateFacade;
+import online.bottler.mapletter.application.MapLetterFacade;
 import online.bottler.mapletter.application.port.in.MapLetterReplyUseCase;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,6 +33,8 @@ public class MapLetterController {
 
     private final MapLetterUseCase mapLetterUseCase;
     private final MapLetterReplyUseCase mapLetterReplyUseCase;
+    private final MapLetterFacade mapLetterFacade;
+    private final MapLetterCreateFacade mapLetterCreateFacade;
 
     @PostMapping("/public")
     @Operation(summary = "지도 퍼블릭 편지 생성", description = "로그인 필수. 제목 없으면 무제로 넣어주세요.")
@@ -59,8 +63,7 @@ public class MapLetterController {
         }
 
         Long userId = userDetails.getUserId();
-        mapLetterUseCase.createTargetMapLetter(
-                createTargetMapLetterRequest.toCommand(), userId);
+        mapLetterCreateFacade.createTargetMapLetter(createTargetMapLetterRequest.toCommand(), userId);
         return ApiResponse.onCreateSuccess("타겟 편지 생성이 성공되었습니다.");
     }
 
@@ -72,24 +75,24 @@ public class MapLetterController {
         return switch (type) {
             case "sent-all" -> //보낸 편지 전체 조회(지도편지, 답장 편지)
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findSentMapLetters(page, size, userId)));
+                            MapLetterPageResponse.from(mapLetterFacade.findSentMapLetters(page, size, userId)));
             case "sent-reply" -> //보낸 답장 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(
                                     mapLetterReplyUseCase.findAllSentReplyMapLetters(page, size, userId)));
             case "sent-map" -> //보낸 지도 편지 전체 조회
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findAllSentMapLetters(page, size, userId)));
+                            MapLetterPageResponse.from(mapLetterFacade.findAllSentMapLetters(page, size, userId)));
             case "received-all" -> //받은 편지 전체 조회(타겟 편지, 답장 편지)
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findReceivedMapLetters(page, size, userId)));
+                            MapLetterPageResponse.from(mapLetterFacade.findReceivedMapLetters(page, size, userId)));
             case "received-reply" -> //받은 답장 편지 전체 조회
                     ApiResponse.onSuccess(
                             MapLetterPageResponse.from(
                                     mapLetterReplyUseCase.findAllReceivedReplyMapLetters(page, size, userId)));
             case "received-map" -> //받은 타겟 편지 전체 조회
                     ApiResponse.onSuccess(
-                            MapLetterPageResponse.from(mapLetterUseCase.findAllReceivedLetters(page, size, userId)));
+                            MapLetterPageResponse.from(mapLetterFacade.findAllReceivedLetters(page, size, userId)));
             default -> throw new AdaptorException("잘못된 저장된 지도 편지 조회 타입입니다.");
         };
     }

@@ -1,7 +1,10 @@
 package online.bottler.user.adapter.out.persistence.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import online.bottler.user.adapter.out.persistence.entity.UserEntity;
 import online.bottler.user.domain.Provider;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +28,10 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByEmailAndProvider(String kakaoId, Provider provider);
 
     Optional<UserEntity> findByNickname(String nickname);
+
+    @Query("SELECT userId, nickname FROM UserEntity WHERE userId IN :ids")
+    List<Object[]> getIdAndNicknameByUserIdIn(Set<Long> ids);
+
+    @Query("SELECT userId, imageUrl FROM UserEntity WHERE userId IN :ids")
+    List<Object[]> getIdAndImageByUserIdIn(Set<Long> ids);
 }

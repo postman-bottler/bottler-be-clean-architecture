@@ -1,9 +1,5 @@
 package online.bottler.mapletter.application;
 
-import static online.bottler.mapletter.application.DeleteLetterType.MAP;
-import static online.bottler.mapletter.application.DeleteLetterType.REPLY;
-import static online.bottler.notification.domain.NotificationType.TARGET_LETTER;
-
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,24 +10,18 @@ import online.bottler.mapletter.application.command.DeleteMapLettersCommand;
 import online.bottler.mapletter.application.command.DeleteMapLettersCommand.LetterInfo;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
 import online.bottler.mapletter.application.port.out.ReplyMapLetterPersistencePort;
+import online.bottler.mapletter.application.validator.PageValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import online.bottler.mapletter.application.dto.FindReceivedMapLetterDTO;
 import online.bottler.mapletter.application.dto.FindSentMapLetter;
-import online.bottler.mapletter.application.response.FindAllReceivedLetterResponse;
-import online.bottler.mapletter.application.response.FindAllSentMapLetterResponse;
-import online.bottler.mapletter.application.response.FindMapLetterResponse;
-import online.bottler.mapletter.application.response.FindReceivedMapLetterResponse;
 import online.bottler.mapletter.application.port.out.MapLetterPersistencePort;
 import online.bottler.mapletter.application.port.out.RecentReplyCachePort;
 import online.bottler.mapletter.domain.MapLetter;
-import online.bottler.mapletter.domain.MapLetterType;
 import online.bottler.mapletter.domain.ReplyMapLetter;
-import online.bottler.notification.application.NotificationService;
 import online.bottler.reply.application.ReplyType;
-import online.bottler.user.application.UserService;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -40,8 +30,6 @@ public class MapLetterService implements MapLetterUseCase {
     private final MapLetterPersistencePort mapLetterPersistencePort;
     private final ReplyMapLetterPersistencePort replyMapLetterPersistencePort;
     private final RecentReplyCachePort recentReplyCachePort;
-    private final UserService userService;
-    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -52,110 +40,54 @@ public class MapLetterService implements MapLetterUseCase {
 
     @Override
     @Transactional
-    public MapLetter createTargetMapLetter(CreateTargetMapLetterCommand createTargetMapLetterCommand, Long userId) {
-        Long targetUserId = userService.getUserIdByNickname(createTargetMapLetterCommand.target());
+    public MapLetter createTargetMapLetter(CreateTargetMapLetterCommand createTargetMapLetterCommand, Long userId,
+                                           Long targetUserId) {
         MapLetter mapLetter = createTargetMapLetterCommand.toTargetMapLetter(userId, targetUserId);
-
-        MapLetter save = mapLetterPersistencePort.save(mapLetter);
-        notificationService.sendLetterNotification(TARGET_LETTER, targetUserId, save.getId(), save.getLabel());
-        return save;
+        return mapLetterPersistencePort.save(mapLetter);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindMapLetterResponse> findSentMapLetters(int page, int size, Long userId) {
-        validMinPage(page);
-        Page<FindSentMapLetter> sentMapLetters = mapLetterPersistencePort.findSentLettersByUserId(userId,
+    public Page<FindSentMapLetter> findSentLetters(int page, int size, Long userId) {
+        PageValidator.validMinPage(page);
+
+        Page<FindSentMapLetter> sentLettersByUserId = mapLetterPersistencePort.findSentLettersByUserId(userId,
                 PageRequest.of(page - 1, size));
 
-        if (sentMapLetters.isEmpty()) {
+        if (sentLettersByUserId.isEmpty()) {
             return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
         }
 
-        validMaxPage(sentMapLetters.getTotalPages(), page);
+        PageValidator.validMaxPage(sentLettersByUserId.getTotalPages(), page);
 
-        return sentMapLetters.map(this::toFindSentMapLetter);
-    }
-
-    private FindMapLetterResponse toFindSentMapLetter(FindSentMapLetter findSentMapLetter) {
-        String targetUserNickname = null;
-        if (findSentMapLetter.getType().equals("TARGET")) {
-            targetUserNickname = userService.getNicknameById(findSentMapLetter.getTargetUser());
-        }
-
-        return FindMapLetterResponse.from(findSentMapLetter, targetUserNickname,
-                findSentMapLetter.getType().equals("REPLY") ? REPLY : MAP);
+        return sentLettersByUserId;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FindReceivedMapLetterResponse> findReceivedMapLetters(int page, int size, Long userId) {
-        validMinPage(page);
-        Page<FindReceivedMapLetterDTO> letters = mapLetterPersistencePort.findActiveReceivedMapLettersByUserId(userId,
+    public Page<FindReceivedMapLetterDTO> findReceivedMapLetters(int page, int size, Long userId) {
+        PageValidator.validMinPage(page);
+
+        Page<FindReceivedMapLetterDTO> letters = mapLetterPersistencePort.findActiveReceivedMapLettersByUserId(
+                userId,
                 PageRequest.of(page - 1, size));
 
         if (letters.isEmpty()) {
             return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
         }
 
-        validMaxPage(letters.getTotalPages(), page);
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
 
-        return letters.map(letter -> {
-            String senderNickname = null;
-            String senderProfileImg = null;
-
-            if ("TARGET".equals(letter.getType())) {
-                senderNickname = userService.getNicknameById(letter.getSenderId());
-                senderProfileImg = userService.getProfileImageUrlById(letter.getSenderId());
-            }
-
-            return FindReceivedMapLetterResponse.from(letter, senderNickname, senderProfileImg, MAP);
-        });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<FindAllSentMapLetterResponse> findAllSentMapLetters(int page, int size, Long userId) {
-        validMinPage(page);
-        Page<MapLetter> letters = mapLetterPersistencePort.findActiveByCreateUserId(userId,
-                PageRequest.of(page - 1, size));
-        if (letters.isEmpty()) {
-            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
-        }
-        validMaxPage(letters.getTotalPages(), page);
-
-        return letters.map(mapLetter -> {
-            String targetUserNickname = null;
-            if (mapLetter.getType() == MapLetterType.PRIVATE) {
-                targetUserNickname = userService.getNicknameById(mapLetter.getTargetUserId());
-            }
-            return FindAllSentMapLetterResponse.from(mapLetter, targetUserNickname, MAP);
-        });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<FindAllReceivedLetterResponse> findAllReceivedLetters(int page, int size, Long userId) {
-        validMinPage(page);
-        Page<MapLetter> letters = mapLetterPersistencePort.findActiveByTargetUserId(userId,
-                PageRequest.of(page - 1, size));
-        if (letters.isEmpty()) {
-            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
-        }
-        validMaxPage(letters.getTotalPages(), page);
-        return letters.map(letter -> {
-            String sendUserNickname = userService.getNicknameById(letter.getCreateUserId());
-            String sendUserProfileImg = userService.getProfileImageUrlById(letter.getCreateUserId());
-            return FindAllReceivedLetterResponse.from(letter, sendUserNickname, sendUserProfileImg,
-                    MAP);
-        });
+        return letters;
     }
 
     @Override
     @Transactional
     public void deleteMapLetter(List<Long> letters, Long userId) {
         List<MapLetter> mapLetters = mapLetterPersistencePort.findAllByIds(letters);
-        mapLetters.forEach(letter -> {letter.validDeleteMapLetter(userId);});
+        mapLetters.forEach(letter -> {
+            letter.validDeleteMapLetter(userId);
+        });
         mapLetterPersistencePort.softDeleteAll(mapLetters);
     }
 
@@ -251,15 +183,66 @@ public class MapLetterService implements MapLetterUseCase {
         return null;
     }
 
-    void validMaxPage(int maxPage, int nowPage) {
-        if (maxPage < nowPage) {
-            throw new ApplicationException("페이지가 존재하지 않습니다.");
+    @Override
+    @Transactional(readOnly = true)
+    public MapLetter findById(Long id) {
+        return mapLetterPersistencePort.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public void targetUserUpdateRead(Long userId, MapLetter mapLetter) {
+        if (mapLetter.isTargetUser(userId)) {
+            mapLetterPersistencePort.updateRead(mapLetter);
         }
     }
 
-    void validMinPage(int nowPage) {
-        if (nowPage < 1) {
-            throw new ApplicationException("페이지가 존재하지 않습니다.");
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MapLetter> findActiveByCreateUserId(int page, int size, Long userId) {
+        PageValidator.validMinPage(page);
+
+        Page<MapLetter> letters = mapLetterPersistencePort.findActiveByCreateUserId(userId,
+                PageRequest.of(page - 1, size));
+
+        if (letters.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
         }
+
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
+        return letters;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MapLetter> findActiveLetter(int page, int size, Long userId) {
+        PageValidator.validMinPage(page);
+
+        Page<MapLetter> letters = mapLetterPersistencePort.findActiveByTargetUserId(userId,
+                PageRequest.of(page - 1, size));
+
+        if (letters.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
+        }
+
+        PageValidator.validMaxPage(letters.getTotalPages(), page);
+
+        return letters;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MapLetter findArchiveOneLetterById(Long letterId, Long userId) {
+        MapLetter letter = mapLetterPersistencePort.findById(letterId);
+        letter.validateAccess(userId);
+        return letter;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MapLetter findPublicMapLetterById(Long letterId) {
+        MapLetter letter = mapLetterPersistencePort.findById(letterId);
+        letter.validatePublicAccess();
+        return letter;
     }
 }
