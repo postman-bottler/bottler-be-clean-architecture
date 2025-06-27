@@ -1,13 +1,14 @@
 package online.bottler.complaint.adapter.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import online.bottler.complaint.adapter.out.persistence.entity.MapReplyComplaintEntity;
 import online.bottler.complaint.application.port.MapReplyComplaintPersistencePort;
 import online.bottler.complaint.domain.Complaint;
 import online.bottler.complaint.domain.Complaints;
-import online.bottler.complaint.adapter.out.persistence.entity.MapReplyComplaintEntity;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,5 +26,11 @@ public class MapReplyComplaintPersistenceAdapter implements MapReplyComplaintPer
         return Complaints.from(entities.stream()
                 .map(MapReplyComplaintEntity::toDomain)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Optional<Complaint> findByLetterIdAndReporterId(Long letterId, Long reporterId) {
+        return repository.findByLetterIdAndReporterId(letterId, reporterId)
+                .map(MapReplyComplaintEntity::toDomain);
     }
 }
