@@ -21,6 +21,7 @@ public class Subscription {
 
     public PushMessage makeMessage(NotificationType type) {
         return PushMessage.builder()
+                .userId(userId)
                 .device(device)
                 .title(type.getTitle())
                 .content(type.getContent())

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
-import online.bottler.notification.domain.PushMessage;
+import online.bottler.notification.adapter.out.push.SseMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,12 +60,12 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, PushMessage> messageTemplate() {
-        RedisTemplate<String, PushMessage> template = new RedisTemplate<>();
+    public RedisTemplate<String, SseMessage> messageTemplate() {
+        RedisTemplate<String, SseMessage> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory());
 
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(PushMessage.class));
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(SseMessage.class));
         return template;
     }
 

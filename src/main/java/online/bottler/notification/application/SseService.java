@@ -18,7 +18,7 @@ public class SseService {
     private final ListenerPort listenerPort;
 
     public SseEmitter connect(String userId) {
-        SseEmitter emitter = new SseEmitter();
+        SseEmitter emitter = new SseEmitter(15 * 60 * 1000L);
         sseEmitterPort.save(userId, emitter);
         listenerPort.save(userId, emitter);
 
