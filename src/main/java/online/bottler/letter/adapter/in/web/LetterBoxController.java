@@ -13,7 +13,7 @@ import online.bottler.global.response.ApiResponse;
 import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
 import online.bottler.letter.adapter.in.web.request.CommonPageRequest;
 import online.bottler.letter.adapter.in.web.request.LetterDeleteRequest;
-import online.bottler.letter.application.port.in.LetterBoxUseCase;
+import online.bottler.letter.application.facade.LetterBoxFacade;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.response.PageResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Letter Box", description = "보관된(saved) 편지 관리 API")
 public class LetterBoxController {
 
-    private final LetterBoxUseCase letterBoxUseCase;
+    private final LetterBoxFacade letterBoxFacade;
 
     @Operation(summary = "보관된 모든 편지 조회", description = "페이지네이션을 사용하여 보관된 모든 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
             + "\nPage Default: page(1) size(9) sort(createAt)")
@@ -41,7 +41,7 @@ public class LetterBoxController {
                                                                           BindingResult bindingResult,
                                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(
-                PageResponse.from(letterBoxUseCase.getAllLetters(commonPageRequest, userDetails.getUserId())));
+                PageResponse.from(letterBoxFacade.getAllLetters(commonPageRequest.toCommand(), userDetails.getUserId())));
     }
 
     @Operation(summary = "보낸 편지 조회", description = "페이지네이션을 사용하여 보관된 보낸 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
@@ -52,7 +52,7 @@ public class LetterBoxController {
                                                                            BindingResult bindingResult,
                                                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(
-                PageResponse.from(letterBoxUseCase.getSentLetters(commonPageRequest, userDetails.getUserId())));
+                PageResponse.from(letterBoxFacade.getSentLetters(commonPageRequest.toCommand(), userDetails.getUserId())));
     }
 
     @Operation(summary = "받은 편지 조회", description = "페이지네이션을 사용하여 보관된 받은 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
@@ -63,33 +63,33 @@ public class LetterBoxController {
             @Valid CommonPageRequest commonPageRequest, BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(PageResponse.from(
-                letterBoxUseCase.getReceivedLetters(commonPageRequest, userDetails.getUserId())));
+                letterBoxFacade.getReceivedLetters(commonPageRequest.toCommand(), userDetails.getUserId())));
     }
 
     @Operation(summary = "보관된 편지 삭제", description = "편지ID, 편지타입(LETTER, REPLY_LETTER), 송수신 타입(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")
     @DeleteMapping
     public ApiResponse<String> deleteSavedLetter(@RequestBody @Valid List<LetterDeleteRequest> letterDeleteRequests,
                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxUseCase.deleteLetters(LetterDeleteRequest.toCommandList(letterDeleteRequests),
+        letterBoxFacade.deleteLetters(LetterDeleteRequest.toCommandList(letterDeleteRequests),
                 userDetails.getUserId());
         return ApiResponse.onSuccess("보관된 편지를 삭제했습니다.");
     }
 
     @DeleteMapping("/all")
     public ApiResponse<String> deleteAllSavedLetters(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxUseCase.deleteAllLetters(userDetails.getUserId());
+        letterBoxFacade.deleteAllLetters(userDetails.getUserId());
         return ApiResponse.onSuccess("보관된 편지를 모두 삭제했습니다");
     }
 
     @DeleteMapping("/received")
     public ApiResponse<String> deleteAllSavedReceivedLetters(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxUseCase.deleteAllReceivedLetters(userDetails.getUserId());
+        letterBoxFacade.deleteAllReceivedLetters(userDetails.getUserId());
         return ApiResponse.onSuccess("받은 편지를 모두 삭제했습니다");
     }
 
     @DeleteMapping("/sent")
     public ApiResponse<String> deleteAllSavedSentLetters(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxUseCase.deleteAllSentLetters(userDetails.getUserId());
+        letterBoxFacade.deleteAllSentLetters(userDetails.getUserId());
         return ApiResponse.onSuccess("보낸 편지를 모두 삭제했습니다.");
     }
 }

@@ -1,7 +1,7 @@
-package online.bottler.letter.adapter.out.persistence;
+package online.bottler.letter.adapter.out.cache;
 
 import lombok.RequiredArgsConstructor;
-import online.bottler.letter.adapter.out.persistence.repository.RecentReplyRedisRepository;
+import online.bottler.letter.adapter.out.cache.repository.RecentReplyRedisRepository;
 import online.bottler.letter.application.port.out.DeleteRecentReplyCachePort;
 import online.bottler.letter.application.port.out.PushRecentReplyCachePort;
 import org.springframework.stereotype.Repository;

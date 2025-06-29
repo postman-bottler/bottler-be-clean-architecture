@@ -20,11 +20,11 @@ public class SchedulerConfig {
 
     @Scheduled(cron = "0 0 23,11,17 * * *")
     public void executeRecommendationJob() {
-        recommendationScheduler.processAllUserRecommendations();
+        recommendationScheduler.generateAllUserRecommendationsAsync();
     }
 
     @Scheduled(cron = "0 0 0,12,18 * * ?")
     public void recommendKeywordLetter() {
-        recommendationScheduler.updateAllRecommendations();
+        recommendationScheduler.updateAllRecommendationsAndNotify();
     }
 }

@@ -1,7 +1,8 @@
 package online.bottler.letter.application.port.in;
 
-import online.bottler.letter.application.response.KeywordResponse;
+import java.util.List;
+import online.bottler.letter.domain.Keyword;
 
 public interface KeywordUseCase {
-    KeywordResponse getAll();
+    List<Keyword> getAll();
 }

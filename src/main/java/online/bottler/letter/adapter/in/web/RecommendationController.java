@@ -32,7 +32,7 @@ public class RecommendationController {
     @Operation(summary = "키워드 편지 추천 요청", description = "현재 3개가 추천됩니다")
     @PostMapping("/process")
     public ResponseEntity<String> processRecommendation() {
-        recommendationScheduler.processAllUserRecommendations();
+        recommendationScheduler.generateAllUserRecommendationsAsync();
         return ResponseEntity.ok("Recommendation process started for user " + userService.getAllUserIds());
     }
 

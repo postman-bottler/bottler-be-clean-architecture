@@ -14,7 +14,7 @@ import online.bottler.letter.adapter.in.web.request.CommonPageRequest;
 import online.bottler.letter.adapter.in.web.request.ReplyLetterDeleteRequest;
 import online.bottler.letter.adapter.in.web.request.ReplyLetterRequest;
 import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
-import online.bottler.letter.application.port.in.ReplyLetterUseCase;
+import online.bottler.letter.application.facade.ReplyLetterFacade;
 import online.bottler.letter.application.response.PageResponse;
 import online.bottler.letter.application.response.ReplyLetterDetailResponse;
 import online.bottler.letter.application.response.ReplyLetterResponse;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Reply Letters", description = "키워드 편지 API")
 public class ReplyLetterController {
 
-    private final ReplyLetterUseCase replyLetterUseCase;
+    private final ReplyLetterFacade replyLetterFacade;
 
     @Operation(summary = "키워드 편지 생성", description = "지정된 편지 ID에 대한 답장을 생성합니다.")
     @PostMapping("/{letterId}")
@@ -46,7 +46,7 @@ public class ReplyLetterController {
                                                               BindingResult bindingResult,
                                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(
-                replyLetterUseCase.create(replyLetterRequest.toCommand(letterId, userDetails.getUserId())));
+                replyLetterFacade.create(replyLetterRequest.toCommand(letterId, userDetails.getUserId())));
     }
 
     @Operation(summary = "특정 키워드 편지에 대한 답장 목록 조회", description = "지정된 편지 ID에 대한 답장들의 제목, 라벨이미지, 작성날짜를 페이지네이션 형태로 반환합니다."
@@ -57,8 +57,8 @@ public class ReplyLetterController {
                                                                                      @Valid CommonPageRequest commonPageRequest,
                                                                                      BindingResult bindingResult,
                                                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Page<ReplyLetterSummaryResponse> result = replyLetterUseCase.getSummaries(
-                ReplyLetterSummariesQuery.of(letterId, commonPageRequest, userDetails.getUserId()));
+        Page<ReplyLetterSummaryResponse> result = replyLetterFacade.getSummaries(
+                ReplyLetterSummariesQuery.of(letterId, commonPageRequest.toCommand(), userDetails.getUserId()));
         return ApiResponse.onSuccess(PageResponse.from(result));
     }
 
@@ -66,14 +66,14 @@ public class ReplyLetterController {
     @GetMapping("/detail/{replyLetterId}")
     public ApiResponse<ReplyLetterDetailResponse> getReplyLetter(@PathVariable Long replyLetterId,
                                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(replyLetterUseCase.getDetail(replyLetterId, userDetails.getUserId()));
+        return ApiResponse.onSuccess(replyLetterFacade.getDetail(replyLetterId, userDetails.getUserId()));
     }
 
     @Operation(summary = "답장 편지 삭제", description = "답장 편지ID, 송수신 타입(SEND, RECEIVE)을 기반으로 답장 편지를 삭제합니다.")
     @DeleteMapping
     public ApiResponse<String> deleteReplyLetter(@RequestBody @Valid ReplyLetterDeleteRequest replyLetterDeleteRequest,
                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        replyLetterUseCase.softDelete(replyLetterDeleteRequest.toCommand(userDetails.getUserId()));
+        replyLetterFacade.softDelete(replyLetterDeleteRequest.toCommand(userDetails.getUserId()));
         return ApiResponse.onSuccess("답장 편지가 성공적으로 삭제되었습니다.");
     }
 }

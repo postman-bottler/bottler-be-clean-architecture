@@ -1,0 +1,70 @@
+package online.bottler.letter.application.facade;
+
+import static online.bottler.letter.domain.BoxType.NONE;
+import static online.bottler.letter.domain.LetterType.LETTER;
+
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import online.bottler.letter.application.command.LetterWithKeywordsCommand;
+import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand;
+import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
+import online.bottler.letter.application.port.in.LetterBoxUseCase;
+import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
+import online.bottler.letter.application.port.in.RecommendUseCase;
+import online.bottler.letter.application.port.in.ReplyLetterUseCase;
+import online.bottler.letter.application.response.LetterRecommendSummaryResponse;
+import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
+import online.bottler.letter.application.response.LetterWithKeywordsResponse;
+import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterWithKeywords;
+import online.bottler.letter.exception.UnauthorizedLetterAccessException;
+import online.bottler.user.application.port.in.UserUseCase;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class LetterWithKeywordsFacade {
+
+    private final UserUseCase userUseCase;
+    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
+    private final ReplyLetterUseCase replyLetterUseCase;
+    private final LetterBoxUseCase letterBoxUseCase;
+    private final RecommendUseCase recommendUseCase;
+
+    @Transactional
+    public LetterWithKeywordsResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
+        Letter letter = letterWithKeywordsUseCase.create(letterWithKeywordsCommand);
+        letterBoxUseCase.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
+        return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, letterWithKeywordsCommand.keywords()));
+    }
+
+    @Transactional(readOnly = true)
+    public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
+        if (letterBoxUseCase.isAccessDenied(letterWithKeywordsDetailQuery.letterId(),
+                letterWithKeywordsDetailQuery.userId())) {
+            throw new UnauthorizedLetterAccessException();
+        }
+
+        LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.get(letterWithKeywordsDetailQuery);
+        String profile = userUseCase.findById(letterWithKeywords.getUserId()).getImageUrl();
+        boolean isReplied = replyLetterUseCase.isReplied(letterWithKeywordsDetailQuery.letterId(), letterWithKeywordsDetailQuery.userId());
+
+        return LetterWithKeywordsDetailResponse.of(letterWithKeywords, letterWithKeywordsDetailQuery.userId(), profile, isReplied);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
+        List<Long> recommendedLetterIds = recommendUseCase.getRecommended(userId);
+        List<Letter> letters = letterWithKeywordsUseCase.loadAllIncludingDeletedByIds(recommendedLetterIds);
+        return LetterRecommendSummaryResponse.fromList(letters);
+    }
+
+    @Transactional
+    public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
+        letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteCommand);
+        letterBoxUseCase.deleteLetter(letterWithKeywordsDeleteCommand.letterId(), LETTER, NONE);
+    }
+}

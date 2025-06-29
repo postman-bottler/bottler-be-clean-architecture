@@ -12,8 +12,7 @@ import online.bottler.letter.adapter.in.web.annotation.LetterValidationMetaData;
 import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsDeleteRequest;
 import online.bottler.letter.adapter.in.web.request.LetterWithKeywordsRequest;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
-import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
-import online.bottler.letter.application.port.in.RecommendUseCase;
+import online.bottler.letter.application.facade.LetterWithKeywordsFacade;
 import online.bottler.letter.application.response.LetterWithKeywordsDetailResponse;
 import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,8 +33,7 @@ import online.bottler.letter.application.response.LetterRecommendSummaryResponse
 @Tag(name = "키워드 편지", description = "키워드 편지 API")
 public class LetterWithKeywordsController {
 
-    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
-    private final RecommendUseCase recommendUseCase;
+    private final LetterWithKeywordsFacade letterWithKeywordsFacade;
 
     @Operation(summary = "키워드 편지 생성", description = "새로운 키워드 편지를 생성합니다.")
     @PostMapping
@@ -44,14 +42,14 @@ public class LetterWithKeywordsController {
             @RequestBody @Valid LetterWithKeywordsRequest letterWithKeywordsRequest, BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(
-                letterWithKeywordsUseCase.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
+                letterWithKeywordsFacade.create(letterWithKeywordsRequest.toCommand(userDetails.getUserId())));
     }
 
     @Operation(summary = "키워드 편지 상세 조회", description = "편지 ID로 키워드 편지의 상세 정보를 조회합니다.")
     @GetMapping("/detail/{letterId}")
     public ApiResponse<LetterWithKeywordsDetailResponse> getLetterDetail(@PathVariable Long letterId,
                                                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(letterWithKeywordsUseCase.getDetail(
+        return ApiResponse.onSuccess(letterWithKeywordsFacade.getDetail(
                 LetterWithKeywordsDetailQuery.of(letterId, userDetails.getUserId())));
     }
 
@@ -59,7 +57,7 @@ public class LetterWithKeywordsController {
     @GetMapping("/recommend")
     public ApiResponse<List<LetterRecommendSummaryResponse>> getRecommendLetters(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(recommendUseCase.getRecommended(userDetails.getUserId()));
+        return ApiResponse.onSuccess(letterWithKeywordsFacade.getRecommended(userDetails.getUserId()));
     }
 
     @Operation(summary = "키워드 편지 삭제", description = "키워드 편지ID, BoxType 송수신(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")
@@ -67,7 +65,7 @@ public class LetterWithKeywordsController {
     public ApiResponse<String> deleteLetter(
             @RequestBody @Valid LetterWithKeywordsDeleteRequest letterWithKeywordsDeleteRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteRequest.toCommand(userDetails.getUserId()));
+        letterWithKeywordsFacade.delete(letterWithKeywordsDeleteRequest.toCommand(userDetails.getUserId()));
         return ApiResponse.onSuccess("키워드 편지를 삭제했습니다.");
     }
 }

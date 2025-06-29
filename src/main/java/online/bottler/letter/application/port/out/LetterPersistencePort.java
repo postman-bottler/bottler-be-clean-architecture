@@ -9,7 +9,7 @@ public interface LetterPersistencePort {
 
     Optional<Letter> loadById(Long letterId);
 
-    List<Letter> loadAllByIds(List<Long> letterIds);
+    List<Letter> loadAllIncludingDeletedByIds(List<Long> letterIds);
 
     List<Long> loadIdsByUserId(Long userId);
 

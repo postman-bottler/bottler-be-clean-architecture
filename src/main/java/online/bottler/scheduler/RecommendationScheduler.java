@@ -11,19 +11,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.RecommendUseCase;
+import online.bottler.notification.application.port.NotificationUseCase;
+import online.bottler.user.application.port.in.UserUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import online.bottler.notification.application.request.RecommendNotificationCommand;
-import online.bottler.notification.application.NotificationService;
-import online.bottler.user.application.UserService;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RecommendationScheduler {
 
-    private final UserService userService;
-    private final NotificationService notificationService;
+    private final UserUseCase userUseCase;
+    private final NotificationUseCase notificationUseCase;
     private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
     private final RecommendUseCase recommendUseCase;
 
@@ -33,10 +33,11 @@ public class RecommendationScheduler {
     @Value("${scheduler.parallelism}")
     private int parallelism;
 
-    public void processAllUserRecommendations() {
+    public void generateAllUserRecommendationsAsync() {
         ExecutorService executorService = Executors.newFixedThreadPool(parallelism);
         try {
-            for (List<Long> batch : createBatches(userService.getAllUserIds())) {
+            List<List<Long>> batches = createBatches(userUseCase.getAllUserIds());
+            for (List<Long> batch : batches) {
                 log.info("사용자 배치 처리 시작 (크기: {}): {}", batch.size(), batch);
 
                 List<CompletableFuture<String>> futures = batch.stream().map(userId -> CompletableFuture.supplyAsync(
@@ -72,16 +73,16 @@ public class RecommendationScheduler {
         }
     }
 
-    public void updateAllRecommendations() {
+    public void updateAllRecommendationsAndNotify() {
         List<RecommendNotificationCommand> notifications = new ArrayList<>();
-        for (List<Long> batch : createBatches(userService.getAllUserIds())) {
+        for (List<Long> batch : createBatches(userUseCase.getAllUserIds())) {
             batch.forEach(userId -> recommendUseCase.updateRecommendationsFromTemp(userId)
                     .ifPresent(recommendId -> notifications.add(createRecommendNotification(userId, recommendId))));
         }
 
         if (!notifications.isEmpty()) {
             try {
-                notificationService.sendKeywordNotifications(notifications);
+                notificationUseCase.sendKeywordNotifications(notifications);
                 log.info("추천 알림이 성공적으로 전송되었습니다. 알림 수: {}", notifications.size());
             } catch (Exception e) {
                 log.error("추천 알림 전송 중 예외 발생: {}", e.getMessage(), e);

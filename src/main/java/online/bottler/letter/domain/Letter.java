@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class Letter extends BaseEntity {
+public class Letter extends BaseDomain {
     private final Long userId;
     private final LetterContent letterContent;
     private final LetterStatus letterStatus;
@@ -22,6 +22,10 @@ public class Letter extends BaseEntity {
 
     public static Letter create(Long userId, LetterContent letterContent) {
         return new Letter(null, userId, letterContent, LetterStatus.create(false, false), LocalDateTime.now());
+    }
+
+    public boolean isOwner(Long userId) {
+        return this.userId.equals(userId);
     }
 
     public String getTitle() {

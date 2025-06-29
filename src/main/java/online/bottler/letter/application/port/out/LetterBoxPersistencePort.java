@@ -2,9 +2,10 @@ package online.bottler.letter.application.port.out;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import online.bottler.letter.adapter.out.persistence.model.LetterSummaryProjection;
 import online.bottler.letter.domain.BoxType;
+import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface LetterBoxPersistencePort {
@@ -16,7 +17,7 @@ public interface LetterBoxPersistencePort {
 
     void createForDeveloperLetter(List<Long> letterId, Long userId);
 
-    List<LetterSummaryProjection> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType);
+    Page<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType);
 
     boolean existsByLetterIdAndUserId(Long letterId, Long userId);
 
@@ -27,6 +28,4 @@ public interface LetterBoxPersistencePort {
     void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType);
 
     void deleteByConditionAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId);
-
-    long countLetters(Long userId, BoxType boxType);
 }

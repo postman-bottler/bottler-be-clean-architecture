@@ -1,5 +1,10 @@
 package online.bottler.letter.adapter.out.persistence;
 
+import static online.bottler.letter.domain.BoxType.RECEIVE;
+import static online.bottler.letter.domain.BoxType.SEND;
+import static online.bottler.letter.domain.LetterType.LETTER;
+import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +15,9 @@ import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRe
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
+import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -23,28 +30,30 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
 
     @Override
     public void createForLetter(Long letterId, Long userId, LocalDateTime createdAt) {
-        save(letterId, userId, LetterType.LETTER, BoxType.SEND, createdAt);
+        save(letterId, userId, LETTER, SEND, createdAt);
     }
 
     @Override
     public void createForReplyLetter(Long letterId, Long userId, Long receiverId, LocalDateTime createdAt) {
-        save(letterId, userId, LetterType.REPLY_LETTER, BoxType.SEND, createdAt);
-        save(letterId, receiverId, LetterType.REPLY_LETTER, BoxType.RECEIVE, createdAt);
+        save(letterId, userId, REPLY_LETTER, SEND, createdAt);
+        save(letterId, receiverId, REPLY_LETTER, RECEIVE, createdAt);
     }
 
     @Override
     public void createForRecommendedLetter(Long letterId, Long userId) {
-        save(letterId, userId, LetterType.LETTER, BoxType.SEND, LocalDateTime.now());
+        save(letterId, userId, LETTER, SEND, LocalDateTime.now());
     }
 
     @Override
     public void createForDeveloperLetter(List<Long> letterIds, Long userId) {
-        letterIds.forEach(letterId -> save(letterId, userId, LetterType.LETTER, BoxType.RECEIVE, LocalDateTime.now()));
+        letterIds.forEach(letterId -> save(letterId, userId, LETTER, RECEIVE, LocalDateTime.now()));
     }
 
     @Override
-    public List<LetterSummaryProjection> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
-        return letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(userId, boxType, pageable);
+    public Page<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
+        Page<LetterSummaryProjection> letterSummaryProjections = letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(
+                userId, boxType, pageable);
+        return letterSummaryProjections.map(LetterSummaryProjection::toDomain);
     }
 
     @Override
@@ -69,12 +78,7 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
 
     @Override
     public void deleteByConditionAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId) {
-        letterBoxQueryRepository.deleteByConditionAndUserId(ids, LetterType.LETTER, boxType, userId);
-    }
-
-    @Override
-    public long countLetters(Long userId, BoxType boxType) {
-        return letterBoxQueryRepository.countLetters(userId, boxType);
+        letterBoxQueryRepository.deleteByConditionAndUserId(ids, LETTER, boxType, userId);
     }
 
     private void save(Long letterId, Long userId, LetterType letterType, BoxType boxType, LocalDateTime createdAt) {
