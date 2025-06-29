@@ -65,6 +65,8 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+
     // Firebase Admin SDK
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
