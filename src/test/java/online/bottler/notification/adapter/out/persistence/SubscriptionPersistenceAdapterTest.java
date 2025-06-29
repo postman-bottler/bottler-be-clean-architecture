@@ -49,10 +49,10 @@ class SubscriptionPersistenceAdapterTest {
 
         // then
         assertThat(subscriptions.getSubscriptions()).hasSize(2)
-                .extracting("userId", "token")
+                .extracting("userId", "device")
                 .containsExactlyInAnyOrder(
-                        tuple(1L, "token1"),
-                        tuple(1L, "token2")
+                        tuple(1L, new Device("token1")),
+                        tuple(1L, new Device("token2"))
                 );
     }
 
@@ -83,10 +83,10 @@ class SubscriptionPersistenceAdapterTest {
 
         // then
         assertThat(subscriptions.getSubscriptions()).hasSize(2)
-                .extracting("userId", "token")
+                .extracting("userId", "device")
                 .containsExactlyInAnyOrder(
-                        tuple(1L, "token1"),
-                        tuple(2L, "token2")
+                        tuple(1L, new Device("token1")),
+                        tuple(2L, new Device("token2"))
                 );
     }
 
@@ -123,8 +123,8 @@ class SubscriptionPersistenceAdapterTest {
         // then
         Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(1L);
         assertThat(subscriptions.getSubscriptions()).hasSize(1)
-                .extracting("userId", "token")
-                .containsExactlyInAnyOrder(tuple(1L, "token2"));
+                .extracting("userId", "device")
+                .containsExactlyInAnyOrder(tuple(1L, new Device("token2")));
     }
 
     @DisplayName("이미 구독된 유저의 기기라면, true를 반환한다.")

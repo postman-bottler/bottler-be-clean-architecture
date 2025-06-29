@@ -22,10 +22,10 @@ class SubscriptionsTest {
 
         // then
         assertThat(subscriptions.getSubscriptions()).hasSize(2)
-                .extracting("userId", "token")
+                .extracting("userId", "device")
                 .containsExactlyInAnyOrder(
-                        tuple(1L, "token1"),
-                        tuple(1L, "token2")
+                        tuple(1L, new Device("token1")),
+                        tuple(1L, new Device("token2"))
                 );
     }
 
@@ -42,10 +42,10 @@ class SubscriptionsTest {
 
         // then
         assertThat(pushMessages.getMessages()).hasSize(2)
-                .extracting("token", "title", "content")
+                .extracting("device", "title", "content")
                 .containsExactlyInAnyOrder(
-                        tuple("token1", NEW_LETTER.getTitle(), NEW_LETTER.getContent()),
-                        tuple("token2", NEW_LETTER.getTitle(), NEW_LETTER.getContent())
+                        tuple(new Device("token1"), NEW_LETTER.getTitle(), NEW_LETTER.getContent()),
+                        tuple(new Device("token2"), NEW_LETTER.getTitle(), NEW_LETTER.getContent())
                 );
     }
 
