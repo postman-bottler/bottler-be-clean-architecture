@@ -6,6 +6,8 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PushMessage {
+    private Long userId;
+
     private Device device;
 
     private String title;
