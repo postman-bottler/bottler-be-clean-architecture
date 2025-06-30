@@ -1,5 +1,6 @@
 package online.bottler.notification.application;
 
+import online.bottler.RedisTestContainersConfig;
 import online.bottler.global.exception.DomainException;
 import online.bottler.notification.application.port.PushNotificationPort;
 import online.bottler.notification.application.request.RecommendNotificationCommand;
@@ -16,6 +17,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.verify;
 
 @DisplayName("알림 서비스 테스트")
 @SpringBootTest
+@Import(RedisTestContainersConfig.class)
 public class NotificationServiceTest {
     @Autowired
     private NotificationService notificationService;

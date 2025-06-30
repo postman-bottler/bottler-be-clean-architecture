@@ -59,9 +59,9 @@ public class SubscriptionServiceTest {
         String token = "token";
 
         // WHEN
-        subscriptionService.unsubscribe(token);
+        subscriptionService.unsubscribe(1L, token);
 
         // THEN
-        verify(subscriptionRepository, times(1)).deleteByDevice(new Device(token));
+        verify(subscriptionRepository, times(1)).deleteByDevice(1L, new Device(token));
     }
 }
