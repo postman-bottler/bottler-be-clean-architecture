@@ -5,16 +5,18 @@ import static org.assertj.core.groups.Tuple.tuple;
 
 import com.google.firebase.messaging.Message;
 import java.util.List;
-
+import online.bottler.RedisTestContainersConfig;
 import online.bottler.notification.domain.Device;
+import online.bottler.notification.domain.PushMessage;
+import online.bottler.notification.domain.PushMessages;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import online.bottler.notification.domain.PushMessage;
-import online.bottler.notification.domain.PushMessages;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
+@Import(RedisTestContainersConfig.class)
 class FirebaseMessageMapperTest {
 
     @Autowired

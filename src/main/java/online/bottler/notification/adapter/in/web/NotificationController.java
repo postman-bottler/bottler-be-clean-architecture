@@ -74,8 +74,9 @@ public class NotificationController {
 
     @Operation(summary = "기기 알림 비허용", description = "특정 토큰을 삭제합니다.")
     @DeleteMapping("/subscribe")
-    public ApiResponse<String> unsubscribe(@RequestBody UnsubscriptionRequest unsubscriptionRequest) {
-        subscriptionUseCase.unsubscribe(unsubscriptionRequest.token());
+    public ApiResponse<String> unsubscribe(@RequestBody UnsubscriptionRequest unsubscriptionRequest,
+                                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        subscriptionUseCase.unsubscribe(customUserDetails.getUserId(), unsubscriptionRequest.token());
         return ApiResponse.onDeleteSuccess("삭제 성공");
     }
 }

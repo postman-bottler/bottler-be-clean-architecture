@@ -31,7 +31,7 @@ public class SubscriptionService implements SubscriptionUseCase {
     }
 
     @Transactional
-    public void unsubscribe(String token) {
-        subscriptionPersistencePort.deleteByDevice(new Device(token));
+    public void unsubscribe(Long userId, String token) {
+        subscriptionPersistencePort.deleteByDevice(userId, new Device(token));
     }
 }

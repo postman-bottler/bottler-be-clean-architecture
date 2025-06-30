@@ -3,19 +3,24 @@ package online.bottler.notification.adapter.out.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import online.bottler.IdGenerator;
+import online.bottler.RedisTestContainersConfig;
 import online.bottler.notification.domain.Device;
+import online.bottler.notification.domain.Subscription;
+import online.bottler.notification.domain.Subscriptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
-import online.bottler.notification.domain.Subscription;
-import online.bottler.notification.domain.Subscriptions;
 
 @SpringBootTest
 @Transactional
+@Import(RedisTestContainersConfig.class)
 class SubscriptionPersistenceAdapterTest {
-
+    @Autowired
+    private IdGenerator idGenerator;
     @Autowired
     private SubscriptionPersistenceAdapter subscriptionPersistenceAdapter;
 
@@ -38,21 +43,21 @@ class SubscriptionPersistenceAdapterTest {
     @Test
     void findByUserId() {
         // given
-        Long userId = 1L;
+        Long userId = idGenerator.generateId();
         Subscription subscription1 = Subscription.create(userId, "token1");
         Subscription subscription2 = Subscription.create(userId, "token2");
         subscriptionPersistenceAdapter.save(subscription1);
         subscriptionPersistenceAdapter.save(subscription2);
 
         // when
-        Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(1L);
+        Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(userId);
 
         // then
         assertThat(subscriptions.getSubscriptions()).hasSize(2)
                 .extracting("userId", "device")
                 .containsExactlyInAnyOrder(
-                        tuple(1L, new Device("token1")),
-                        tuple(1L, new Device("token2"))
+                        tuple(userId, new Device("token1")),
+                        tuple(userId, new Device("token2"))
                 );
     }
 
@@ -60,7 +65,7 @@ class SubscriptionPersistenceAdapterTest {
     @Test
     void findByUserIdWithoutSubscription() {
         // given
-        Long userId = 1L;
+        Long userId = idGenerator.generateId();
 
         // when
         Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(userId);
@@ -73,8 +78,10 @@ class SubscriptionPersistenceAdapterTest {
     @Test
     void findAll() {
         // given
-        Subscription subscription1 = Subscription.create(1L, "token1");
-        Subscription subscription2 = Subscription.create(2L, "token2");
+        long userId1 = idGenerator.generateId();
+        Subscription subscription1 = Subscription.create(userId1, "token1");
+        long userId2 = idGenerator.generateId();
+        Subscription subscription2 = Subscription.create(userId2, "token2");
         subscriptionPersistenceAdapter.save(subscription1);
         subscriptionPersistenceAdapter.save(subscription2);
 
@@ -85,8 +92,8 @@ class SubscriptionPersistenceAdapterTest {
         assertThat(subscriptions.getSubscriptions()).hasSize(2)
                 .extracting("userId", "device")
                 .containsExactlyInAnyOrder(
-                        tuple(1L, new Device("token1")),
-                        tuple(2L, new Device("token2"))
+                        tuple(userId1, new Device("token1")),
+                        tuple(userId2, new Device("token2"))
                 );
     }
 
@@ -94,7 +101,7 @@ class SubscriptionPersistenceAdapterTest {
     @Test
     void deleteAllByUserId() {
         // given
-        Long userId = 1L;
+        Long userId = idGenerator.generateId();
         Subscription subscription = Subscription.create(userId, "token1");
         subscriptionPersistenceAdapter.save(subscription);
 
@@ -112,27 +119,29 @@ class SubscriptionPersistenceAdapterTest {
         // given
         String token = "token1";
         Device device = new Device("token1");
-        Subscription subscription1 = Subscription.create(1L, token);
-        Subscription subscription2 = Subscription.create(1L, "token2");
+        long userId = idGenerator.generateId();
+        Subscription subscription1 = Subscription.create(userId, token);
+        Subscription subscription2 = Subscription.create(userId, "token2");
         subscriptionPersistenceAdapter.save(subscription1);
         subscriptionPersistenceAdapter.save(subscription2);
 
         // when
-        subscriptionPersistenceAdapter.deleteByDevice(device);
+        subscriptionPersistenceAdapter.deleteByDevice(userId, device);
 
         // then
-        Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(1L);
+        Subscriptions subscriptions = subscriptionPersistenceAdapter.findByUserId(userId);
         assertThat(subscriptions.getSubscriptions()).hasSize(1)
                 .extracting("userId", "device")
-                .containsExactlyInAnyOrder(tuple(1L, new Device("token2")));
+                .containsExactlyInAnyOrder(tuple(userId, new Device("token2")));
     }
 
     @DisplayName("이미 구독된 유저의 기기라면, true를 반환한다.")
     @Test
     void checkDeviceDuplicateWithDuplicateSubscription() {
         // given
-        Subscription subscription = Subscription.create(1L, "token");
-        Subscription duplicateSubscription = Subscription.create(1L, "token");
+        long userId = idGenerator.generateId();
+        Subscription subscription = Subscription.create(userId, "token");
+        Subscription duplicateSubscription = Subscription.create(userId, "token");
         subscriptionPersistenceAdapter.save(subscription);
 
         // when
@@ -146,8 +155,9 @@ class SubscriptionPersistenceAdapterTest {
     @Test
     void checkDeviceDuplicate() {
         // given
-        Subscription subscription = Subscription.create(1L, "token1");
-        Subscription notDuplicateSubscription = Subscription.create(1L, "token2");
+        Long userId = idGenerator.generateId();
+        Subscription subscription = Subscription.create(userId, "token1");
+        Subscription notDuplicateSubscription = Subscription.create(userId, "token2");
         subscriptionPersistenceAdapter.save(subscription);
 
         // when

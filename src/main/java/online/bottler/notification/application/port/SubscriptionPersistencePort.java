@@ -13,7 +13,7 @@ public interface SubscriptionPersistencePort {
 
     void deleteAllByUserId(Long userId);
 
-    void deleteByDevice(Device device);
+    void deleteByDevice(Long userId, Device device);
 
     Boolean checkDeviceDuplicate(Device device);
 }
