@@ -8,6 +8,6 @@ public interface SubscriptionUseCase {
 
     void unsubscribeAll(Long userId);
 
-    void unsubscribe(String token);
+    void unsubscribe(Long userId, String token);
 
 }
