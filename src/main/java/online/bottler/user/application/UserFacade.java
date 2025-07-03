@@ -17,7 +17,9 @@ import online.bottler.slack.domain.SlackConstant;
 import online.bottler.user.application.command.SignUpCommand;
 import online.bottler.user.application.port.in.BanUseCase;
 import online.bottler.user.application.port.in.UserUseCase;
+import online.bottler.user.application.response.SignIn;
 import online.bottler.user.domain.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class UserFacade {
     private final RecommendUseCase recommendUseCase;
     private final LetterBoxUseCase letterBoxUseCase;
     private final LabelUseCase labelUseCase;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void updateWarningCount(Long userId) {
@@ -50,15 +53,41 @@ public class UserFacade {
 
     @Transactional
     public void createUser(SignUpCommand signUpCommand) {
-        String profileImageUrl = userUseCase.findProfileImageUrl();
+        String profileImageUrl = userUseCase.findRandomProfileImageUrl();
 
-        User storedUser = userUseCase.createUser(profileImageUrl, signUpCommand);
+        User user = User.createUser(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
+                signUpCommand.nickname(), profileImageUrl);
+        User storedUser = userUseCase.createUser(user);
 
         giveDefaultLabelsToNewUser(storedUser);
 
         List<Long> randomDevelopLetter = findRandomDevelopLetter();
         recommendUseCase.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
         letterBoxUseCase.save(randomDevelopLetter, storedUser.getUserId());
+    }
+
+    @Transactional
+    public SignIn kakaoSignin(String kakaoId, String nickname) {
+        if (!userUseCase.isUserExistsByKakaoId(kakaoId)) {
+            nickname = generateUniqueNickname(nickname);
+            String profileImageUrl = userUseCase.findRandomProfileImageUrl();
+            User user = User.createKakaoUser(kakaoId, nickname, profileImageUrl, passwordEncoder.encode(kakaoId));
+            User storedUser = userUseCase.createUser(user);
+            giveDefaultLabelsToNewUser(storedUser);
+        }
+        return userUseCase.authenticateAndGenerateTokens(kakaoId, kakaoId);
+    }
+
+    private String generateUniqueNickname(String nickname) {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[20];
+        random.nextBytes(bytes);
+
+        while (userUseCase.isUserExistsByNickname(nickname)) {
+            int randomNumber = random.nextInt(10000);
+            nickname = nickname + randomNumber;
+        }
+        return nickname;
     }
 
     private void giveDefaultLabelsToNewUser(User storedUser) {

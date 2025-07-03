@@ -19,7 +19,10 @@ import online.bottler.user.application.response.UserResponse;
 import online.bottler.user.domain.User;
 
 public interface UserUseCase {
-    void createUser(SignUpCommand signUpCommand);
+
+    String findRandomProfileImageUrl();
+
+    User createUser(User user);
 
     void createDeveloper(SignUpCommand signUpCommand);
 
@@ -51,7 +54,11 @@ public interface UserUseCase {
 
     User findById(Long userId);
 
-    SignIn kakaoSignin(String kakaoId, String nickname);
+    SignIn authenticateAndGenerateTokens(String email, String password);
+
+    boolean isUserExistsByKakaoId(String kakaoId);
+
+    boolean isUserExistsByNickname(String nickname);
 
     String getProfileImageUrlById(Long userId);
 

@@ -60,13 +60,11 @@ public class UserService implements UserUseCase {
     private static final int CODE_LENGTH = 8;
     private static final SecureRandom random = new SecureRandom();
 
-    public String findProfileImageUrl() {
+    public String findRandomProfileImageUrl() {
         return profileImagePersistencePort.findProfileImage();
     }
 
-    public User createUser(String profileImage, SignUpCommand signUpCommand) {
-        User user = User.createUser(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
-                signUpCommand.nickname(), profileImage);
+    public User createUser(User user) {
         return userPersistencePort.save(user);
     }
 
@@ -206,19 +204,7 @@ public class UserService implements UserUseCase {
         return userPersistencePort.findById(userId);
     }
 
-    @Transactional
-    public SignIn kakaoSignin(String kakaoId, String nickname) {
-        if (!userPersistencePort.existsByEmailAndProvider(kakaoId)) {
-            nickname = generateUniqueNickname(nickname);
-            String profileImageUrl = profileImagePersistencePort.findProfileImage();
-            User user = User.createKakaoUser(kakaoId, nickname, profileImageUrl, passwordEncoder.encode(kakaoId));
-            User storedUser = userPersistencePort.save(user);
-            giveDefaultLabelsToNewUser(storedUser);
-        }
-        return authenticateAndGenerateTokens(kakaoId, kakaoId);
-    }
-
-    private SignIn authenticateAndGenerateTokens(String email, String password) {
+    public SignIn authenticateAndGenerateTokens(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -232,25 +218,19 @@ public class UserService implements UserUseCase {
         return new SignIn(accessToken, refreshToken);
     }
 
-    private String generateUniqueNickname(String nickname) {
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[20];
-        random.nextBytes(bytes);
-
-        while (userPersistencePort.existsByNickname(nickname)) {
-            int randomNumber = random.nextInt(10000);
-            nickname = nickname + randomNumber;
-        }
-        return nickname;
+    public boolean isUserExistsByKakaoId(String kakaoId) {
+        return userPersistencePort.existsByEmailAndProvider(kakaoId);
     }
 
-    //아이디로 프로필 이미지 조회
+    public boolean isUserExistsByNickname(String nickname) {
+        return userPersistencePort.existsByNickname(nickname);
+    }
+
     @Transactional
     public String getProfileImageUrlById(Long userId) {
         return userPersistencePort.findById(userId).getImageUrl();
     }
 
-    //아이디로 닉네임 조회
     @Transactional
     public String getNicknameById(Long userId) {
         return userPersistencePort.findById(userId).getNickname();
@@ -266,7 +246,6 @@ public class UserService implements UserUseCase {
         userPersistencePort.updateWarningCount(user);
     }
 
-    //전체 유저 아이디 조회
     @Transactional
     public List<Long> getAllUserIds() {
         List<User> users = userPersistencePort.findAllUserId();
@@ -301,7 +280,7 @@ public class UserService implements UserUseCase {
     @Override
     @Transactional(readOnly = true)
     public Map<Long, String> getProfileImageUrlsByIds(Set<Long> ids) {
-        List<Object[]> getProfileImageUrls=userPersistencePort.findIdAndImageUrlByUserIdIn(ids);
+        List<Object[]> getProfileImageUrls = userPersistencePort.findIdAndImageUrlByUserIdIn(ids);
 
         return getProfileImageUrls.stream()
                 .collect(Collectors.toMap(
