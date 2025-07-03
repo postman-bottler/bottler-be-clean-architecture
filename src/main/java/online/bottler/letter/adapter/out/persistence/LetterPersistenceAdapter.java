@@ -10,6 +10,7 @@ import online.bottler.letter.adapter.out.persistence.entity.LetterEntity;
 import online.bottler.letter.adapter.out.persistence.repository.LetterJpaRepository;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,7 +26,7 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
     @Override
     public Optional<Letter> loadById(Long id) {
-        return letterJpaRepository.findById(id).map(LetterEntity::toDomain);
+        return letterJpaRepository.findByIdAndStatus(id, LetterStatus.OPEN).map(LetterEntity::toDomain);
     }
 
     @Override
@@ -38,12 +39,12 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
     @Override
     public List<Long> loadIdsByUserId(Long userId) {
-        return letterJpaRepository.findIdsByUserId(userId);
+        return letterJpaRepository.findIdsByUserId(userId, LetterStatus.OPEN);
     }
 
     @Override
     public List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds) {
-        Long maxId = letterJpaRepository.findMaxId();
+        Long maxId = letterJpaRepository.findMaxId(LetterStatus.OPEN);
 
         if (maxId == null || maxId == 0) {
             return new ArrayList<>();
@@ -56,7 +57,7 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
         while (result.size() < count && tryCount < 5) {
             long randomId = random.nextLong(1L, maxId + 1);
-            result.addAll(letterJpaRepository.getRandomIds(count, randomId, excludedIds));
+            result.addAll(letterJpaRepository.getRandomIds(count, randomId, excludedIds, LetterStatus.OPEN));
             tryCount++;
         }
 
@@ -65,17 +66,17 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
 
     @Override
     public void softDelete(Long id) {
-        letterJpaRepository.softDeleteById(id);
+        letterJpaRepository.softDeleteById(id, LetterStatus.DELETED);
     }
 
     @Override
     public void softDeleteByIds(List<Long> ids) {
-        letterJpaRepository.softDeleteByIds(ids);
+        letterJpaRepository.softDeleteByIds(ids, LetterStatus.DELETED);
     }
 
     @Override
     public void softBlock(Long id) {
-        letterJpaRepository.softBlockById(id);
+        letterJpaRepository.softBlockById(id, LetterStatus.BLOCKED);
     }
 
     @Override

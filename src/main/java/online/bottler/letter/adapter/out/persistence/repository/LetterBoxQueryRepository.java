@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxEntity;
+import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxTypeEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QReplyLetterEntity;
 import online.bottler.letter.adapter.out.persistence.model.LetterSummaryProjection;
@@ -27,8 +28,12 @@ public class LetterBoxQueryRepository {
 
     public Page<LetterSummaryProjection> fetchLetterSummariesByUserIdAndBoxType(Long userId, BoxType boxType, Pageable pageable) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
+        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
+
         QLetterEntity letter = QLetterEntity.letterEntity;
+
         QReplyLetterEntity replyLetter = QReplyLetterEntity.replyLetterEntity;
+
 
         StringExpression letterTitle = getLetterTitle(letterBox, letter, replyLetter);
         StringExpression letterLabel = getLetterLabel(letterBox, letter, replyLetter);
@@ -41,15 +46,15 @@ public class LetterBoxQueryRepository {
                         letterBox.letterId,
                         letterTitle,
                         letterLabel,
-                        letterBox.letterType,
-                        letterBox.boxType,
+                        letterBoxType.letterType,
+                        letterBoxType.boxType,
                         letterBox.createdAt
                 ))
                 .from(letterBox)
                 .leftJoin(letter).on(letterBox.letterId.eq(letter.id)
-                        .and(letterBox.letterType.eq(LetterType.LETTER)))
+                        .and(letterBoxType.letterType.eq(LetterType.LETTER)))
                 .leftJoin(replyLetter).on(letterBox.letterId.eq(replyLetter.id)
-                        .and(letterBox.letterType.eq(LetterType.REPLY_LETTER)))
+                        .and(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)))
                 .where(condition)
                 .orderBy(letterBox.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -107,27 +112,30 @@ public class LetterBoxQueryRepository {
 
     private StringExpression getLetterTitle(QLetterBoxEntity letterBox, QLetterEntity letter,
                                             QReplyLetterEntity replyLetter) {
+        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         return new CaseBuilder()
-                .when(letterBox.letterType.eq(LetterType.LETTER)).then(letter.title)
-                .when(letterBox.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.title)
+                .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letter.title)
+                .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.title)
                 .otherwise("Unknown Title");
     }
 
     private StringExpression getLetterLabel(QLetterBoxEntity letterBox, QLetterEntity letter,
                                             QReplyLetterEntity replyLetter) {
+        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         return new CaseBuilder()
-                .when(letterBox.letterType.eq(LetterType.LETTER)).then(letter.label)
-                .when(letterBox.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.label)
+                .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letter.label)
+                .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.label)
                 .otherwise("Unknown Label");
     }
 
     private BooleanBuilder buildFetchCondition(Long userId, BoxType boxType) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
+        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(letterBox.userId.eq(userId));
 
         if (boxType != BoxType.NONE) {
-            condition.and(letterBox.boxType.eq(boxType));
+            condition.and(letterBoxType.boxType.eq(boxType));
         }
 
         return condition;
@@ -136,6 +144,7 @@ public class LetterBoxQueryRepository {
     private BooleanBuilder buildDeletionCondition(Long userId, List<Long> letterIds, LetterType letterType,
                                                   BoxType boxType) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
+        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         BooleanBuilder condition = new BooleanBuilder();
 
         if (userId != null) {
@@ -145,10 +154,10 @@ public class LetterBoxQueryRepository {
             condition.and(letterBox.letterId.in(letterIds));
         }
         if (letterType != LetterType.NONE) {
-            condition.and(letterBox.letterType.eq(letterType));
+            condition.and(letterBoxType.letterType.eq(letterType));
         }
         if (boxType != BoxType.NONE) {
-            condition.and(letterBox.boxType.eq(boxType));
+            condition.and(letterBoxType.boxType.eq(boxType));
         }
 
         return condition;
