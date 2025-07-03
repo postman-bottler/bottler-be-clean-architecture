@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.auth.CustomUserDetails;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.label.adapter.in.web.request.LabelRequest;
+import online.bottler.label.application.LabelFacade;
 import online.bottler.label.application.port.in.LabelUseCase;
 import online.bottler.label.application.response.LabelResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +28,7 @@ import online.bottler.global.response.ApiResponse;
 @Tag(name = "라벨", description = "라벨 관련 API")
 public class LabelController {
     private final LabelUseCase labelUseCase;
+    private final LabelFacade labelFacade;
 
     @Operation(summary = "라벨 생성", description = "라벨 이미지 URL을 DB에 저장합니다. 실제 서비스에서 사용하는 API는 아닙니다!")
     @PostMapping
@@ -101,7 +103,7 @@ public class LabelController {
     @Operation(summary = "선착순 라벨 뽑기", description = "(로그인 필요) 로그인한 사용자가 뽑기 대상 라벨들 중 하나를 선착순으로 가져갑니다.")
     @PostMapping("/first-come")
     public ApiResponse<LabelResponse> createFirstComeFirstServedLabel(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        LabelResponse labelResponse = labelUseCase.createFirstComeFirstServedLabel(customUserDetails.getUserId());
+        LabelResponse labelResponse = labelFacade.createFirstComeFirstServedLabel(customUserDetails.getUserId());
         return ApiResponse.onCreateSuccess(labelResponse);
     }
 }
