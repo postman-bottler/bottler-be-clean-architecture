@@ -65,15 +65,21 @@ public class ReplyLetterEntity {
                 .label(replyLetter.getLabel())
                 .letterId(replyLetter.getLetterId())
                 .receiverId(replyLetter.getReceiverId())
-                .senderId(replyLetter.getUserId())
+                .senderId(replyLetter.getSenderId())
                 .status(replyLetter.getStatus())
                 .createdAt(replyLetter.getCreatedAt())
                 .build();
     }
 
     public ReplyLetter toDomain() {
-        return ReplyLetter.of(id, senderId, LetterContent.of(title, content, font, paper, label),
-                status, createdAt, letterId, receiverId);
+        return ReplyLetter.of(
+                id,
+                senderId, receiverId,
+                letterId,
+                LetterContent.of(title, content, font, paper, label),
+                status,
+                createdAt
+        );
     }
 
     public static List<ReplyLetter> toDomainList(List<ReplyLetterEntity> replyLetterEntities) {

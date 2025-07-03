@@ -5,32 +5,50 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class ReplyLetter {
-    private final Letter letter;
-    @Getter
-    private final Long letterId;
-    @Getter
+public class ReplyLetter extends BaseLetter {
+    private final Long senderId;
+
     private final Long receiverId;
 
-    public ReplyLetter(Letter letter, Long letterId, Long receiverId) {
-        this.letter = letter;
-        this.letterId = letterId;
+    private final Long letterId;
+
+    public ReplyLetter(
+            Long id,
+            Long senderId, Long receiverId,
+            Long letterId,
+            LetterContent letterContent,
+            LetterStatus status,
+            LocalDateTime createdAt
+    ) {
+        super(id, letterContent, status, createdAt);
+        this.senderId = senderId;
         this.receiverId = receiverId;
+        this.letterId = letterId;
     }
 
-    public static ReplyLetter of(Long id, Long userId, LetterContent letterContent, LetterStatus letterStatus,
-                                   LocalDateTime createdAt, Long letterId, Long receiverId) {
-        Letter letter = Letter.of(id, userId, letterContent, letterStatus, createdAt);
-        return new ReplyLetter(letter, letterId, receiverId);
+    public static ReplyLetter of(
+            Long id,
+            Long senderId, Long receiverId,
+            Long letterId,
+            LetterContent letterContent,
+            LetterStatus status,
+            LocalDateTime createdAt
+    ) {
+        return new ReplyLetter(id, senderId, receiverId, letterId, letterContent, status, createdAt);
     }
 
-    public static ReplyLetter create(Long userId, LetterContent letterContent, Long letterId, Long receiverId, String originalTitle) {
+    public static ReplyLetter create(Long senderId, Long receiverId, Long letterId, LetterContent letterContent, String originalTitle) {
         String formattedTitle = formatReplyTitle(originalTitle);
 
-        Letter letter = Letter.create(userId, LetterContent.of(formattedTitle, letterContent.getContent(),
-                letterContent.getFont(), letterContent.getPaper(), letterContent.getLabel()));
-
-        return new ReplyLetter(letter, letterId, receiverId);
+        return new ReplyLetter(
+                null,
+                senderId, receiverId,
+                letterId,
+                LetterContent.of(formattedTitle, letterContent.getContent(),
+                        letterContent.getFont(), letterContent.getPaper(), letterContent.getLabel()),
+                LetterStatus.OPEN,
+                null
+        );
     }
 
     private static String formatReplyTitle(String title) {
@@ -38,42 +56,6 @@ public class ReplyLetter {
     }
 
     public boolean isOwner(Long userId) {
-        return letter.getUserId().equals(userId);
-    }
-
-    public Long getId() {
-        return letter.getId();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return letter.getCreatedAt();
-    }
-
-    public Long getUserId() {
-        return letter.getUserId();
-    }
-
-    public String getTitle() {
-        return letter.getTitle();
-    }
-
-    public String getContent() {
-        return letter.getContent();
-    }
-
-    public String getFont() {
-        return letter.getFont();
-    }
-
-    public String getPaper() {
-        return letter.getPaper();
-    }
-
-    public String getLabel() {
-        return letter.getLabel();
-    }
-
-    public LetterStatus getStatus() {
-        return letter.getLetterStatus();
+        return senderId.equals(userId);
     }
 }
