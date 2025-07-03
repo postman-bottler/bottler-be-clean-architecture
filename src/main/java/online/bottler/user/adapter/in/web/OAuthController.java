@@ -7,9 +7,9 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import online.bottler.global.exception.AdaptorException;
 import online.bottler.global.response.ApiResponse;
+import online.bottler.user.application.UserFacade;
 import online.bottler.user.application.port.in.CookieUseCase;
 import online.bottler.user.application.port.in.KakaoUseCase;
-import online.bottler.user.application.port.in.UserUseCase;
 import online.bottler.user.application.response.SignIn;
 import online.bottler.user.application.response.SignInResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +24,8 @@ import org.springframework.web.servlet.view.RedirectView;
 @Tag(name = "소셜로그인", description = "소셜로그인 관련 API")
 public class OAuthController {
     private final KakaoUseCase kakaoUseCase;
-    private final UserUseCase userUseCase;
     private final CookieUseCase cookieUseCase;
+    private final UserFacade userFacade;
 
     @Operation(summary = "카카오 소셜로그인", description = "카카오 서버로 요청을 보내 회원가입 및 로그인을 합니다.")
     @GetMapping("/kakao")
@@ -43,7 +43,7 @@ public class OAuthController {
         String kakaoId = userInfo.get("kakaoId");
         String nickname = userInfo.get("nickname");
 
-        SignIn signIn = userUseCase.kakaoSignin(kakaoId, nickname);
+        SignIn signIn = userFacade.kakaoSignin(kakaoId, nickname);
 
         cookieUseCase.addCookie(response, "refreshToken", signIn.refreshToken());
         return ApiResponse.onSuccess(new SignInResponse(signIn.accessToken()));

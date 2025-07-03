@@ -15,6 +15,7 @@ import online.bottler.user.adapter.in.web.request.EmailRequest;
 import online.bottler.user.adapter.in.web.request.NicknameRequest;
 import online.bottler.user.adapter.in.web.request.ProfileImgRequest;
 import online.bottler.user.adapter.in.web.request.SignUpRequest;
+import online.bottler.user.application.UserFacade;
 import online.bottler.user.application.port.in.UserUseCase;
 import online.bottler.user.application.response.ExistingUserResponse;
 import online.bottler.user.application.response.UserResponse;
@@ -36,13 +37,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "유저", description = "유저 관련 API")
 public class UserController {
     private final UserUseCase userUseCase;
+    private final UserFacade userFacade;
 
     @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임으로 회원가입을 합니다.")
     @PostMapping("/signup")
     public ApiResponse<String> signup(@Valid @RequestBody SignUpRequest signUpRequest,
                                       BindingResult bindingResult) {
         validateRequest(bindingResult);
-        userUseCase.createUser(signUpRequest.toCommand());
+        userFacade.createUser(signUpRequest.toCommand());
         return ApiResponse.onCreateSuccess("회원가입 성공");
     }
 
