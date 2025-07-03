@@ -57,7 +57,9 @@ public interface UserUseCase {
 
     String getNicknameById(Long userId);
 
-    void updateWarningCount(Long userId);
+    User updateUserWarningCountByUserId(Long userId);
+
+    void updateWarningCount(User user);
 
     List<Long> getAllUserIds();
 

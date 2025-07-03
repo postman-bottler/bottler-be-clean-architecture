@@ -16,9 +16,6 @@ import online.bottler.label.application.port.out.LabelPersistencePort;
 import online.bottler.label.domain.Label;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.port.in.RecommendUseCase;
-import online.bottler.notification.application.port.NotificationUseCase;
-import online.bottler.slack.domain.SlackConstant;
-import online.bottler.slack.application.port.in.SlackUseCase;
 import online.bottler.user.application.command.AuthEmailCommand;
 import online.bottler.user.application.command.ChangePasswordCommand;
 import online.bottler.user.application.command.CheckDuplicateNicknameCommand;
@@ -37,7 +34,6 @@ import online.bottler.user.domain.EmailForm;
 import online.bottler.user.domain.ProfileImage;
 import online.bottler.user.domain.RefreshToken;
 import online.bottler.user.domain.User;
-import online.bottler.user.application.port.in.BanUseCase;
 import online.bottler.user.application.port.in.EmailUseCase;
 import online.bottler.user.application.port.in.UserUseCase;
 import online.bottler.user.application.port.out.EmailCodePersistencePort;
@@ -61,15 +57,12 @@ public class UserService implements UserUseCase {
     private final RefreshTokenPersistencePort refreshTokenPersistencePort;
     private final ProfileImagePersistencePort profileImagePersistencePort;
     private final EmailCodePersistencePort emailCodePersistencePort;
-    private final BanUseCase banUseCase;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailUseCase emailUseCase;
-    private final SlackUseCase slackUseCase;
 
-    private final NotificationUseCase notificationUseCase;
     private final RecommendUseCase recommendUseCase;
     private final LetterBoxUseCase letterBoxUseCase;
     private final LabelPersistencePort labelPersistencePort;
@@ -290,17 +283,13 @@ public class UserService implements UserUseCase {
         return userPersistencePort.findById(userId).getNickname();
     }
 
-    //유저 경고 횟수 증가
-    @Transactional
-    public void updateWarningCount(Long userId) {
+    public User updateUserWarningCountByUserId(Long userId) {
         User user = userPersistencePort.findById(userId);
         user.updateWarningCount();
-        slackUseCase.sendSlackMessage(SlackConstant.WARNING, userId);
-        if (user.checkBan()) {
-            banUseCase.banUser(user);
-            slackUseCase.sendSlackMessage(SlackConstant.BAN, userId);
-            notificationUseCase.sendBanNotification(userId);
-        }
+        return user;
+    }
+
+    public void updateWarningCount(User user) {
         userPersistencePort.updateWarningCount(user);
     }
 
