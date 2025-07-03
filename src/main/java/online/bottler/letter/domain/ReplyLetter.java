@@ -73,11 +73,7 @@ public class ReplyLetter {
         return letter.getLabel();
     }
 
-    public boolean isDeleted() {
-        return letter.isDeleted();
-    }
-
-    public boolean isBlocked() {
-        return letter.isBlocked();
+    public LetterStatus getStatus() {
+        return letter.getLetterStatus();
     }
 }

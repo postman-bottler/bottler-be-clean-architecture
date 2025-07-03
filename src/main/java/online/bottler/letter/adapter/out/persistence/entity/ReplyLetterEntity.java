@@ -19,7 +19,7 @@ import online.bottler.letter.domain.ReplyLetter;
 
 @Entity
 @Table(name = "reply_letters",
-        indexes = @Index(name = "idx_replyletter_isdeleted_id", columnList = ("isDeleted, id")),
+        indexes = @Index(name = "idx_replyletter_status_id", columnList = ("status, id")),
         uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"senderId"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReplyLetterEntity {
@@ -36,14 +36,13 @@ public class ReplyLetterEntity {
     private Long letterId;
     private Long receiverId;
     private Long senderId;
-    private boolean isDeleted;
-    private boolean isBlocked;
+    private LetterStatus status;
     private LocalDateTime createdAt;
 
     @Builder
     private ReplyLetterEntity(String title, String content, String font, String paper, String label,
                               Long letterId, Long receiverId, Long senderId,
-                              boolean isDeleted, boolean isBlocked,
+                              LetterStatus status,
                               LocalDateTime createdAt) {
         this.title = title;
         this.content = content;
@@ -53,8 +52,7 @@ public class ReplyLetterEntity {
         this.letterId = letterId;
         this.receiverId = receiverId;
         this.senderId = senderId;
-        this.isDeleted = isDeleted;
-        this.isBlocked = isBlocked;
+        this.status = status;
         this.createdAt = createdAt;
     }
 
@@ -68,15 +66,14 @@ public class ReplyLetterEntity {
                 .letterId(replyLetter.getLetterId())
                 .receiverId(replyLetter.getReceiverId())
                 .senderId(replyLetter.getUserId())
-                .isDeleted(replyLetter.isDeleted())
-                .isBlocked(replyLetter.isBlocked())
+                .status(replyLetter.getStatus())
                 .createdAt(replyLetter.getCreatedAt())
                 .build();
     }
 
     public ReplyLetter toDomain() {
         return ReplyLetter.of(id, senderId, LetterContent.of(title, content, font, paper, label),
-                LetterStatus.create(isDeleted, isBlocked), createdAt, letterId, receiverId);
+                status, createdAt, letterId, receiverId);
     }
 
     public static List<ReplyLetter> toDomainList(List<ReplyLetterEntity> replyLetterEntities) {

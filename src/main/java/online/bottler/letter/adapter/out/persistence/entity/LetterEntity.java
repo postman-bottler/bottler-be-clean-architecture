@@ -18,7 +18,7 @@ import online.bottler.letter.domain.LetterStatus;
 
 @Entity
 @Table(name = "letters",
-        indexes = @Index(name = "idx_letter_isdeleted_id", columnList = ("isDeleted, id")))
+        indexes = @Index(name = "idx_letter_status_id", columnList = ("status, id")))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LetterEntity {
 
@@ -32,13 +32,12 @@ public class LetterEntity {
     private String paper;
     private String label;
     private Long userId;
-    private boolean isDeleted;
-    private boolean isBlocked;
+    private LetterStatus status;
     private LocalDateTime createdAt;
 
     @Builder
     private LetterEntity(String title, String content, String font, String paper, String label, Long userId,
-                         boolean isDeleted, boolean isBlocked,
+                         LetterStatus status,
                          LocalDateTime createdAt) {
         this.title = title;
         this.content = content;
@@ -46,8 +45,7 @@ public class LetterEntity {
         this.paper = paper;
         this.label = label;
         this.userId = userId;
-        this.isDeleted = isDeleted;
-        this.isBlocked = isBlocked;
+        this.status = status;
         this.createdAt = createdAt;
     }
 
@@ -59,19 +57,17 @@ public class LetterEntity {
                 .paper(letter.getPaper())
                 .label(letter.getLabel())
                 .userId(letter.getUserId())
-                .isDeleted(letter.isDeleted())
-                .isBlocked(letter.isBlocked())
+                .status(letter.getStatus())
                 .createdAt(letter.getCreatedAt())
                 .build();
     }
 
     public Letter toDomain() {
         return Letter.of(id, userId, LetterContent.of(title, content, font, paper, label),
-                LetterStatus.create(isDeleted, isBlocked), createdAt);
+                status, createdAt);
     }
 
     public static List<Letter> toDomainList(List<LetterEntity> letterEntities) {
         return letterEntities.stream().map(LetterEntity::toDomain).toList();
     }
-
 }

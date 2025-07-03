@@ -3,16 +3,18 @@ package online.bottler.letter.domain;
 import lombok.Getter;
 
 @Getter
-public class LetterStatus {
-    private final boolean isDeleted;
-    private final boolean isBlocked;
+public enum LetterStatus {
+    OPEN("OPEN"),
+    BLOCKED("BLOCKED"),
+    DELETED("DELETED");
 
-    public LetterStatus(boolean isDeleted, boolean isBlocked) {
-        this.isDeleted = isDeleted;
-        this.isBlocked = isBlocked;
+    private final String status;
+
+    LetterStatus(String status) {
+        this.status = status;
     }
 
-    public static LetterStatus create(boolean isDeleted, boolean isBlocked) {
-        return new LetterStatus(isDeleted, isBlocked);
+    public boolean isOpen() {
+        return status.equals("OPEN");
     }
 }

@@ -21,7 +21,7 @@ public class Letter extends BaseDomain {
     }
 
     public static Letter create(Long userId, LetterContent letterContent) {
-        return new Letter(null, userId, letterContent, LetterStatus.create(false, false), LocalDateTime.now());
+        return new Letter(null, userId, letterContent, LetterStatus.OPEN, LocalDateTime.now());
     }
 
     public boolean isOwner(Long userId) {
@@ -48,11 +48,7 @@ public class Letter extends BaseDomain {
         return letterContent.getLabel();
     }
 
-    public boolean isDeleted() {
-        return letterStatus.isDeleted();
-    }
-
-    public boolean isBlocked() {
-        return letterStatus.isBlocked();
+    public LetterStatus getStatus() {
+        return letterStatus;
     }
 }
