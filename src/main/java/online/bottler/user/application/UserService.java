@@ -17,8 +17,8 @@ import online.bottler.label.domain.Label;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.port.in.RecommendUseCase;
 import online.bottler.notification.application.port.NotificationUseCase;
-import online.bottler.slack.SlackConstant;
-import online.bottler.slack.SlackService;
+import online.bottler.slack.domain.SlackConstant;
+import online.bottler.slack.application.port.in.SlackUseCase;
 import online.bottler.user.application.command.AuthEmailCommand;
 import online.bottler.user.application.command.ChangePasswordCommand;
 import online.bottler.user.application.command.CheckDuplicateNicknameCommand;
@@ -67,8 +67,8 @@ public class UserService implements UserUseCase {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailUseCase emailUseCase;
-    private final SlackService slackService;
-    //    private final NotificationService notificationService;
+    private final SlackUseCase slackUseCase;
+
     private final NotificationUseCase notificationUseCase;
     private final RecommendUseCase recommendUseCase;
     private final LetterBoxUseCase letterBoxUseCase;
@@ -295,10 +295,10 @@ public class UserService implements UserUseCase {
     public void updateWarningCount(Long userId) {
         User user = userPersistencePort.findById(userId);
         user.updateWarningCount();
-        slackService.sendSlackMessage(SlackConstant.WARNING, userId);
+        slackUseCase.sendSlackMessage(SlackConstant.WARNING, userId);
         if (user.checkBan()) {
             banUseCase.banUser(user);
-            slackService.sendSlackMessage(SlackConstant.BAN, userId);
+            slackUseCase.sendSlackMessage(SlackConstant.BAN, userId);
             notificationUseCase.sendBanNotification(userId);
         }
         userPersistencePort.updateWarningCount(user);
