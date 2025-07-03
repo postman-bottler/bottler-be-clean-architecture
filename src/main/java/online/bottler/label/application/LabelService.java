@@ -4,11 +4,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.label.application.port.out.LabelPersistencePort;
 import online.bottler.label.domain.Label;
-import online.bottler.label.application.command.LabelCommand;
 import online.bottler.label.application.port.in.LabelUseCase;
 import online.bottler.label.application.response.LabelResponse;
 import online.bottler.label.domain.LabelType;
-import online.bottler.scheduler.LabelScheduler;
 import online.bottler.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LabelService implements LabelUseCase {
     private final LabelPersistencePort labelPersistencePort;
-    private final LabelScheduler labelScheduler;
 
     @Transactional
     public void createLabel(String imageUrl, int limitCount) {
@@ -48,11 +45,6 @@ public class LabelService implements LabelUseCase {
     public List<LabelResponse> findFirstComeLabels() {
         List<Label> labels = labelPersistencePort.findFirstComeLabels();
         return labels.stream().map(Label::toLabelResponse).toList();
-    }
-
-    @Transactional
-    public void updateFirstComeLabel(LabelCommand labelCommand) {
-        labelScheduler.scheduleUpdateFirstComeLabel(labelCommand);
     }
 
     @Override

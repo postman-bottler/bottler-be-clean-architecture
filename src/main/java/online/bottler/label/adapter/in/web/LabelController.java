@@ -84,7 +84,7 @@ public class LabelController {
     public ApiResponse<String> updateFirstComeLabel(@Valid @RequestBody LabelRequest labelRequest,
                                                     BindingResult bindingResult) {
         validateRequest(bindingResult);
-        labelUseCase.updateFirstComeLabel(labelRequest.toCommand());
+        labelFacade.updateFirstComeLabel(labelRequest.toCommand());
         return ApiResponse.onCreateSuccess("선착순 뽑기 대상 라벨로 변경 예약되었습니다.");
     }
 
