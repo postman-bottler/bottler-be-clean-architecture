@@ -2,20 +2,13 @@ package online.bottler.user.application;
 
 import jakarta.mail.MessagingException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import online.bottler.auth.JwtTokenProvider;
 import online.bottler.global.exception.ApplicationException;
-import online.bottler.label.application.port.out.LabelPersistencePort;
-import online.bottler.label.domain.Label;
-import online.bottler.letter.application.port.in.LetterBoxUseCase;
-import online.bottler.letter.application.port.in.RecommendUseCase;
 import online.bottler.user.application.command.AuthEmailCommand;
 import online.bottler.user.application.command.ChangePasswordCommand;
 import online.bottler.user.application.command.CheckDuplicateNicknameCommand;
@@ -63,38 +56,18 @@ public class UserService implements UserUseCase {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailUseCase emailUseCase;
 
-    private final RecommendUseCase recommendUseCase;
-    private final LetterBoxUseCase letterBoxUseCase;
-    private final LabelPersistencePort labelPersistencePort;
-
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int CODE_LENGTH = 8;
     private static final SecureRandom random = new SecureRandom();
 
-    @Transactional
-    public void createUser(SignUpCommand signUpCommand) {
-        String profileImageUrl = profileImagePersistencePort.findProfileImage();
-        User user = User.createUser(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
-                signUpCommand.nickname(), profileImageUrl);
-        User storedUser = userPersistencePort.save(user);
-
-//        giveDefaultLabelsToNewUser(storedUser);
-
-        List<Long> randomDevelopLetter = findRandomDevelopLetter();
-        recommendUseCase.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
-        letterBoxUseCase.save(randomDevelopLetter, storedUser.getUserId());
+    public String findProfileImageUrl() {
+        return profileImagePersistencePort.findProfileImage();
     }
 
-    private List<Long> findRandomDevelopLetter() {
-        Random random = new SecureRandom();
-        Set<Long> randomNumbers = new LinkedHashSet<>();
-
-        while (randomNumbers.size() < 3) {
-            long number = 1L + random.nextInt(8);
-            randomNumbers.add(number);
-        }
-
-        return new ArrayList<>(randomNumbers);
+    public User createUser(String profileImage, SignUpCommand signUpCommand) {
+        User user = User.createUser(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
+                signUpCommand.nickname(), profileImage);
+        return userPersistencePort.save(user);
     }
 
     @Transactional
@@ -335,19 +308,5 @@ public class UserService implements UserUseCase {
                         row -> (Long) row[0],
                         row -> (String) row[1]
                 ));
-    }
-
-    public void giveDefaultLabelsToNewUser(User storedUser) {
-        List<Long> defaultLabelIds = List.of(1L, 2L);
-        for (Long labelId : defaultLabelIds) {
-            Label label = labelPersistencePort.findLabelByLabelId(labelId);
-            giveLabelToUser(storedUser, label);
-        }
-    }
-
-    private void giveLabelToUser(User user, Label label) {
-        labelPersistencePort.updateOwnedCount(label);
-
-        labelPersistencePort.createUserLabel(user, label);
     }
 }
