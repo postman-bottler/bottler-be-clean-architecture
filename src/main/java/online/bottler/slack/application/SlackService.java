@@ -1,4 +1,4 @@
-package online.bottler.slack;
+package online.bottler.slack.application;
 
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
@@ -6,12 +6,14 @@ import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import online.bottler.slack.domain.SlackConstant;
+import online.bottler.slack.application.port.in.SlackUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class SlackService {
+public class SlackService implements SlackUseCase {
     @Value("${slack.token}")
     String slackToken;
 

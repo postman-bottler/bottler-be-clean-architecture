@@ -2,23 +2,13 @@ package online.bottler.user.application;
 
 import jakarta.mail.MessagingException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import online.bottler.auth.JwtTokenProvider;
 import online.bottler.global.exception.ApplicationException;
-import online.bottler.label.application.port.out.LabelPersistencePort;
-import online.bottler.label.domain.Label;
-import online.bottler.letter.application.port.in.LetterBoxUseCase;
-import online.bottler.letter.application.port.in.RecommendUseCase;
-import online.bottler.notification.application.port.NotificationUseCase;
-import online.bottler.slack.SlackConstant;
-import online.bottler.slack.SlackService;
 import online.bottler.user.application.command.AuthEmailCommand;
 import online.bottler.user.application.command.ChangePasswordCommand;
 import online.bottler.user.application.command.CheckDuplicateNicknameCommand;
@@ -37,7 +27,6 @@ import online.bottler.user.domain.EmailForm;
 import online.bottler.user.domain.ProfileImage;
 import online.bottler.user.domain.RefreshToken;
 import online.bottler.user.domain.User;
-import online.bottler.user.application.port.in.BanUseCase;
 import online.bottler.user.application.port.in.EmailUseCase;
 import online.bottler.user.application.port.in.UserUseCase;
 import online.bottler.user.application.port.out.EmailCodePersistencePort;
@@ -61,47 +50,22 @@ public class UserService implements UserUseCase {
     private final RefreshTokenPersistencePort refreshTokenPersistencePort;
     private final ProfileImagePersistencePort profileImagePersistencePort;
     private final EmailCodePersistencePort emailCodePersistencePort;
-    private final BanUseCase banUseCase;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailUseCase emailUseCase;
-    private final SlackService slackService;
-    //    private final NotificationService notificationService;
-    private final NotificationUseCase notificationUseCase;
-    private final RecommendUseCase recommendUseCase;
-    private final LetterBoxUseCase letterBoxUseCase;
-    private final LabelPersistencePort labelPersistencePort;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int CODE_LENGTH = 8;
     private static final SecureRandom random = new SecureRandom();
 
-    @Transactional
-    public void createUser(SignUpCommand signUpCommand) {
-        String profileImageUrl = profileImagePersistencePort.findProfileImage();
-        User user = User.createUser(signUpCommand.email(), passwordEncoder.encode(signUpCommand.password()),
-                signUpCommand.nickname(), profileImageUrl);
-        User storedUser = userPersistencePort.save(user);
-
-//        giveDefaultLabelsToNewUser(storedUser);
-
-        List<Long> randomDevelopLetter = findRandomDevelopLetter();
-        recommendUseCase.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
-        letterBoxUseCase.save(randomDevelopLetter, storedUser.getUserId());
+    public String findRandomProfileImageUrl() {
+        return profileImagePersistencePort.findProfileImage();
     }
 
-    private List<Long> findRandomDevelopLetter() {
-        Random random = new SecureRandom();
-        Set<Long> randomNumbers = new LinkedHashSet<>();
-
-        while (randomNumbers.size() < 3) {
-            long number = 1L + random.nextInt(8);
-            randomNumbers.add(number);
-        }
-
-        return new ArrayList<>(randomNumbers);
+    public User createUser(User user) {
+        return userPersistencePort.save(user);
     }
 
     @Transactional
@@ -240,19 +204,7 @@ public class UserService implements UserUseCase {
         return userPersistencePort.findById(userId);
     }
 
-    @Transactional
-    public SignIn kakaoSignin(String kakaoId, String nickname) {
-        if (!userPersistencePort.existsByEmailAndProvider(kakaoId)) {
-            nickname = generateUniqueNickname(nickname);
-            String profileImageUrl = profileImagePersistencePort.findProfileImage();
-            User user = User.createKakaoUser(kakaoId, nickname, profileImageUrl, passwordEncoder.encode(kakaoId));
-            User storedUser = userPersistencePort.save(user);
-            giveDefaultLabelsToNewUser(storedUser);
-        }
-        return authenticateAndGenerateTokens(kakaoId, kakaoId);
-    }
-
-    private SignIn authenticateAndGenerateTokens(String email, String password) {
+    public SignIn authenticateAndGenerateTokens(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -266,45 +218,34 @@ public class UserService implements UserUseCase {
         return new SignIn(accessToken, refreshToken);
     }
 
-    private String generateUniqueNickname(String nickname) {
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[20];
-        random.nextBytes(bytes);
-
-        while (userPersistencePort.existsByNickname(nickname)) {
-            int randomNumber = random.nextInt(10000);
-            nickname = nickname + randomNumber;
-        }
-        return nickname;
+    public boolean isUserExistsByKakaoId(String kakaoId) {
+        return userPersistencePort.existsByEmailAndProvider(kakaoId);
     }
 
-    //아이디로 프로필 이미지 조회
+    public boolean isUserExistsByNickname(String nickname) {
+        return userPersistencePort.existsByNickname(nickname);
+    }
+
     @Transactional
     public String getProfileImageUrlById(Long userId) {
         return userPersistencePort.findById(userId).getImageUrl();
     }
 
-    //아이디로 닉네임 조회
     @Transactional
     public String getNicknameById(Long userId) {
         return userPersistencePort.findById(userId).getNickname();
     }
 
-    //유저 경고 횟수 증가
-    @Transactional
-    public void updateWarningCount(Long userId) {
+    public User updateUserWarningCountByUserId(Long userId) {
         User user = userPersistencePort.findById(userId);
         user.updateWarningCount();
-        slackService.sendSlackMessage(SlackConstant.WARNING, userId);
-        if (user.checkBan()) {
-            banUseCase.banUser(user);
-            slackService.sendSlackMessage(SlackConstant.BAN, userId);
-            notificationUseCase.sendBanNotification(userId);
-        }
+        return user;
+    }
+
+    public void updateWarningCount(User user) {
         userPersistencePort.updateWarningCount(user);
     }
 
-    //전체 유저 아이디 조회
     @Transactional
     public List<Long> getAllUserIds() {
         List<User> users = userPersistencePort.findAllUserId();
@@ -339,26 +280,12 @@ public class UserService implements UserUseCase {
     @Override
     @Transactional(readOnly = true)
     public Map<Long, String> getProfileImageUrlsByIds(Set<Long> ids) {
-        List<Object[]> getProfileImageUrls=userPersistencePort.findIdAndImageUrlByUserIdIn(ids);
+        List<Object[]> getProfileImageUrls = userPersistencePort.findIdAndImageUrlByUserIdIn(ids);
 
         return getProfileImageUrls.stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> (String) row[1]
                 ));
-    }
-
-    public void giveDefaultLabelsToNewUser(User storedUser) {
-        List<Long> defaultLabelIds = List.of(1L, 2L);
-        for (Long labelId : defaultLabelIds) {
-            Label label = labelPersistencePort.findLabelByLabelId(labelId);
-            giveLabelToUser(storedUser, label);
-        }
-    }
-
-    private void giveLabelToUser(User user, Label label) {
-        labelPersistencePort.updateOwnedCount(label);
-
-        labelPersistencePort.createUserLabel(user, label);
     }
 }

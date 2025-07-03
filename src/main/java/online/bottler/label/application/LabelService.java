@@ -10,7 +10,7 @@ import online.bottler.label.application.command.LabelCommand;
 import online.bottler.label.application.port.in.LabelUseCase;
 import online.bottler.label.application.response.LabelResponse;
 import online.bottler.scheduler.LabelScheduler;
-import online.bottler.user.application.UserService;
+import online.bottler.user.application.port.in.UserUseCase;
 import online.bottler.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LabelService implements LabelUseCase {
     private final LabelPersistencePort labelPersistencePort;
-    private final UserService userService;
+    private final UserUseCase userUseCase;
     private final LabelScheduler labelScheduler;
 
     @Transactional
@@ -41,7 +41,7 @@ public class LabelService implements LabelUseCase {
 
     @Transactional
     public LabelResponse createFirstComeFirstServedLabel(Long userId) {
-        User user = userService.findById(userId);
+        User user = userUseCase.findById(userId);
 
         List<Label> firstComeLabels = labelPersistencePort.findByLabelType(LabelType.FIRST_COME);
 
@@ -66,5 +66,20 @@ public class LabelService implements LabelUseCase {
     @Transactional
     public void updateFirstComeLabel(LabelCommand labelCommand) {
         labelScheduler.scheduleUpdateFirstComeLabel(labelCommand);
+    }
+
+    @Override
+    public Label findLabelByLabelId(Long labelId) {
+        return labelPersistencePort.findLabelByLabelId(labelId);
+    }
+
+    @Override
+    public void updateOwnedCount(Label label) {
+        labelPersistencePort.updateOwnedCount(label);
+    }
+
+    @Override
+    public void createUserLabel(User user, Label label) {
+        labelPersistencePort.createUserLabel(user, label);
     }
 }
