@@ -3,13 +3,12 @@ package online.bottler.complaint.application;
 import lombok.RequiredArgsConstructor;
 import online.bottler.complaint.application.port.ComplaintUseCase;
 import online.bottler.complaint.domain.ComplaintType;
-import online.bottler.complaint.domain.Complaints;
 import online.bottler.letter.application.port.in.BlockLetterUseCase;
 import online.bottler.letter.application.port.in.BlockReplyLetterUseCase;
 import online.bottler.mapletter.application.BlockMapLetterType;
 import online.bottler.mapletter.application.port.in.MapLetterUseCase;
 import online.bottler.notification.application.port.NotificationUseCase;
-import online.bottler.user.application.port.in.UserUseCase;
+import online.bottler.user.application.UserFacade;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,7 @@ public class ComplaintFacade {
     private final BlockLetterUseCase blockLetterUseCase;
     private final BlockReplyLetterUseCase blockReplyLetterUseCase;
     private final MapLetterUseCase mapLetterUseCase;
-    private final UserUseCase userUseCase;
+    private final UserFacade userFacade;
 
     @Transactional
     public ComplaintResponse complain(ComplaintCommand complaintCommand) {
@@ -35,7 +34,7 @@ public class ComplaintFacade {
     private void sendWarningToWriter(ComplaintType type, Long letterId) {
         Long writerId = blockLetter(type, letterId);
         notificationUseCase.sendWarningNotification(writerId);
-        userUseCase.updateWarningCount(writerId);
+        userFacade.updateWarningCount(writerId);
     }
 
     private Long blockLetter(ComplaintType type, Long letterId) {
