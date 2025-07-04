@@ -13,7 +13,7 @@ import online.bottler.letter.domain.UserKeyword;
 @Entity
 @Table(
         name = "user_keyword",
-        uniqueConstraints = @UniqueConstraint(name = "uq_user_keyword", columnNames = {"userId", "keyword"})
+        uniqueConstraints = @UniqueConstraint(name = "uq_user_keyword", columnNames = {"user_id", "keyword"})
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserKeywordEntity extends BaseEntity {
