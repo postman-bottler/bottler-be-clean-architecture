@@ -20,21 +20,21 @@ abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    Long id;
+    protected Long id;
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    Long createdBy;
+    protected Long createdBy;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @LastModifiedBy
     @Column(name = "modified_by")
-    Long modifiedBy;
+    protected Long modifiedBy;
 
     @LastModifiedDate
     @Column(name = "modifiedAt")
-    LocalDateTime modifiedAt;
+    protected LocalDateTime modifiedAt;
 }

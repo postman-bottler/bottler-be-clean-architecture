@@ -8,12 +8,12 @@ import jakarta.persistence.MappedSuperclass;
 import online.bottler.letter.domain.LetterStatus;
 
 @MappedSuperclass
-public abstract class BaseLetterEntity extends BaseEntity {
+abstract class BaseLetterEntity extends BaseEntity {
 
     @Embedded
-    LetterContentEntity letterContentEntity;
+    protected LetterContentEntity letterContentEntity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    LetterStatus status;
+    protected LetterStatus status;
 }

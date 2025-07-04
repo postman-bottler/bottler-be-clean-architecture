@@ -8,7 +8,7 @@ abstract class BaseLetter extends BaseDomain {
     private final LetterContent letterContent;
     private LetterStatus status;
 
-    protected BaseLetter(
+    BaseLetter(
             Long id,
             LetterContent letterContent,
             LetterStatus status,
