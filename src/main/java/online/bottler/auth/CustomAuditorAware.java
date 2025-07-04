@@ -12,7 +12,11 @@ public class CustomAuditorAware implements AuditorAware<Long> {
     @NotNull
     @Override
     public Optional<Long> getCurrentAuditor() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return Optional.empty();
+        }
+        Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUserDetails customUserDetails) {
             return Optional.ofNullable(customUserDetails.getUserId());
