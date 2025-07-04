@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxTypeEntity;
+import online.bottler.letter.adapter.out.persistence.entity.QLetterContentEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterEntity;
 import online.bottler.letter.adapter.out.persistence.entity.QReplyLetterEntity;
 import online.bottler.letter.adapter.out.persistence.model.LetterSummaryProjection;
@@ -113,8 +114,9 @@ public class LetterBoxQueryRepository {
     private StringExpression getLetterTitle(QLetterBoxEntity letterBox, QLetterEntity letter,
                                             QReplyLetterEntity replyLetter) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
+        QLetterContentEntity letterContent = letter.letterContentEntity;
         return new CaseBuilder()
-                .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letter.title)
+                .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letterContent.title)
                 .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.title)
                 .otherwise("Unknown Title");
     }
@@ -122,8 +124,9 @@ public class LetterBoxQueryRepository {
     private StringExpression getLetterLabel(QLetterBoxEntity letterBox, QLetterEntity letter,
                                             QReplyLetterEntity replyLetter) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
+        QLetterContentEntity letterContent = letter.letterContentEntity;
         return new CaseBuilder()
-                .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letter.label)
+                .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letterContent.label)
                 .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.label)
                 .otherwise("Unknown Label");
     }
