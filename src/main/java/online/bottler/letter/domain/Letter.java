@@ -7,7 +7,7 @@ import lombok.Getter;
 public class Letter extends BaseLetter {
     private final Long userId;
 
-    public Letter(
+    private Letter(
             Long id,
             Long userId,
             LetterContent letterContent,

@@ -11,7 +11,7 @@ public class LetterKeyword extends BaseDomain {
     private final String keyword;
     private LetterStatus status;
 
-    public LetterKeyword(Long id, Long letterId, String keyword, LetterStatus status, LocalDateTime createdAt) {
+    private LetterKeyword(Long id, Long letterId, String keyword, LetterStatus status, LocalDateTime createdAt) {
         super(id, createdAt);
         this.letterId = letterId;
         this.keyword = keyword;

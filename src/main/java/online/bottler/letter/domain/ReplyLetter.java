@@ -12,7 +12,7 @@ public class ReplyLetter extends BaseLetter {
 
     private final Long letterId;
 
-    public ReplyLetter(
+    private ReplyLetter(
             Long id,
             Long senderId, Long receiverId,
             Long letterId,

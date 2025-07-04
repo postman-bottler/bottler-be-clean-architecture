@@ -12,7 +12,7 @@ public class LetterSummary {
     private final BoxType boxType;
     private final LocalDateTime createdAt;
 
-    public LetterSummary(Long letterId, String title, String label, LetterType letterType, BoxType boxType,
+    private LetterSummary(Long letterId, String title, String label, LetterType letterType, BoxType boxType,
                          LocalDateTime createdAt) {
         this.letterId = letterId;
         this.title = title;
