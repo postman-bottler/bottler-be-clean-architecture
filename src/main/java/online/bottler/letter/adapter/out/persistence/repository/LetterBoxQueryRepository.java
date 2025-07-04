@@ -115,9 +115,10 @@ public class LetterBoxQueryRepository {
                                             QReplyLetterEntity replyLetter) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         QLetterContentEntity letterContent = letter.letterContentEntity;
+        QLetterContentEntity replyLetterContent = replyLetter.letterContentEntity;
         return new CaseBuilder()
                 .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letterContent.title)
-                .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.title)
+                .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetterContent.title)
                 .otherwise("Unknown Title");
     }
 
@@ -125,9 +126,10 @@ public class LetterBoxQueryRepository {
                                             QReplyLetterEntity replyLetter) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         QLetterContentEntity letterContent = letter.letterContentEntity;
+        QLetterContentEntity replyLetterContent = replyLetter.letterContentEntity;
         return new CaseBuilder()
                 .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letterContent.label)
-                .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetter.label)
+                .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetterContent.label)
                 .otherwise("Unknown Label");
     }
 
