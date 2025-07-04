@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterKeywordEntity;
+import online.bottler.letter.domain.LetterStatus;
 import org.springframework.stereotype.Repository;
 import online.bottler.letter.adapter.out.persistence.entity.LetterKeywordEntity;
 
@@ -30,7 +31,7 @@ public class LetterKeywordQueryDslRepository {
                 .from(qLetterKeyword)
                 .where(qLetterKeyword.keyword.in(userKeywords)
                         .and(qLetterKeyword.letterId.notIn(letterIds))
-                        .and(qLetterKeyword.isDeleted.eq(false)))
+                        .and(qLetterKeyword.status.eq(LetterStatus.OPEN)))
                 .groupBy(qLetterKeyword.letterId)
                 .orderBy(qLetterKeyword.letterId.count().desc())
                 .limit(limit)
@@ -44,7 +45,7 @@ public class LetterKeywordQueryDslRepository {
                 .select(letterKeyword.keyword)
                 .from(letterKeyword)
                 .where(letterKeyword.letterId.in(letterIds)
-                        .and(letterKeyword.isDeleted.isFalse()))
+                        .and(letterKeyword.status.eq(LetterStatus.OPEN)))
                 .groupBy(letterKeyword.keyword)
                 .orderBy(letterKeyword.keyword.count().desc())
                 .limit(5)

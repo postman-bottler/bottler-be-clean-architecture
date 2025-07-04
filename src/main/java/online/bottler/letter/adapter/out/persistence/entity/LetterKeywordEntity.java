@@ -2,9 +2,8 @@ package online.bottler.letter.adapter.out.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -13,39 +12,39 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import online.bottler.letter.domain.LetterKeyword;
+import online.bottler.letter.domain.LetterStatus;
 
 @Entity
 @Table(name = "letter_keyword",
-        indexes = @Index(name = "idx_letterkeyword_keyword_isdeleted_letter", columnList = "keyword, isDeleted, letterId"),
+        indexes = @Index(name = "idx_letterkeyword_keyword_status_letter", columnList = "keyword, status, letterId"),
         uniqueConstraints = @UniqueConstraint(name = "uq_letter_keyword", columnNames = {"letterId", "keyword"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LetterKeywordEntity {
+public class LetterKeywordEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+    @Column(name = "letter_id", nullable = false)
     private Long letterId;
 
-    @Column(nullable = false)
+    @Column(name = "keyword", nullable = false)
     private String keyword;
 
-    @Column(nullable = false)
-    private boolean isDeleted;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private LetterStatus status;
 
     @Builder
-    public LetterKeywordEntity(Long letterId, String keyword, boolean isDeleted) {
+    public LetterKeywordEntity(Long id, Long letterId, String keyword, LetterStatus status) {
+        this.id = id;
         this.letterId = letterId;
         this.keyword = keyword;
-        this.isDeleted = isDeleted;
+        this.status = status;
     }
 
     public static LetterKeywordEntity from(LetterKeyword letterKeyword) {
         return LetterKeywordEntity.builder()
+                .id(letterKeyword.getId())
                 .letterId(letterKeyword.getLetterId())
                 .keyword(letterKeyword.getKeyword())
-                .isDeleted(letterKeyword.isDeleted())
+                .status(letterKeyword.getStatus())
                 .build();
     }
 
@@ -56,7 +55,7 @@ public class LetterKeywordEntity {
     }
 
     public LetterKeyword toDomain() {
-        return LetterKeyword.of(id, letterId, keyword, isDeleted);
+        return LetterKeyword.of(id, letterId, keyword, status, createdAt);
     }
 
     public static List<LetterKeyword> toDomainList(List<LetterKeywordEntity> letterKeywordEntities) {
