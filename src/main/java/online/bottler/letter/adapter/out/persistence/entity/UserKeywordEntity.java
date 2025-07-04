@@ -25,7 +25,7 @@ public class UserKeywordEntity extends BaseEntity {
     private String keyword;
 
     @Builder
-    public UserKeywordEntity(Long id, Long userId, String keyword) {
+    private UserKeywordEntity(Long id, Long userId, String keyword) {
         this.id = id;
         this.userId = userId;
         this.keyword = keyword;

@@ -32,7 +32,7 @@ public class LetterKeywordEntity extends BaseEntity {
     private LetterStatus status;
 
     @Builder
-    public LetterKeywordEntity(Long id, Long letterId, String keyword, LetterStatus status) {
+    private LetterKeywordEntity(Long id, Long letterId, String keyword, LetterStatus status) {
         this.id = id;
         this.letterId = letterId;
         this.keyword = keyword;

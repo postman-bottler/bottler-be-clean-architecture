@@ -27,7 +27,7 @@ public class LetterContentEntity {
     private String label;
 
     @Builder
-    public LetterContentEntity(String title, String content, String font, String paper, String label) {
+    private LetterContentEntity(String title, String content, String font, String paper, String label) {
         this.title = title;
         this.content = content;
         this.font = font;

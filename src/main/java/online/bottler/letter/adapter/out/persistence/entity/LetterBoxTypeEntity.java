@@ -24,7 +24,7 @@ public class LetterBoxTypeEntity {
     private BoxType boxType;
 
     @Builder
-    public LetterBoxTypeEntity(LetterType letterType, BoxType boxType) {
+    private LetterBoxTypeEntity(LetterType letterType, BoxType boxType) {
         this.letterType = letterType;
         this.boxType = boxType;
     }

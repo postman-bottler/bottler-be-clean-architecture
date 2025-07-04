@@ -22,7 +22,7 @@ public class RecommendedLetterEntity extends BaseEntity {
     private Long letterId;
 
     @Builder
-    public RecommendedLetterEntity(Long id, Long userId, Long letterId) {
+    private RecommendedLetterEntity(Long id, Long userId, Long letterId) {
         this.id = id;
         this.userId = userId;
         this.letterId = letterId;
