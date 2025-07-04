@@ -15,6 +15,7 @@ import online.bottler.letter.adapter.out.persistence.repository.LetterBoxQueryRe
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
+import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterSummary;
 import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
@@ -83,6 +84,6 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
 
     private void save(Long letterId, Long userId, LetterType letterType, BoxType boxType, LocalDateTime createdAt) {
         letterBoxJpaRepository.save(
-                LetterBoxEntity.from(LetterBox.create(letterId, userId, letterType, boxType, createdAt))).toDomain();
+                LetterBoxEntity.from(LetterBox.create(letterId, userId, LetterBoxType.of(letterType, boxType)))).toDomain();
     }
 }

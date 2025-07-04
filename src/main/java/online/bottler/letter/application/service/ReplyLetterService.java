@@ -26,8 +26,8 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     public ReplyLetter create(ReplyLetterCommand replyLetterCommand, Long userId, String title) {
         return replyLetterPersistencePort.create(
-                ReplyLetter.create(replyLetterCommand.userId(), replyLetterCommand.letterContent(),
-                        replyLetterCommand.letterId(), userId, title));
+                ReplyLetter.create(replyLetterCommand.userId(), userId, replyLetterCommand.letterId(),
+                        replyLetterCommand.letterContent(), title));
     }
 
     @Transactional(readOnly = true)
@@ -76,7 +76,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     public Long softBlock(Long id) {
         replyLetterPersistencePort.softBlock(id);
-        return findReplyLetter(id).getUserId();
+        return findReplyLetter(id).getSenderId();
     }
 
     private ReplyLetter findReplyLetter(Long id) {

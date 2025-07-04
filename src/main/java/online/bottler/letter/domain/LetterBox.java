@@ -7,25 +7,21 @@ import lombok.Getter;
 public class LetterBox extends BaseDomain {
     private final Long userId;
     private final Long letterId;
-    private final LetterType letterType;
-    private final BoxType boxType;
+    private final LetterBoxType letterBoxType;
 
-    private LetterBox(Long id, Long userId, Long letterId, LetterType letterType, BoxType boxType,
-                     LocalDateTime createdAt) {
+    private LetterBox(Long id, Long userId, Long letterId, LetterBoxType letterBoxType, LocalDateTime createdAt) {
         super(id, createdAt);
-        this.userId = userId;
         this.letterId = letterId;
-        this.letterType = letterType;
-        this.boxType = boxType;
+        this.userId = userId;
+        this.letterBoxType = letterBoxType;
     }
 
-    public static LetterBox of(Long id, Long userId, Long letterId, LetterType letterType, BoxType boxType,
+    public static LetterBox of(Long id, Long userId, Long letterId, LetterBoxType letterBoxType,
                                LocalDateTime createdAt) {
-        return new LetterBox(id, userId, letterId, letterType, boxType, createdAt);
+        return new LetterBox(id, userId, letterId, letterBoxType, createdAt);
     }
 
-    public static LetterBox create(Long userId, Long letterId, LetterType letterType, BoxType boxType,
-                                   LocalDateTime createdAt) {
-        return new LetterBox(null, userId, letterId, letterType, boxType, createdAt);
+    public static LetterBox create(Long userId, Long letterId, LetterBoxType letterBoxType) {
+        return new LetterBox(null, userId, letterId, letterBoxType, null);
     }
 }

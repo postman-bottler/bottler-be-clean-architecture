@@ -2,81 +2,77 @@ package online.bottler.letter.adapter.out.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import online.bottler.letter.domain.LetterContent;
 import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.ReplyLetter;
 
 @Entity
-@Table(name = "reply_letters",
-        indexes = @Index(name = "idx_replyletter_isdeleted_id", columnList = ("isDeleted, id")),
-        uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"senderId"}))
+@Table(
+        name = "reply_letters",
+        indexes = {
+                @Index(name = "idx_replyletter_receiverId_letterId_isDeleted", columnList = "receiverId, letterId, status"),
+                @Index(name = "idx_senderId_status", columnList = "senderId, status")
+        },
+        uniqueConstraints = @UniqueConstraint(name = "uq_letter_sender", columnNames = {"senderId", "letterId"})
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReplyLetterEntity {
+public class ReplyLetterEntity extends BaseLetterEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String title;
-    @Column(columnDefinition = "TEXT")
-    private String content;
-    private String font;
-    private String paper;
-    private String label;
-    private Long letterId;
-    private Long receiverId;
+    @Column(name = "sender_id", nullable = false)
     private Long senderId;
-    private boolean isDeleted;
-    private boolean isBlocked;
-    private LocalDateTime createdAt;
+
+    @Column(name = "receiver_id", nullable = false)
+    private Long receiverId;
+
+    @Column(name = "letter_id", nullable = false)
+    private Long letterId;
 
     @Builder
-    private ReplyLetterEntity(String title, String content, String font, String paper, String label,
-                              Long letterId, Long receiverId, Long senderId,
-                              boolean isDeleted, boolean isBlocked,
-                              LocalDateTime createdAt) {
-        this.title = title;
-        this.content = content;
-        this.font = font;
-        this.paper = paper;
-        this.label = label;
-        this.letterId = letterId;
-        this.receiverId = receiverId;
+    private ReplyLetterEntity(
+            Long id,
+            Long senderId, Long receiverId,
+            Long letterId,
+            LetterContentEntity letterContentEntity,
+            LetterStatus status
+    ) {
+        this.id = id;
         this.senderId = senderId;
-        this.isDeleted = isDeleted;
-        this.isBlocked = isBlocked;
-        this.createdAt = createdAt;
+        this.receiverId = receiverId;
+        this.letterId = letterId;
+        this.letterContentEntity = letterContentEntity;
+        this.status = status;
     }
 
     public static ReplyLetterEntity from(ReplyLetter replyLetter) {
         return ReplyLetterEntity.builder()
-                .title(replyLetter.getTitle())
-                .content(replyLetter.getContent())
-                .font(replyLetter.getFont())
-                .paper(replyLetter.getPaper())
-                .label(replyLetter.getLabel())
-                .letterId(replyLetter.getLetterId())
+                .id(replyLetter.getId())
+                .senderId(replyLetter.getSenderId())
                 .receiverId(replyLetter.getReceiverId())
-                .senderId(replyLetter.getUserId())
-                .isDeleted(replyLetter.isDeleted())
-                .isBlocked(replyLetter.isBlocked())
-                .createdAt(replyLetter.getCreatedAt())
+                .letterId(replyLetter.getLetterId())
+                .letterContentEntity(LetterContentEntity.from(replyLetter.getLetterContent()))
+                .status(replyLetter.getStatus())
                 .build();
     }
 
+    public static Iterable<ReplyLetterEntity> fromList(List<ReplyLetter> replyLetters) {
+        return replyLetters.stream().map(ReplyLetterEntity::from).toList();
+    }
+
     public ReplyLetter toDomain() {
-        return ReplyLetter.of(id, senderId, LetterContent.of(title, content, font, paper, label),
-                LetterStatus.create(isDeleted, isBlocked), createdAt, letterId, receiverId);
+        return ReplyLetter.of(
+                id,
+                senderId, receiverId,
+                letterId,
+                letterContentEntity.toDomain(),
+                status,
+                createdAt
+        );
     }
 
     public static List<ReplyLetter> toDomainList(List<ReplyLetterEntity> replyLetterEntities) {

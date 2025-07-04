@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public abstract class BaseDomain {
+abstract class BaseDomain {
     private final Long id;
     private final LocalDateTime createdAt;
 
-    protected BaseDomain(Long id, LocalDateTime createdAt) {
+    BaseDomain(Long id, LocalDateTime createdAt) {
         this.id = id;
         this.createdAt = createdAt;
     }

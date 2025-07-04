@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.ReplyLetterEntity;
 import online.bottler.letter.adapter.out.persistence.repository.ReplyLetterJpaRepository;
 import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
+import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.ReplyLetter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
 
     @Override
     public Page<ReplyLetter> loadSummariesByLetterIdAndReceiverId(Long letterId, Long receiverId, Pageable pageable) {
-        return replyLetterJpaRepository.findAllByLetterIdAndReceiverId(letterId, receiverId, pageable)
+        return replyLetterJpaRepository.findAllByLetterIdAndReceiverId(letterId, receiverId, pageable, LetterStatus.OPEN)
                 .map(ReplyLetterEntity::toDomain);
     }
 

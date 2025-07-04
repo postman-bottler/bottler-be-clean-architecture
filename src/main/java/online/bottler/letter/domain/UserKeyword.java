@@ -5,11 +5,11 @@ import lombok.Getter;
 @Getter
 public class UserKeyword {
 
-    private Long id;
+    private final Long id;
     private final Long userId;
     private final String keyword;
 
-    public UserKeyword(Long id, Long userId, String keyword) {
+    private UserKeyword(Long id, Long userId, String keyword) {
         this.id = id;
         this.userId = userId;
         this.keyword = keyword;
