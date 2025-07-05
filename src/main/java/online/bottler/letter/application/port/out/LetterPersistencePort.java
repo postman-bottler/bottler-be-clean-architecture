@@ -3,6 +3,7 @@ package online.bottler.letter.application.port.out;
 import java.util.List;
 import java.util.Optional;
 import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterStatus;
 
 public interface LetterPersistencePort {
     Letter create(Letter letter);
@@ -15,11 +16,9 @@ public interface LetterPersistencePort {
 
     List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds);
 
-    void softDelete(Long letterId);
-
-    void softDeleteByIds(List<Long> letterIds);
-
-    void softBlock(Long id);
-
     boolean existsById(Long letterId);
+
+    List<Letter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus letterStatus);
+
+    void createAll(List<Letter> letters);
 }

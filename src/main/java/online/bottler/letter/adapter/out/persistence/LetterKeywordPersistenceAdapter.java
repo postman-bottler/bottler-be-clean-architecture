@@ -7,6 +7,7 @@ import online.bottler.letter.adapter.out.persistence.repository.LetterKeywordJpa
 import online.bottler.letter.adapter.out.persistence.repository.LetterKeywordQueryDslRepository;
 import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.domain.LetterKeyword;
+import online.bottler.letter.domain.LetterStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,16 +24,6 @@ public class LetterKeywordPersistenceAdapter implements LetterKeywordPersistence
     }
 
     @Override
-    public void softDelete(Long letterId) {
-        letterKeywordJpaRepository.softDeleteById(letterId);
-    }
-
-    @Override
-    public void softDeleteByIds(List<Long> ids) {
-        letterKeywordJpaRepository.softDeleteByIds(ids);
-    }
-
-    @Override
     public List<String> loadFrequentKeywords(List<Long> letterIds) {
         return queryDslRepository.getFrequentKeywords(letterIds);
     }
@@ -45,5 +36,15 @@ public class LetterKeywordPersistenceAdapter implements LetterKeywordPersistence
     @Override
     public List<Long> loadMatchedLetters(List<String> userKeywords, List<Long> letterIds, int limit) {
         return queryDslRepository.getMatchedLetters(userKeywords, letterIds, limit);
+    }
+
+    @Override
+    public List<LetterKeyword> loadAllByLetterId(Long letterId) {
+        return LetterKeywordEntity.toDomainList(queryDslRepository.findKeywordsByLetterId(letterId));
+    }
+
+    @Override
+    public List<LetterKeyword> loadAllByLetterIdInAndStatus(List<Long> letterIds, LetterStatus status) {
+        return LetterKeywordEntity.toDomainList(letterKeywordJpaRepository.findAllByLetterIdInAndStatus(letterIds, status));
     }
 }

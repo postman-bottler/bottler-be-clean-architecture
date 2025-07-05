@@ -50,17 +50,12 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public void softBlock(Long id) {
-        replyLetterJpaRepository.softBlockById(id);
+    public void createAll(List<ReplyLetter> replyLetters) {
+        replyLetterJpaRepository.saveAll(ReplyLetterEntity.fromList(replyLetters));
     }
 
     @Override
-    public void softDelete(Long id) {
-        replyLetterJpaRepository.softDeleteById(id);
-    }
-
-    @Override
-    public void softDeleteByIds(List<Long> ids) {
-        replyLetterJpaRepository.softDeleteByIds(ids);
+    public List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status) {
+        return ReplyLetterEntity.toDomainList(replyLetterJpaRepository.findAllByIdInAndStatus(ids, status));
     }
 }
