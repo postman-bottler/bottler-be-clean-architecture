@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.port.in.RecentReplyForLetterUseCase;
 import online.bottler.letter.application.port.in.ReplyLetterUseCase;
+import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
                 replyLetter.getId(), replyLetter.getLabel()));
 
         replyLetterUseCase.softDeleteByIds(ids);
-        letterBoxUseCase.deleteByType(ids, REPLY_LETTER, NONE);
+        letterBoxUseCase.deleteByType(ids, LetterBoxType.of(REPLY_LETTER, NONE));
     }
 
     private void validateReplyLetterOwnerShip(Long userId, List<ReplyLetter> replyLetters) {

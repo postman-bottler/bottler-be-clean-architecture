@@ -15,6 +15,7 @@ import online.bottler.letter.application.response.ReplyLetterDetailResponse;
 import online.bottler.letter.application.response.ReplyLetterResponse;
 import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
 import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.DuplicateReplyLetterException;
 import online.bottler.letter.exception.UnauthorizedLetterAccessException;
@@ -69,8 +70,8 @@ public class ReplyLetterFacade {
     @Transactional
     public void softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
         ReplyLetter replyLetter = replyLetterUseCase.softDelete(replyLetterDeleteCommand);
-        letterBoxUseCase.deleteLetter(replyLetterDeleteCommand.id(), REPLY_LETTER,
-                replyLetterDeleteCommand.boxType());
+        letterBoxUseCase.deleteLetter(replyLetterDeleteCommand.id(), LetterBoxType.of(REPLY_LETTER,
+                replyLetterDeleteCommand.boxType()));
         recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
     }
 

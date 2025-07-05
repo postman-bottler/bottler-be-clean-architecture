@@ -3,8 +3,8 @@ package online.bottler.letter.application.port.out;
 import java.time.LocalDateTime;
 import java.util.List;
 import online.bottler.letter.domain.BoxType;
+import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterSummary;
-import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,11 +21,11 @@ public interface LetterBoxPersistencePort {
 
     boolean existsByLetterIdAndUserId(Long letterId, Long userId);
 
-    void delete(Long letterId, LetterType letterType, BoxType boxType);
+    void delete(Long letterId, LetterBoxType letterBoxType);
 
-    void deleteByCondition(List<Long> letterIds, LetterType letterType, BoxType boxType);
+    void deleteByCondition(List<Long> letterIds, LetterBoxType letterBoxType);
 
     void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType);
 
-    void deleteByConditionAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId);
+    void deleteByConditionAndUserId(List<Long> ids, LetterBoxType letterBoxType, Long userId);
 }

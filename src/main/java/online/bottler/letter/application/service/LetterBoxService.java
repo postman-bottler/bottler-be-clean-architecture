@@ -11,8 +11,8 @@ import online.bottler.letter.application.command.CommonPageCommand;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.domain.BoxType;
+import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterSummary;
-import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -62,8 +62,8 @@ public class LetterBoxService implements LetterBoxUseCase {
 
     @Transactional
     @Override
-    public void deleteLetter(Long letterId, LetterType letterType, BoxType boxType) {
-        letterBoxPersistencePort.delete(letterId, letterType, boxType);
+    public void deleteLetter(Long letterId, LetterBoxType letterBoxType) {
+        letterBoxPersistencePort.delete(letterId, letterBoxType);
     }
 
     @Transactional(readOnly = true)
@@ -82,12 +82,12 @@ public class LetterBoxService implements LetterBoxUseCase {
     }
 
     @Override
-    public void deleteByTypeAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId) {
-        letterBoxPersistencePort.deleteByConditionAndUserId(ids, letterType, boxType, userId);
+    public void deleteByTypeAndUserId(List<Long> ids, LetterBoxType letterBoxType, Long userId) {
+        letterBoxPersistencePort.deleteByConditionAndUserId(ids, letterBoxType, userId);
     }
 
     @Override
-    public void deleteByType(List<Long> ids, LetterType letterType, BoxType boxType) {
-        letterBoxPersistencePort.deleteByCondition(ids, letterType, boxType);
+    public void deleteByType(List<Long> ids, LetterBoxType letterBoxType) {
+        letterBoxPersistencePort.deleteByCondition(ids, letterBoxType);
     }
 }

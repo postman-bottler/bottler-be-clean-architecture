@@ -17,8 +17,8 @@ import online.bottler.letter.application.port.in.ReplyLetterUseCase;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.strategy.LetterDeleteStrategy;
 import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterDeleteKey;
-import online.bottler.letter.domain.LetterDeleteValues;
+import online.bottler.letter.domain.LetterBoxType;
+import online.bottler.letter.domain.LetterDeletion;
 import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LetterBoxFacade {
 
     private final LetterBoxUseCase letterBoxUseCase;
-    private final Map<LetterDeleteKey, LetterDeleteStrategy> letterDeleteStrategyMap;
+    private final Map<LetterBoxType, LetterDeleteStrategy> letterDeleteStrategyMap;
     private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
     private final ReplyLetterUseCase replyLetterUseCase;
 
@@ -50,7 +50,7 @@ public class LetterBoxFacade {
 
     @Transactional
     public void deleteLetters(List<LetterDeleteCommand> letterDeleteCommands, Long userId) {
-        Map<LetterDeleteKey, LetterDeleteValues> letterDeleteMap = LetterDeleteCommand.toLetterDeleteMap(
+        Map<LetterBoxType, LetterDeletion> letterDeleteMap = LetterDeleteCommand.toLetterDeleteMap(
                 letterDeleteCommands);
         letterDeleteMap.forEach((key, value) -> getDeleteStrategy(key).deleteLetters(value.letterIds(), userId));
     }
@@ -73,8 +73,8 @@ public class LetterBoxFacade {
 
     private void deleteAllLettersByBoxType(BoxType boxType, Long userId) {
         if (boxType == NONE || boxType == SEND) {
-            deleteLettersForType(LetterDeleteKey.of(LETTER, boxType), userId);
-            deleteLettersForType(LetterDeleteKey.of(REPLY_LETTER, boxType), userId);
+            deleteLettersForType(LetterBoxType.of(LETTER, boxType), userId);
+            deleteLettersForType(LetterBoxType.of(REPLY_LETTER, boxType), userId);
         }
 
         if (boxType == NONE || boxType == RECEIVE) {
@@ -82,10 +82,10 @@ public class LetterBoxFacade {
         }
     }
 
-    private void deleteLettersForType(LetterDeleteKey letterDeleteKey, Long userId) {
-        List<Long> ids = getLetterIdsByLetterType(letterDeleteKey.letterType(), userId);
+    private void deleteLettersForType(LetterBoxType letterBoxType, Long userId) {
+        List<Long> ids = getLetterIdsByLetterType(letterBoxType.getLetterType(), userId);
         if (!ids.isEmpty()) {
-            getDeleteStrategy(letterDeleteKey).deleteLetters(ids, userId);
+            getDeleteStrategy(letterBoxType).deleteLetters(ids, userId);
         }
     }
 
@@ -97,7 +97,7 @@ public class LetterBoxFacade {
         };
     }
 
-    private LetterDeleteStrategy getDeleteStrategy(LetterDeleteKey key) {
-        return letterDeleteStrategyMap.get(key);
+    private LetterDeleteStrategy getDeleteStrategy(LetterBoxType letterBoxType) {
+        return letterDeleteStrategyMap.get(letterBoxType);
     }
 }
