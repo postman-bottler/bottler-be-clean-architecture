@@ -65,22 +65,17 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public void softDelete(Long id) {
-        letterJpaRepository.softDeleteById(id, LetterStatus.DELETED);
-    }
-
-    @Override
-    public void softDeleteByIds(List<Long> ids) {
-        letterJpaRepository.softDeleteByIds(ids, LetterStatus.DELETED);
-    }
-
-    @Override
-    public void softBlock(Long id) {
-        letterJpaRepository.softBlockById(id, LetterStatus.BLOCKED);
-    }
-
-    @Override
     public boolean existsById(Long id) {
         return letterJpaRepository.existsById(id);
+    }
+
+    @Override
+    public List<Letter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status) {
+        return LetterEntity.toDomainList(letterJpaRepository.findAllByIdInAndStatus(ids, status));
+    }
+
+    @Override
+    public void createAll(List<Letter> letters) {
+        letterJpaRepository.saveAll(LetterEntity.fromList(letters));
     }
 }
