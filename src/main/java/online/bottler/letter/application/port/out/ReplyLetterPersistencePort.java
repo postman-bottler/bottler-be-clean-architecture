@@ -2,6 +2,7 @@ package online.bottler.letter.application.port.out;
 
 import java.util.List;
 import java.util.Optional;
+import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.ReplyLetter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,7 @@ public interface ReplyLetterPersistencePort {
 
     List<ReplyLetter> loadAllByIds(List<Long> ids);
 
-    void softBlock(Long id);
+    void createAll(List<ReplyLetter> replyLetters);
 
-    void softDelete(Long id);
-
-    void softDeleteByIds(List<Long> replyIds);
+    List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status);
 }

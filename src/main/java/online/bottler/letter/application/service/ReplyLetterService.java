@@ -1,5 +1,6 @@
 package online.bottler.letter.application.service;
 
+import static online.bottler.letter.domain.LetterStatus.OPEN;
 import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
 
 import java.util.List;
@@ -46,8 +47,11 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Transactional
     @Override
     public ReplyLetter softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
-        replyLetterPersistencePort.softDelete(replyLetterDeleteCommand.id());
-        return findReplyLetter(replyLetterDeleteCommand.id());
+        ReplyLetter replyLetter = findReplyLetter(replyLetterDeleteCommand.id());
+        replyLetter.delete();
+        replyLetterPersistencePort.create(replyLetter);
+
+        return replyLetter;
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +68,9 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Override
     public void softDeleteByIds(List<Long> ids) {
-        replyLetterPersistencePort.softDeleteByIds(ids);
+        List<ReplyLetter> replyLetters = replyLetterPersistencePort.loadAllByIdInAndStatus(ids, OPEN);
+        replyLetters.forEach(ReplyLetter::delete);
+        replyLetterPersistencePort.createAll(replyLetters);
     }
 
     @Override
@@ -75,8 +81,11 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Transactional
     @Override
     public Long softBlock(Long id) {
-        replyLetterPersistencePort.softBlock(id);
-        return findReplyLetter(id).getSenderId();
+        ReplyLetter replyLetter = findReplyLetter(id);
+        replyLetter.block();
+        replyLetterPersistencePort.create(replyLetter);
+
+        return replyLetter.getSenderId();
     }
 
     private ReplyLetter findReplyLetter(Long id) {
