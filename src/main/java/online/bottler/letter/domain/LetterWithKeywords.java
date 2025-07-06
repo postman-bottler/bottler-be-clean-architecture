@@ -2,6 +2,7 @@ package online.bottler.letter.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 
 public class LetterWithKeywords {
@@ -11,7 +12,7 @@ public class LetterWithKeywords {
 
     private LetterWithKeywords(Letter letter, List<String> keywords) {
         this.letter = letter;
-        this.keywords = keywords;
+        this.keywords = List.copyOf(Objects.requireNonNull(keywords, "keywords must not be null"));
     }
 
     public Long getLetterId() {
