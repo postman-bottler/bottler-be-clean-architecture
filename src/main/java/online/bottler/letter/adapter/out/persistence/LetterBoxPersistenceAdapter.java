@@ -71,21 +71,6 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
         letterBoxQueryRepository.deleteByCondition(List.of(letterId), letterBoxType.getLetterType(), letterBoxType.getBoxType());
     }
 
-    @Override
-    public void deleteByCondition(List<Long> letterIds, LetterBoxType letterBoxType) {
-        letterBoxQueryRepository.deleteByCondition(letterIds, letterBoxType.getLetterType(), letterBoxType.getBoxType());
-    }
-
-    @Override
-    public void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType) {
-        letterBoxQueryRepository.deleteAllByUserIdAndBoxType(userId, boxType);
-    }
-
-    @Override
-    public void deleteByConditionAndUserId(List<Long> ids, LetterBoxType letterBoxType, Long userId) {
-        letterBoxQueryRepository.deleteByConditionAndUserId(ids, letterBoxType.getLetterType(), letterBoxType.getBoxType(), userId);
-    }
-
     private void save(Long letterId, Long userId, LetterBoxType letterBoxType, LocalDateTime createdAt) {
         letterBoxJpaRepository.save(
                 LetterBoxEntity.from(LetterBox.create(userId, letterId, letterBoxType)));

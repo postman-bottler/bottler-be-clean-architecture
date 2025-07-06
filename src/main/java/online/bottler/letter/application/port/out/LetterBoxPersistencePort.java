@@ -24,10 +24,4 @@ public interface LetterBoxPersistencePort {
     void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType);
 
     void delete(Long letterId, LetterBoxType letterBoxType);
-
-    void deleteByCondition(List<Long> letterIds, LetterBoxType letterBoxType);
-
-    void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType);
-
-    void deleteByConditionAndUserId(List<Long> ids, LetterBoxType letterBoxType, Long userId);
 }
