@@ -42,6 +42,10 @@ public class LetterWithKeywords {
         return letter.getLabel();
     }
 
+    public boolean isOwner(Long userId) {
+        return letter.isOwner(userId);
+    }
+
     public boolean isDeleted() {
         return letter.isDeleted();
     }

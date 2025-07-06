@@ -10,7 +10,7 @@ import online.bottler.letter.domain.LetterWithKeywords;
 public interface LetterWithKeywordsUseCase {
     Letter create(LetterWithKeywordsCommand command);
 
-    LetterWithKeywords get(LetterWithKeywordsDetailQuery query);
+    LetterWithKeywords getOne(LetterWithKeywordsDetailQuery query);
 
     String getLabel(Long letterId);
 
@@ -20,7 +20,7 @@ public interface LetterWithKeywordsUseCase {
 
     List<Long> getLetterIdsByUserId(Long userId);
 
-    List<Letter> loadAllIncludingDeletedByIds(List<Long> recommendedLetterIds);
+    List<Letter> getLettersIncludingAllStatusByIdIn(List<Long> recommendedLetterIds);
 
     void softDeleteByIds(List<Long> ids);
 }

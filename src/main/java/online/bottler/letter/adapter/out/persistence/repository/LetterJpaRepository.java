@@ -12,9 +12,6 @@ public interface LetterJpaRepository extends JpaRepository<LetterEntity, Long> {
 
     Optional<LetterEntity> findByIdAndStatus(Long id, LetterStatus status);
 
-    @Query("SELECT l FROM LetterEntity l WHERE l.id IN :ids")
-    List<LetterEntity> findAllIncludingDeletedByIds(List<Long> ids);
-
     @Query("SELECT MAX(l.id) FROM LetterEntity l WHERE l.status = :status")
     Long findMaxId(LetterStatus status);
 
@@ -23,6 +20,8 @@ public interface LetterJpaRepository extends JpaRepository<LetterEntity, Long> {
 
     @Query("SELECT l.id FROM LetterEntity l WHERE l.status = :status AND l.id >= :randomId AND l.id NOT IN :excludedIds ORDER BY l.id LIMIT :count")
     List<Long> getRandomIds(int count, Long randomId, List<Long> excludedIds, LetterStatus status);
+
+    List<LetterEntity> findAllByIdIn(Collection<Long> ids);
 
     List<LetterEntity> findAllByIdInAndStatus(Collection<Long> ids, LetterStatus status);
 }

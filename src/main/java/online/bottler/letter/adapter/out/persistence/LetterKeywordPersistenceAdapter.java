@@ -29,8 +29,8 @@ public class LetterKeywordPersistenceAdapter implements LetterKeywordPersistence
     }
 
     @Override
-    public List<LetterKeyword> loadKeywordsByLetterId(Long letterId) {
-        return LetterKeywordEntity.toDomainList(queryDslRepository.findKeywordsByLetterId(letterId));
+    public List<String> loadKeywordsByLetterIdAndStatus(Long letterId, LetterStatus status) {
+        return letterKeywordJpaRepository.findKeywordsByLetterIdAndStatus(letterId, status);
     }
 
     @Override

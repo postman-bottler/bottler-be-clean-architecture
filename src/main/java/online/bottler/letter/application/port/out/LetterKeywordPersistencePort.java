@@ -9,7 +9,7 @@ public interface LetterKeywordPersistencePort {
 
     List<String> loadFrequentKeywords(List<Long> letterIds);
 
-    List<LetterKeyword> loadKeywordsByLetterId(Long letterId);
+    List<String> loadKeywordsByLetterIdAndStatus(Long letterId, LetterStatus status);
 
     List<Long> loadMatchedLetters(List<String> userKeywords, List<Long> letterIds, int limit);
 
