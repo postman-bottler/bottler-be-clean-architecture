@@ -5,7 +5,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.adapter.out.persistence.entity.QLetterBoxEntity;
@@ -99,26 +98,6 @@ public class LetterBoxQueryRepository {
                 .execute();
     }
 
-    public void deleteByConditionAndUserId(List<Long> letterIds, LetterType letterType, BoxType boxType, Long userId) {
-        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-
-        BooleanBuilder condition = buildDeletionCondition(userId, letterIds, letterType, boxType, letterBox);
-
-        queryFactory
-                .delete(letterBox)
-                .where(condition)
-                .execute();
-    }
-
-    public void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType) {
-        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        BooleanBuilder condition = buildDeletionCondition(userId, Collections.emptyList(), LetterType.NONE, boxType, letterBox);
-
-        queryFactory.delete(letterBox)
-                .where(condition)
-                .execute();
-    }
-
     private StringExpression getLetterTitle(QLetterBoxEntity letterBox, QLetterEntity letter,
                                             QReplyLetterEntity replyLetter) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
@@ -147,7 +126,7 @@ public class LetterBoxQueryRepository {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(letterBox.userId.eq(userId));
 
-        if (boxType != BoxType.NONE) {
+        if (boxType != null) {
             condition.and(letterBoxType.boxType.eq(boxType));
         }
 

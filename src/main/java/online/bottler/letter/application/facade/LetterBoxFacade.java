@@ -78,7 +78,6 @@ public class LetterBoxFacade {
         return switch (letterType) {
             case LETTER -> letterWithKeywordsUseCase.getLetterIdsByUserId(userId);
             case REPLY_LETTER -> replyLetterUseCase.getIdsByUserId(userId);
-            default -> throw new IllegalArgumentException("Unsupported letter type");
         };
     }
 

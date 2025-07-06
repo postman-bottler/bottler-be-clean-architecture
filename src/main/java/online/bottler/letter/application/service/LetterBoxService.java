@@ -1,6 +1,5 @@
 package online.bottler.letter.application.service;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.BoxType.RECEIVE;
 import static online.bottler.letter.domain.BoxType.SEND;
 
@@ -45,7 +44,7 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional(readOnly = true)
     @Override
     public Page<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), NONE);
+        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), null);
     }
 
     @Transactional(readOnly = true)
