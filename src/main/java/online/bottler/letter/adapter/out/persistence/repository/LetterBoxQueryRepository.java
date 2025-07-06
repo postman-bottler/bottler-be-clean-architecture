@@ -79,9 +79,9 @@ public class LetterBoxQueryRepository {
         return count != null ? count : 0L;
     }
 
-    public void deleteByCondition(List<Long> letterIds, LetterType letterType, BoxType boxType) {
+    public void deleteLetters(Long userId, List<Long> letterIds, LetterType letterType, BoxType boxType) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        BooleanBuilder condition = buildDeletionCondition(null, letterIds, letterType, boxType);
+        BooleanBuilder condition = buildDeletionCondition(userId, letterIds, letterType, boxType, letterBox);
 
         queryFactory
                 .delete(letterBox)
@@ -89,12 +89,20 @@ public class LetterBoxQueryRepository {
                 .execute();
     }
 
+    public void deleteByCondition(List<Long> letterIds, LetterType letterType, BoxType boxType) {
+        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
+        BooleanBuilder condition = buildDeletionCondition(null, letterIds, letterType, boxType, letterBox);
 
+        queryFactory
+                .delete(letterBox)
+                .where(condition)
+                .execute();
+    }
 
     public void deleteByConditionAndUserId(List<Long> letterIds, LetterType letterType, BoxType boxType, Long userId) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
 
-        BooleanBuilder condition = buildDeletionCondition(userId, letterIds, letterType, boxType);
+        BooleanBuilder condition = buildDeletionCondition(userId, letterIds, letterType, boxType, letterBox);
 
         queryFactory
                 .delete(letterBox)
@@ -104,7 +112,7 @@ public class LetterBoxQueryRepository {
 
     public void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        BooleanBuilder condition = buildDeletionCondition(userId, Collections.emptyList(), LetterType.NONE, boxType);
+        BooleanBuilder condition = buildDeletionCondition(userId, Collections.emptyList(), LetterType.NONE, boxType, letterBox);
 
         queryFactory.delete(letterBox)
                 .where(condition)
@@ -147,21 +155,20 @@ public class LetterBoxQueryRepository {
     }
 
     private BooleanBuilder buildDeletionCondition(Long userId, List<Long> letterIds, LetterType letterType,
-                                                  BoxType boxType) {
-        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
+                                                  BoxType boxType, QLetterBoxEntity letterBox) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
         BooleanBuilder condition = new BooleanBuilder();
 
         if (userId != null) {
             condition.and(letterBox.userId.eq(userId));
         }
-        if (!letterIds.isEmpty()) {
+        if (letterIds != null) {
             condition.and(letterBox.letterId.in(letterIds));
         }
-        if (letterType != LetterType.NONE) {
+        if (letterType != null) {
             condition.and(letterBoxType.letterType.eq(letterType));
         }
-        if (boxType != BoxType.NONE) {
+        if (boxType != null) {
             condition.and(letterBoxType.boxType.eq(boxType));
         }
 
