@@ -19,8 +19,8 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     private final ReplyLetterJpaRepository replyLetterJpaRepository;
 
     @Override
-    public boolean existsByLetterIdAndUserId(Long letterId, Long userId) {
-        return replyLetterJpaRepository.existsByLetterIdAndSenderId(letterId, userId);
+    public boolean existsByUserIdAndLetterId(Long userId, Long letterId) {
+        return replyLetterJpaRepository.existsBySenderIdAndLetterId(userId, letterId);
     }
 
     @Override
