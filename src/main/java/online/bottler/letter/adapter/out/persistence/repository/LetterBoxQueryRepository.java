@@ -88,16 +88,6 @@ public class LetterBoxQueryRepository {
                 .execute();
     }
 
-    public void deleteByCondition(List<Long> letterIds, LetterType letterType, BoxType boxType) {
-        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        BooleanBuilder condition = buildDeletionCondition(null, letterIds, letterType, boxType, letterBox);
-
-        queryFactory
-                .delete(letterBox)
-                .where(condition)
-                .execute();
-    }
-
     private StringExpression getLetterTitle(QLetterBoxEntity letterBox, QLetterEntity letter,
                                             QReplyLetterEntity replyLetter) {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
