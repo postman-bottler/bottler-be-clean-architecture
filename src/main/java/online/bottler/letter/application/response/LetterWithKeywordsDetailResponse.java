@@ -2,7 +2,6 @@ package online.bottler.letter.application.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import online.bottler.letter.domain.LetterWithKeywords;
 
 public record LetterWithKeywordsDetailResponse(
@@ -18,18 +17,17 @@ public record LetterWithKeywordsDetailResponse(
         boolean isReplied,
         LocalDateTime createdAt
 ) {
-    public static LetterWithKeywordsDetailResponse of(LetterWithKeywords letterWithKeywords, Long currentUserId,
-                                                      String profile, boolean isReplied) {
+    public static LetterWithKeywordsDetailResponse of(LetterWithKeywords letterWithKeywords, String profile, boolean isOwner, boolean isReplied) {
         return new LetterWithKeywordsDetailResponse(
                 letterWithKeywords.getLetterId(),
                 letterWithKeywords.getTitle(),
                 letterWithKeywords.getContent(),
-                List.copyOf(letterWithKeywords.getKeywords()),
+                letterWithKeywords.getKeywords(),
                 letterWithKeywords.getFont(),
                 letterWithKeywords.getPaper(),
                 profile,
                 letterWithKeywords.getLabel(),
-                Objects.equals(letterWithKeywords.getUserId(), currentUserId),
+                isOwner,
                 isReplied,
                 letterWithKeywords.getCreatedAt()
         );

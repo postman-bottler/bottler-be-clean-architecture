@@ -18,7 +18,6 @@ import online.bottler.letter.application.response.LetterWithKeywordsResponse;
 import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterWithKeywords;
-import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import online.bottler.user.application.port.in.UserUseCase;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,22 +42,23 @@ public class LetterWithKeywordsFacade {
 
     @Transactional(readOnly = true)
     public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
-        if (letterBoxUseCase.isAccessDenied(letterWithKeywordsDetailQuery.letterId(),
-                letterWithKeywordsDetailQuery.userId())) {
-            throw new UnauthorizedLetterAccessException();
-        }
+        LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.getOne(letterWithKeywordsDetailQuery);
 
-        LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.get(letterWithKeywordsDetailQuery);
         String profile = userUseCase.findById(letterWithKeywords.getUserId()).getImageUrl();
-        boolean isReplied = replyLetterUseCase.isReplied(letterWithKeywordsDetailQuery.letterId(), letterWithKeywordsDetailQuery.userId());
 
-        return LetterWithKeywordsDetailResponse.of(letterWithKeywords, letterWithKeywordsDetailQuery.userId(), profile, isReplied);
+        boolean isOwner = letterWithKeywords.isOwner(letterWithKeywordsDetailQuery.userId());
+
+        boolean isReplied = replyLetterUseCase.isReplied(letterWithKeywordsDetailQuery.userId(), letterWithKeywordsDetailQuery.letterId());
+
+        return LetterWithKeywordsDetailResponse.of(letterWithKeywords, profile, isOwner, isReplied);
     }
 
     @Transactional(readOnly = true)
     public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
         List<Long> recommendedLetterIds = recommendUseCase.getRecommended(userId);
-        List<Letter> letters = letterWithKeywordsUseCase.loadAllIncludingDeletedByIds(recommendedLetterIds);
+
+        List<Letter> letters = letterWithKeywordsUseCase.getLettersIncludingAllStatusByIdIn(recommendedLetterIds);
+
         return LetterRecommendSummaryResponse.fromList(letters);
     }
 
