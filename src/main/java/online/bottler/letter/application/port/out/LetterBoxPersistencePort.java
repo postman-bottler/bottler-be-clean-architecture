@@ -19,7 +19,7 @@ public interface LetterBoxPersistencePort {
 
     Page<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType);
 
-    boolean existsByLetterIdAndUserId(Long letterId, Long userId);
+    boolean existsByUserIdAndLetterId(Long userId, Long letterId);
 
     void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType);
 }

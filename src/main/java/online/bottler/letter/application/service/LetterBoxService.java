@@ -86,7 +86,7 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional(readOnly = true)
     @Override
     public boolean isAccessDenied(Long letterId, Long userId) {
-        return !letterBoxPersistencePort.existsByLetterIdAndUserId(letterId, userId);
+        return !letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
     private Page<LetterSummary> getLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
