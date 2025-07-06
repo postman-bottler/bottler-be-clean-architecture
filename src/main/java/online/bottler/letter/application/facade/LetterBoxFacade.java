@@ -1,6 +1,5 @@
 package online.bottler.letter.application.facade;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.BoxType.RECEIVE;
 import static online.bottler.letter.domain.BoxType.SEND;
 import static online.bottler.letter.domain.LetterType.LETTER;
@@ -52,44 +51,30 @@ public class LetterBoxFacade {
     public void deleteLetters(List<LetterDeleteCommand> letterDeleteCommands, Long userId) {
         Map<LetterBoxType, LetterDeletion> letterDeleteMap = LetterDeleteCommand.toLetterDeleteMap(
                 letterDeleteCommands);
+
         letterDeleteMap.forEach((key, value) -> getDeleteStrategy(key).deleteLetters(value.letterIds(), userId));
     }
 
     @Transactional
-    public void deleteAllLetters(Long userId) {
-        deleteAllLettersByBoxType(NONE, userId);
-    }
-
-    @Transactional
-    public void deleteAllReceivedLetters(Long userId) {
-        deleteAllLettersByBoxType(RECEIVE, userId);
-    }
-
-    @Transactional
-    public void deleteAllSentLetters(Long userId) {
-        deleteAllLettersByBoxType(SEND, userId);
-    }
-
-
-    private void deleteAllLettersByBoxType(BoxType boxType, Long userId) {
-        if (boxType == NONE || boxType == SEND) {
-            deleteLettersForType(LetterBoxType.of(LETTER, boxType), userId);
-            deleteLettersForType(LetterBoxType.of(REPLY_LETTER, boxType), userId);
+    public void deleteAllLetters(Long userId, BoxType boxType) {
+        if (boxType == null || boxType == SEND) {
+            deleteLettersForType(userId, LetterBoxType.of(LETTER, boxType));
+            deleteLettersForType(userId, LetterBoxType.of(REPLY_LETTER, boxType));
         }
 
-        if (boxType == NONE || boxType == RECEIVE) {
+        if (boxType == null || boxType == RECEIVE) {
             letterBoxUseCase.removeLettersFromBox(userId, LetterBoxType.of(null, RECEIVE));
         }
     }
 
-    private void deleteLettersForType(LetterBoxType letterBoxType, Long userId) {
-        List<Long> ids = getLetterIdsByLetterType(letterBoxType.getLetterType(), userId);
+    private void deleteLettersForType(Long userId, LetterBoxType letterBoxType) {
+        List<Long> ids = getLetterIdsByLetterType(userId, letterBoxType.getLetterType());
         if (!ids.isEmpty()) {
             getDeleteStrategy(letterBoxType).deleteLetters(ids, userId);
         }
     }
 
-    private List<Long> getLetterIdsByLetterType(LetterType letterType, Long userId) {
+    private List<Long> getLetterIdsByLetterType(Long userId, LetterType letterType) {
         return switch (letterType) {
             case LETTER -> letterWithKeywordsUseCase.getLetterIdsByUserId(userId);
             case REPLY_LETTER -> replyLetterUseCase.getIdsByUserId(userId);

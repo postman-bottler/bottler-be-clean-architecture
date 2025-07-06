@@ -16,6 +16,7 @@ import online.bottler.letter.adapter.in.web.request.LetterDeleteRequest;
 import online.bottler.letter.application.facade.LetterBoxFacade;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.response.PageResponse;
+import online.bottler.letter.domain.BoxType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -77,19 +78,19 @@ public class LetterBoxController {
 
     @DeleteMapping("/all")
     public ApiResponse<String> deleteAllSavedLetters(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxFacade.deleteAllLetters(userDetails.getUserId());
+        letterBoxFacade.deleteAllLetters(userDetails.getUserId(), null);
         return ApiResponse.onSuccess("보관된 편지를 모두 삭제했습니다");
     }
 
     @DeleteMapping("/received")
     public ApiResponse<String> deleteAllSavedReceivedLetters(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxFacade.deleteAllReceivedLetters(userDetails.getUserId());
+        letterBoxFacade.deleteAllLetters(userDetails.getUserId(), BoxType.RECEIVE);
         return ApiResponse.onSuccess("받은 편지를 모두 삭제했습니다");
     }
 
     @DeleteMapping("/sent")
     public ApiResponse<String> deleteAllSavedSentLetters(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        letterBoxFacade.deleteAllSentLetters(userDetails.getUserId());
+        letterBoxFacade.deleteAllLetters(userDetails.getUserId(), BoxType.SEND);
         return ApiResponse.onSuccess("보낸 편지를 모두 삭제했습니다.");
     }
 }
