@@ -1,6 +1,5 @@
 package online.bottler.letter.application.service;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.BoxType.RECEIVE;
 import static online.bottler.letter.domain.BoxType.SEND;
 
@@ -11,8 +10,8 @@ import online.bottler.letter.application.command.CommonPageCommand;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.domain.BoxType;
+import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterSummary;
-import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional(readOnly = true)
     @Override
     public Page<LetterSummary> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), NONE);
+        return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), null);
     }
 
     @Transactional(readOnly = true)
@@ -60,10 +59,28 @@ public class LetterBoxService implements LetterBoxUseCase {
         return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), SEND);
     }
 
-    @Transactional
     @Override
-    public void deleteLetter(Long letterId, LetterType letterType, BoxType boxType) {
-        letterBoxPersistencePort.delete(letterId, letterType, boxType);
+    @Transactional
+    public void removeLetterFromBox(Long letterId, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(null, List.of(letterId), letterBoxType);
+    }
+
+    @Override
+    @Transactional
+    public void removeLettersFromBox(List<Long> letterIds, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(null, letterIds, letterBoxType);
+    }
+
+    @Override
+    @Transactional
+    public void removeLettersFromBox(Long userId, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(userId, null, letterBoxType);
+    }
+
+    @Override
+    @Transactional
+    public void removeLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(userId, letterIds, letterBoxType);
     }
 
     @Transactional(readOnly = true)
@@ -76,18 +93,7 @@ public class LetterBoxService implements LetterBoxUseCase {
         return letterBoxPersistencePort.loadLetterBoxSummaries(userId, pageable, boxType);
     }
 
-    @Override
-    public void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType) {
-        letterBoxPersistencePort.deleteAllByUserIdAndBoxType(userId, boxType);
-    }
-
-    @Override
-    public void deleteByTypeAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId) {
-        letterBoxPersistencePort.deleteByConditionAndUserId(ids, letterType, boxType, userId);
-    }
-
-    @Override
-    public void deleteByType(List<Long> ids, LetterType letterType, BoxType boxType) {
-        letterBoxPersistencePort.deleteByCondition(ids, letterType, boxType);
+    private void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
+        letterBoxPersistencePort.deleteLettersFromBox(userId, letterIds, letterBoxType);
     }
 }

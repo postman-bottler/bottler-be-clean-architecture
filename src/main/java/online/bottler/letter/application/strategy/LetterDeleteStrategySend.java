@@ -1,12 +1,12 @@
 package online.bottler.letter.application.strategy;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.LetterType.LETTER;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.port.in.LetterBoxUseCase;
 import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
+import online.bottler.letter.domain.LetterBoxType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +19,6 @@ public class LetterDeleteStrategySend implements LetterDeleteStrategy {
     @Override
     public void deleteLetters(List<Long> ids, Long userId) {
         letterWithKeywordsUseCase.softDeleteByIds(ids);
-        letterBoxUseCase.deleteByType(ids, LETTER, NONE);
+        letterBoxUseCase.removeLettersFromBox(ids, LetterBoxType.of(LETTER, null));
     }
 }

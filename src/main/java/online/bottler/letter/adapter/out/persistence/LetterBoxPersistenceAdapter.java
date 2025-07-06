@@ -17,7 +17,6 @@ import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterSummary;
-import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -31,23 +30,23 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
 
     @Override
     public void createForLetter(Long letterId, Long userId, LocalDateTime createdAt) {
-        save(letterId, userId, LETTER, SEND, createdAt);
+        save(letterId, userId, LetterBoxType.of(LETTER, SEND), createdAt);
     }
 
     @Override
     public void createForReplyLetter(Long letterId, Long userId, Long receiverId, LocalDateTime createdAt) {
-        save(letterId, userId, REPLY_LETTER, SEND, createdAt);
-        save(letterId, receiverId, REPLY_LETTER, RECEIVE, createdAt);
+        save(letterId, userId, LetterBoxType.of(REPLY_LETTER, SEND), createdAt);
+        save(letterId, receiverId, LetterBoxType.of(REPLY_LETTER, RECEIVE), createdAt);
     }
 
     @Override
     public void createForRecommendedLetter(Long letterId, Long userId) {
-        save(letterId, userId, LETTER, SEND, LocalDateTime.now());
+        save(letterId, userId, LetterBoxType.of(LETTER, SEND), LocalDateTime.now());
     }
 
     @Override
     public void createForDeveloperLetter(List<Long> letterIds, Long userId) {
-        letterIds.forEach(letterId -> save(letterId, userId, LETTER, RECEIVE, LocalDateTime.now()));
+        letterIds.forEach(letterId -> save(letterId, userId, LetterBoxType.of(LETTER, RECEIVE), LocalDateTime.now()));
     }
 
     @Override
@@ -63,27 +62,12 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
-    public void delete(Long letterId, LetterType letterType, BoxType boxType) {
-        letterBoxQueryRepository.deleteByCondition(List.of(letterId), letterType, boxType);
+    public void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
+        letterBoxQueryRepository.deleteLetters(userId, letterIds, letterBoxType.getLetterType(), letterBoxType.getBoxType());
     }
 
-    @Override
-    public void deleteByCondition(List<Long> letterIds, LetterType letterType, BoxType boxType) {
-        letterBoxQueryRepository.deleteByCondition(letterIds, letterType, boxType);
-    }
-
-    @Override
-    public void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType) {
-        letterBoxQueryRepository.deleteAllByUserIdAndBoxType(userId, boxType);
-    }
-
-    @Override
-    public void deleteByConditionAndUserId(List<Long> ids, LetterType letterType, BoxType boxType, Long userId) {
-        letterBoxQueryRepository.deleteByConditionAndUserId(ids, LETTER, boxType, userId);
-    }
-
-    private void save(Long letterId, Long userId, LetterType letterType, BoxType boxType, LocalDateTime createdAt) {
+    private void save(Long letterId, Long userId, LetterBoxType letterBoxType, LocalDateTime createdAt) {
         letterBoxJpaRepository.save(
-                LetterBoxEntity.from(LetterBox.create(letterId, userId, LetterBoxType.of(letterType, boxType)))).toDomain();
+                LetterBoxEntity.from(LetterBox.create(userId, letterId, letterBoxType)));
     }
 }

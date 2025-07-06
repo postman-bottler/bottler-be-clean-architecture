@@ -1,31 +1,24 @@
 package online.bottler.letter.application.command;
 
-import static online.bottler.letter.domain.BoxType.NONE;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterDeleteKey;
-import online.bottler.letter.domain.LetterDeleteValues;
-import online.bottler.letter.domain.LetterType;
+import online.bottler.letter.domain.LetterBoxType;
+import online.bottler.letter.domain.LetterDeletion;
 
-public record LetterDeleteCommand(Long letterId, LetterType letterType, BoxType boxType) {
+public record LetterDeleteCommand(Long letterId, LetterBoxType letterBoxType) {
     public static LetterDeleteCommand of(Long letterId, String letterType, String boxType) {
-        return new LetterDeleteCommand(letterId, LetterType.valueOf(letterType), BoxType.valueOf(boxType));
+        return new LetterDeleteCommand(letterId, LetterBoxType.from(letterType, boxType));
     }
 
-    public static Map<LetterDeleteKey, LetterDeleteValues> toLetterDeleteMap(List<LetterDeleteCommand> letterDeleteCommands) {
-        Map<LetterDeleteKey, LetterDeleteValues> groupedLetters = new HashMap<>();
+    public static Map<LetterBoxType, LetterDeletion> toLetterDeleteMap(List<LetterDeleteCommand> letterDeleteCommands) {
+        Map<LetterBoxType, LetterDeletion> groupedLetters = new HashMap<>();
 
         letterDeleteCommands.stream()
-                .filter(command -> command.letterType() != LetterType.NONE && command.boxType() != NONE)
-                .forEach(command -> {
-                    LetterDeleteKey key = LetterDeleteKey.of(command.letterType(), command.boxType());
-                    groupedLetters.computeIfAbsent(key, k -> new LetterDeleteValues(new ArrayList<>()))
-                            .letterIds().add(command.letterId());
-                });
+                .filter(command -> command.letterBoxType.isValid())
+                .forEach(command -> groupedLetters.computeIfAbsent(command.letterBoxType, k -> new LetterDeletion(new ArrayList<>()))
+                        .letterIds().add(command.letterId()));
 
         return groupedLetters;
     }

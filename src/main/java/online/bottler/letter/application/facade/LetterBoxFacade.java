@@ -1,6 +1,5 @@
 package online.bottler.letter.application.facade;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.BoxType.RECEIVE;
 import static online.bottler.letter.domain.BoxType.SEND;
 import static online.bottler.letter.domain.LetterType.LETTER;
@@ -17,8 +16,8 @@ import online.bottler.letter.application.port.in.ReplyLetterUseCase;
 import online.bottler.letter.application.response.LetterSummaryResponse;
 import online.bottler.letter.application.strategy.LetterDeleteStrategy;
 import online.bottler.letter.domain.BoxType;
-import online.bottler.letter.domain.LetterDeleteKey;
-import online.bottler.letter.domain.LetterDeleteValues;
+import online.bottler.letter.domain.LetterBoxType;
+import online.bottler.letter.domain.LetterDeletion;
 import online.bottler.letter.domain.LetterType;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LetterBoxFacade {
 
     private final LetterBoxUseCase letterBoxUseCase;
-    private final Map<LetterDeleteKey, LetterDeleteStrategy> letterDeleteStrategyMap;
+    private final Map<LetterBoxType, LetterDeleteStrategy> letterDeleteStrategyMap;
     private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
     private final ReplyLetterUseCase replyLetterUseCase;
 
@@ -50,54 +49,39 @@ public class LetterBoxFacade {
 
     @Transactional
     public void deleteLetters(List<LetterDeleteCommand> letterDeleteCommands, Long userId) {
-        Map<LetterDeleteKey, LetterDeleteValues> letterDeleteMap = LetterDeleteCommand.toLetterDeleteMap(
+        Map<LetterBoxType, LetterDeletion> letterDeleteMap = LetterDeleteCommand.toLetterDeleteMap(
                 letterDeleteCommands);
+
         letterDeleteMap.forEach((key, value) -> getDeleteStrategy(key).deleteLetters(value.letterIds(), userId));
     }
 
     @Transactional
-    public void deleteAllLetters(Long userId) {
-        deleteAllLettersByBoxType(NONE, userId);
-    }
-
-    @Transactional
-    public void deleteAllReceivedLetters(Long userId) {
-        deleteAllLettersByBoxType(RECEIVE, userId);
-    }
-
-    @Transactional
-    public void deleteAllSentLetters(Long userId) {
-        deleteAllLettersByBoxType(SEND, userId);
-    }
-
-
-    private void deleteAllLettersByBoxType(BoxType boxType, Long userId) {
-        if (boxType == NONE || boxType == SEND) {
-            deleteLettersForType(LetterDeleteKey.of(LETTER, boxType), userId);
-            deleteLettersForType(LetterDeleteKey.of(REPLY_LETTER, boxType), userId);
+    public void deleteAllLetters(Long userId, BoxType boxType) {
+        if (boxType == null || boxType == SEND) {
+            deleteLettersForType(userId, LetterBoxType.of(LETTER, boxType));
+            deleteLettersForType(userId, LetterBoxType.of(REPLY_LETTER, boxType));
         }
 
-        if (boxType == NONE || boxType == RECEIVE) {
-            letterBoxUseCase.deleteAllByUserIdAndBoxType(userId, RECEIVE);
+        if (boxType == null || boxType == RECEIVE) {
+            letterBoxUseCase.removeLettersFromBox(userId, LetterBoxType.of(null, RECEIVE));
         }
     }
 
-    private void deleteLettersForType(LetterDeleteKey letterDeleteKey, Long userId) {
-        List<Long> ids = getLetterIdsByLetterType(letterDeleteKey.letterType(), userId);
+    private void deleteLettersForType(Long userId, LetterBoxType letterBoxType) {
+        List<Long> ids = getLetterIdsByLetterType(userId, letterBoxType.getLetterType());
         if (!ids.isEmpty()) {
-            getDeleteStrategy(letterDeleteKey).deleteLetters(ids, userId);
+            getDeleteStrategy(letterBoxType).deleteLetters(ids, userId);
         }
     }
 
-    private List<Long> getLetterIdsByLetterType(LetterType letterType, Long userId) {
+    private List<Long> getLetterIdsByLetterType(Long userId, LetterType letterType) {
         return switch (letterType) {
             case LETTER -> letterWithKeywordsUseCase.getLetterIdsByUserId(userId);
             case REPLY_LETTER -> replyLetterUseCase.getIdsByUserId(userId);
-            default -> throw new IllegalArgumentException("Unsupported letter type");
         };
     }
 
-    private LetterDeleteStrategy getDeleteStrategy(LetterDeleteKey key) {
-        return letterDeleteStrategyMap.get(key);
+    private LetterDeleteStrategy getDeleteStrategy(LetterBoxType letterBoxType) {
+        return letterDeleteStrategyMap.get(letterBoxType);
     }
 }
