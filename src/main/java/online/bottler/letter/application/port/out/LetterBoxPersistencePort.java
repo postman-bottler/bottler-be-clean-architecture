@@ -21,6 +21,8 @@ public interface LetterBoxPersistencePort {
 
     boolean existsByLetterIdAndUserId(Long letterId, Long userId);
 
+    void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType);
+
     void delete(Long letterId, LetterBoxType letterBoxType);
 
     void deleteByCondition(List<Long> letterIds, LetterBoxType letterBoxType);

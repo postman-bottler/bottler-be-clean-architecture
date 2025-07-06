@@ -62,6 +62,11 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
+    public void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
+        letterBoxQueryRepository.deleteLetters(userId, letterIds, letterBoxType.getLetterType(), letterBoxType.getBoxType());
+    }
+
+    @Override
     public void delete(Long letterId, LetterBoxType letterBoxType) {
         letterBoxQueryRepository.deleteByCondition(List.of(letterId), letterBoxType.getLetterType(), letterBoxType.getBoxType());
     }
