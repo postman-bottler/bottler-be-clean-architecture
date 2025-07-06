@@ -1,6 +1,5 @@
 package online.bottler.letter.application.facade;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.LetterType.LETTER;
 
 import java.util.List;
@@ -66,6 +65,6 @@ public class LetterWithKeywordsFacade {
     @Transactional
     public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
         letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteCommand);
-        letterBoxUseCase.removeLetterFromBox(letterWithKeywordsDeleteCommand.letterId(), LetterBoxType.of(LETTER, NONE));
+        letterBoxUseCase.removeLetterFromBox(letterWithKeywordsDeleteCommand.letterId(), LetterBoxType.of(LETTER, null));
     }
 }

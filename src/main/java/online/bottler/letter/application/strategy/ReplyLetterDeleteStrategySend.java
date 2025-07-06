@@ -1,6 +1,5 @@
 package online.bottler.letter.application.strategy;
 
-import static online.bottler.letter.domain.BoxType.NONE;
 import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
                 replyLetter.getId(), replyLetter.getLabel()));
 
         replyLetterUseCase.softDeleteByIds(ids);
-        letterBoxUseCase.removeLettersFromBox(ids, LetterBoxType.of(REPLY_LETTER, NONE));
+        letterBoxUseCase.removeLettersFromBox(ids, LetterBoxType.of(REPLY_LETTER, null));
     }
 
     private void validateReplyLetterOwnerShip(Long userId, List<ReplyLetter> replyLetters) {
