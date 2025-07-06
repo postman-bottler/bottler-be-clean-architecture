@@ -30,7 +30,7 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
                 replyLetter.getId(), replyLetter.getLabel()));
 
         replyLetterUseCase.softDeleteByIds(ids);
-        letterBoxUseCase.deleteByType(ids, LetterBoxType.of(REPLY_LETTER, NONE));
+        letterBoxUseCase.removeLettersFromBox(ids, LetterBoxType.of(REPLY_LETTER, NONE));
     }
 
     private void validateReplyLetterOwnerShip(Long userId, List<ReplyLetter> replyLetters) {

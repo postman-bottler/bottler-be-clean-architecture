@@ -78,7 +78,7 @@ public class LetterBoxFacade {
         }
 
         if (boxType == NONE || boxType == RECEIVE) {
-            letterBoxUseCase.deleteAllByUserIdAndBoxType(userId, RECEIVE);
+            letterBoxUseCase.removeLettersFromBox(userId, LetterBoxType.of(null, RECEIVE));
         }
     }
 

@@ -60,10 +60,28 @@ public class LetterBoxService implements LetterBoxUseCase {
         return getLetterBoxSummaries(userId, commonPageCommand.toPageable(), SEND);
     }
 
-    @Transactional
     @Override
-    public void deleteLetter(Long letterId, LetterBoxType letterBoxType) {
-        letterBoxPersistencePort.delete(letterId, letterBoxType);
+    @Transactional
+    public void removeLetterFromBox(Long letterId, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(null, List.of(letterId), letterBoxType);
+    }
+
+    @Override
+    @Transactional
+    public void removeLettersFromBox(List<Long> letterIds, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(null, letterIds, letterBoxType);
+    }
+
+    @Override
+    @Transactional
+    public void removeLettersFromBox(Long userId, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(userId, null, letterBoxType);
+    }
+
+    @Override
+    @Transactional
+    public void removeLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
+        deleteLettersFromBox(userId, letterIds, letterBoxType);
     }
 
     @Transactional(readOnly = true)
@@ -76,18 +94,7 @@ public class LetterBoxService implements LetterBoxUseCase {
         return letterBoxPersistencePort.loadLetterBoxSummaries(userId, pageable, boxType);
     }
 
-    @Override
-    public void deleteAllByUserIdAndBoxType(Long userId, BoxType boxType) {
-        letterBoxPersistencePort.deleteAllByUserIdAndBoxType(userId, boxType);
-    }
-
-    @Override
-    public void deleteByTypeAndUserId(List<Long> ids, LetterBoxType letterBoxType, Long userId) {
-        letterBoxPersistencePort.deleteByConditionAndUserId(ids, letterBoxType, userId);
-    }
-
-    @Override
-    public void deleteByType(List<Long> ids, LetterBoxType letterBoxType) {
-        letterBoxPersistencePort.deleteByCondition(ids, letterBoxType);
+    private void deleteLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
+        letterBoxPersistencePort.deleteLettersFromBox(userId, letterIds, letterBoxType);
     }
 }
