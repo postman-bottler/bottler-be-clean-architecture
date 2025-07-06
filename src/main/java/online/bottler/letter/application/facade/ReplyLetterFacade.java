@@ -55,15 +55,15 @@ public class ReplyLetterFacade {
 
     @Transactional(readOnly = true)
     public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
-        validateUserAccess(replyLetterSummariesQuery.letterId(), replyLetterSummariesQuery.userId());
+        validateUserAccess(replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.letterId());
         return replyLetterUseCase.getSummaries(replyLetterSummariesQuery).map(ReplyLetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
     public ReplyLetterDetailResponse getDetail(Long id, Long userId) {
-        validateUserAccess(id, userId);
+        validateUserAccess(userId, id);
         ReplyLetter replyLetter = replyLetterUseCase.get(id);
-        boolean isReplied = replyLetterUseCase.isReplied(id, userId);
+        boolean isReplied = replyLetterUseCase.isReplied(userId, id);
         return ReplyLetterDetailResponse.from(replyLetter, isReplied);
     }
 
@@ -75,8 +75,8 @@ public class ReplyLetterFacade {
         recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
     }
 
-    private void validateUserAccess(Long letterId, Long userId) {
-        if (letterBoxUseCase.isAccessDenied(letterId, userId)) {
+    private void validateUserAccess(Long userId, Long letterId) {
+        if (letterBoxUseCase.isAccessDenied(userId, letterId)) {
             throw new UnauthorizedLetterAccessException();
         }
     }

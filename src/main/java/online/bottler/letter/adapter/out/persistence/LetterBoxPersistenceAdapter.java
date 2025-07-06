@@ -57,8 +57,8 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
-    public boolean existsByLetterIdAndUserId(Long letterId, Long userId) {
-        return letterBoxJpaRepository.existsByLetterIdAndUserId(letterId, userId);
+    public boolean existsByUserIdAndLetterId(Long userId, Long letterId) {
+        return letterBoxJpaRepository.existsByUserIdAndLetterId(userId, letterId);
     }
 
     @Override

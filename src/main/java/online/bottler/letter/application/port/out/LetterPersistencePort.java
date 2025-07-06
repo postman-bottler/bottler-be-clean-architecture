@@ -8,15 +8,15 @@ import online.bottler.letter.domain.LetterStatus;
 public interface LetterPersistencePort {
     Letter create(Letter letter);
 
-    Optional<Letter> loadById(Long letterId);
-
-    List<Letter> loadAllIncludingDeletedByIds(List<Long> letterIds);
+    Optional<Letter> loadByIdAndStatus(Long letterId, LetterStatus status);
 
     List<Long> loadIdsByUserId(Long userId);
 
     List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds);
 
     boolean existsById(Long letterId);
+
+    List<Letter> loadAllByIdIn(List<Long> letterIds);
 
     List<Letter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus letterStatus);
 

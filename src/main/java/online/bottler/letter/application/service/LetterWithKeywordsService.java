@@ -9,6 +9,7 @@ import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.BlockLetterUseCase;
 import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
+import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.application.port.out.LetterKeywordPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.domain.Letter;
@@ -17,6 +18,7 @@ import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.LetterWithKeywords;
 import online.bottler.letter.exception.LetterAuthorMismatchException;
 import online.bottler.letter.exception.LetterNotFoundException;
+import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, BlockLetterUseCase {
 
     private final LetterPersistencePort letterPersistencePort;
+    private final LetterBoxPersistencePort letterBoxPersistencePort;
     private final LetterKeywordPersistencePort letterKeywordPersistencePort;
 
     @Transactional
@@ -35,11 +38,14 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     @Transactional(readOnly = true)
     @Override
-    public LetterWithKeywords get(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
+    public LetterWithKeywords getOne(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
+        validateUserAccess(letterWithKeywordsDetailQuery.userId(), letterWithKeywordsDetailQuery.letterId());
+
         Letter letter = loadLetterById(letterWithKeywordsDetailQuery.letterId());
-        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadKeywordsByLetterId(
-                letterWithKeywordsDetailQuery.letterId());
-        return LetterWithKeywords.create(letter, letterKeywords.stream().map(LetterKeyword::getKeyword).toList());
+
+        List<String> letterKeywords = letterKeywordPersistencePort.loadKeywordsByLetterIdAndStatus(letter.getId(), LetterStatus.OPEN);
+
+        return LetterWithKeywords.create(letter, letterKeywords);
     }
 
     @Transactional(readOnly = true)
@@ -74,8 +80,8 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     @Transactional(readOnly = true)
     @Override
-    public List<Letter> loadAllIncludingDeletedByIds(List<Long> letterIds) {
-        return letterPersistencePort.loadAllIncludingDeletedByIds(letterIds);
+    public List<Letter> getLettersIncludingAllStatusByIdIn(List<Long> letterIds) {
+        return letterPersistencePort.loadAllByIdIn(letterIds);
     }
 
     @Override
@@ -111,12 +117,23 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     }
 
     private Letter loadLetterById(Long letterId) {
-        return letterPersistencePort.loadById(letterId)
+        return letterPersistencePort.loadByIdAndStatus(letterId, LetterStatus.OPEN)
                 .orElseThrow(() -> new LetterNotFoundException(LETTER));
     }
 
     private List<Letter> loadLetterByIds(List<Long> ids) {
         return letterPersistencePort.loadAllByIdInAndStatus(ids, LetterStatus.OPEN);
+    }
+
+
+    private void validateUserAccess(Long userId, Long letterId) {
+        if (!isLetterInBox(userId, letterId)) {
+            throw new UnauthorizedLetterAccessException();
+        }
+    }
+
+    private boolean isLetterInBox(Long userId, Long letterId) {
+        return letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
     private void deleteLetterWithKeywords(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {

@@ -56,9 +56,14 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Transactional(readOnly = true)
     @Override
-    public boolean isReplied(Long letterId, Long userId) {
-        return replyLetterPersistencePort.existsByLetterIdAndUserId(letterId, userId);
+    public boolean isReplied(Long userId, Long letterId) {
+        return hasReplyLetter(userId, letterId);
     }
+
+    private boolean hasReplyLetter(Long userId, Long letterId) {
+        return replyLetterPersistencePort.existsByUserIdAndLetterId(userId, letterId);
+    }
+
 
     @Transactional(readOnly = true)
     @Override

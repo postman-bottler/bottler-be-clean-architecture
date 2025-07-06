@@ -25,16 +25,8 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public Optional<Letter> loadById(Long id) {
-        return letterJpaRepository.findByIdAndStatus(id, LetterStatus.OPEN).map(LetterEntity::toDomain);
-    }
-
-    @Override
-    public List<Letter> loadAllIncludingDeletedByIds(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return LetterEntity.toDomainList(letterJpaRepository.findAllIncludingDeletedByIds(ids));
+    public Optional<Letter> loadByIdAndStatus(Long id, LetterStatus status) {
+        return letterJpaRepository.findByIdAndStatus(id, status).map(LetterEntity::toDomain);
     }
 
     @Override
@@ -67,6 +59,14 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     @Override
     public boolean existsById(Long id) {
         return letterJpaRepository.existsById(id);
+    }
+
+    @Override
+    public List<Letter> loadAllByIdIn(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return LetterEntity.toDomainList(letterJpaRepository.findAllByIdIn(ids));
     }
 
     @Override

@@ -29,5 +29,5 @@ public interface ReplyLetterJpaRepository extends JpaRepository<ReplyLetterEntit
 
     List<ReplyLetterEntity> findAllByIdInAndStatus(Collection<Long> ids, LetterStatus status);
 
-    boolean existsByLetterIdAndSenderId(Long letterId, Long senderId);
+    boolean existsBySenderIdAndLetterId(Long senderId, Long letterId);
 }

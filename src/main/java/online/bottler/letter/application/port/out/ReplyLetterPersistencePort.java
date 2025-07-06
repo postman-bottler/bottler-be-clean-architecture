@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ReplyLetterPersistencePort {
-    boolean existsByLetterIdAndUserId(Long letterId, Long userId);
+    boolean existsByUserIdAndLetterId(Long userId, Long letterId);
 
     ReplyLetter create(ReplyLetter replyLetter);
 
