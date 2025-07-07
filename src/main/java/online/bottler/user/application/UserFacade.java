@@ -63,7 +63,7 @@ public class UserFacade {
 
         List<Long> randomDevelopLetter = findRandomDevelopLetter();
         recommendUseCase.saveDeveloperLetter(storedUser.getUserId(), randomDevelopLetter);
-        letterBoxUseCase.save(randomDevelopLetter, storedUser.getUserId());
+        letterBoxUseCase.archiveLetters(randomDevelopLetter, storedUser.getUserId());
     }
 
     @Transactional

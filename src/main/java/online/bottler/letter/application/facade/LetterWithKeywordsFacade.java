@@ -36,7 +36,7 @@ public class LetterWithKeywordsFacade {
     @Transactional
     public LetterWithKeywordsResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
         Letter letter = letterWithKeywordsUseCase.create(letterWithKeywordsCommand);
-        letterBoxUseCase.createForLetter(letter.getId(), letter.getUserId(), letter.getCreatedAt());
+        letterBoxUseCase.archiveLetter(letter);
         return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, letterWithKeywordsCommand.keywords()));
     }
 

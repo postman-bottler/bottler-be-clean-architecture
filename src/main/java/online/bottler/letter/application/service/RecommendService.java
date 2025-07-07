@@ -13,6 +13,10 @@ import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.application.port.out.RecommendationCachePort;
 import online.bottler.letter.application.port.out.RecommendedLetterPersistencePort;
 import online.bottler.letter.application.port.out.UserKeywordPersistencePort;
+import online.bottler.letter.domain.BoxType;
+import online.bottler.letter.domain.LetterBox;
+import online.bottler.letter.domain.LetterBoxType;
+import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.RecommendedLetter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -123,7 +127,8 @@ public class RecommendService implements RecommendUseCase {
 
     private void updateRecommendation(Long userId, Long recommendId) {
         recommendationCachePort.updateActiveRecommendations(userId, recommendId);
-        letterBoxPersistencePort.createForRecommendedLetter(recommendId, userId);
+        letterBoxPersistencePort.save(
+                LetterBox.create(userId, recommendId, LetterBoxType.of(LetterType.LETTER, BoxType.RECEIVE)));
         recommendedLetterPersistencePort.create(RecommendedLetter.create(userId, recommendId));
     }
 }
