@@ -24,7 +24,7 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
 
     @Override
     public void save(LetterBox letterBox) {
-        letterBoxJpaRepository.save(LetterBoxEntity.from(letterBox)).toDomain();
+        letterBoxJpaRepository.save(LetterBoxEntity.from(letterBox));
     }
 
     @Override
