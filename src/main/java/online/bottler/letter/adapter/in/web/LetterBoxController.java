@@ -42,7 +42,7 @@ public class LetterBoxController {
                                                                           BindingResult bindingResult,
                                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(
-                PageResponse.from(letterBoxFacade.getAllLetters(commonPageRequest.toCommand(), userDetails.getUserId())));
+                PageResponse.from(letterBoxFacade.getLetters(userDetails.getUserId(), null, commonPageRequest.toCommand())));
     }
 
     @Operation(summary = "보낸 편지 조회", description = "페이지네이션을 사용하여 보관된 보낸 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
@@ -53,7 +53,7 @@ public class LetterBoxController {
                                                                            BindingResult bindingResult,
                                                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(
-                PageResponse.from(letterBoxFacade.getSentLetters(commonPageRequest.toCommand(), userDetails.getUserId())));
+                PageResponse.from(letterBoxFacade.getLetters(userDetails.getUserId(), BoxType.SEND, commonPageRequest.toCommand())));
     }
 
     @Operation(summary = "받은 편지 조회", description = "페이지네이션을 사용하여 보관된 받은 편지의 제목, 라벨이미지, 작성날짜 정보를 조회합니다."
@@ -63,8 +63,8 @@ public class LetterBoxController {
     public ApiResponse<PageResponse<LetterSummaryResponse>> getReceivedLetters(
             @Valid CommonPageRequest commonPageRequest, BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(PageResponse.from(
-                letterBoxFacade.getReceivedLetters(commonPageRequest.toCommand(), userDetails.getUserId())));
+        return ApiResponse.onSuccess(
+                PageResponse.from(letterBoxFacade.getLetters(userDetails.getUserId(), BoxType.RECEIVE, commonPageRequest.toCommand())));
     }
 
     @Operation(summary = "보관된 편지 삭제", description = "편지ID, 편지타입(LETTER, REPLY_LETTER), 송수신 타입(SEND, RECEIVE)을 기반으로 키워드 편지를 삭제합니다.")

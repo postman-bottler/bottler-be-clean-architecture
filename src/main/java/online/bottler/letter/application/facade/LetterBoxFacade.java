@@ -33,18 +33,9 @@ public class LetterBoxFacade {
     private final ReplyLetterUseCase replyLetterUseCase;
 
     @Transactional(readOnly = true)
-    public Page<LetterSummaryResponse> getAllLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return letterBoxUseCase.getAllLetters(commonPageCommand, userId).map(LetterSummaryResponse::from);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<LetterSummaryResponse> getReceivedLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return letterBoxUseCase.getReceivedLetters(commonPageCommand, userId).map(LetterSummaryResponse::from);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<LetterSummaryResponse> getSentLetters(CommonPageCommand commonPageCommand, Long userId) {
-        return letterBoxUseCase.getSentLetters(commonPageCommand, userId).map(LetterSummaryResponse::from);
+    public Page<LetterSummaryResponse> getLetters(Long userId, BoxType boxType, CommonPageCommand commonPageCommand) {
+        return letterBoxUseCase.getLetterBoxSummaries(userId, boxType, commonPageCommand)
+                .map(LetterSummaryResponse::from);
     }
 
     @Transactional
@@ -68,9 +59,10 @@ public class LetterBoxFacade {
     }
 
     private void deleteLettersForType(Long userId, LetterBoxType letterBoxType) {
-        List<Long> ids = getLetterIdsByLetterType(userId, letterBoxType.getLetterType());
-        if (!ids.isEmpty()) {
-            getDeleteStrategy(letterBoxType).deleteLetters(ids, userId);
+        List<Long> letterIds = getLetterIdsByLetterType(userId, letterBoxType.getLetterType());
+
+        if (!letterIds.isEmpty()) {
+            getDeleteStrategy(letterBoxType).deleteLetters(letterIds, userId);
         }
     }
 

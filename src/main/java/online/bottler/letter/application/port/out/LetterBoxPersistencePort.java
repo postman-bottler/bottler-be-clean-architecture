@@ -17,7 +17,7 @@ public interface LetterBoxPersistencePort {
 
     void createForDeveloperLetter(List<Long> letterId, Long userId);
 
-    Page<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType);
+    Page<LetterSummary> loadLetterBoxSummaries(Long userId, BoxType boxType, Pageable pageable);
 
     boolean existsByUserIdAndLetterId(Long userId, Long letterId);
 
