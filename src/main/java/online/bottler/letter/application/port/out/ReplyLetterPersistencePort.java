@@ -8,13 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ReplyLetterPersistencePort {
-    boolean existsByUserIdAndLetterId(Long userId, Long letterId);
+    boolean existsBySenderIdAndLetterId(Long userId, Long letterId);
 
     ReplyLetter save(ReplyLetter replyLetter);
 
-    Page<ReplyLetter> loadSummariesByLetterIdAndReceiverId(Long letterId, Long receiverId, Pageable pageable);
+    Page<ReplyLetter> loadAllByReceiverIdAndLetterIdAndStatus(Long receiverId, Long letterId, LetterStatus status, Pageable pageable);
 
-    Optional<ReplyLetter> loadById(Long id);
+    Optional<ReplyLetter> loadByIdAndStatus(Long id, LetterStatus status);
 
     List<Long> loadIdsByUserId(Long userId);
 

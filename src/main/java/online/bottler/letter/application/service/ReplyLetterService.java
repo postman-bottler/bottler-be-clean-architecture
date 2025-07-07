@@ -10,6 +10,7 @@ import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
 import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
 import online.bottler.letter.application.port.in.BlockReplyLetterUseCase;
 import online.bottler.letter.application.port.in.ReplyLetterUseCase;
+import online.bottler.letter.application.port.out.LetterBoxPersistencePort;
 import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
 import online.bottler.letter.domain.Letter;
@@ -17,6 +18,7 @@ import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.ReplyLetter;
 import online.bottler.letter.exception.DuplicateReplyLetterException;
 import online.bottler.letter.exception.LetterNotFoundException;
+import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     private final ReplyLetterPersistencePort replyLetterPersistencePort;
     private final LetterPersistencePort letterPersistencePort;
+    private final LetterBoxPersistencePort letterBoxPersistencePort;
 
     @Transactional
     @Override
@@ -42,14 +45,18 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Transactional(readOnly = true)
     @Override
-    public Page<ReplyLetter> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
-        return replyLetterPersistencePort.loadSummariesByLetterIdAndReceiverId(replyLetterSummariesQuery.letterId(),
-                        replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.commonPageCommand().toPageable());
+    public Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
+        validateUserAccess(replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.letterId());
+
+        return replyLetterPersistencePort.loadAllByReceiverIdAndLetterIdAndStatus(replyLetterSummariesQuery.userId(),
+                replyLetterSummariesQuery.letterId(), OPEN, replyLetterSummariesQuery.commonPageCommand().toPageable());
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ReplyLetter get(Long id) {
+    public ReplyLetter getReplyLetter(Long userId, Long id) {
+        validateUserAccess(userId, id);
+
         return findReplyLetter(id);
     }
 
@@ -68,7 +75,6 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     public boolean isReplied(Long userId, Long letterId) {
         return hasReplyLetter(userId, letterId);
     }
-
 
     @Transactional(readOnly = true)
     @Override
@@ -105,7 +111,17 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     }
 
     private boolean hasReplyLetter(Long userId, Long letterId) {
-        return replyLetterPersistencePort.existsByUserIdAndLetterId(userId, letterId);
+        return replyLetterPersistencePort.existsBySenderIdAndLetterId(userId, letterId);
+    }
+
+    private void validateUserAccess(Long userId, Long letterId) {
+        if (!isLetterInBox(userId, letterId)) {
+            throw new UnauthorizedLetterAccessException();
+        }
+    }
+
+    private boolean isLetterInBox(Long userId, Long letterId) {
+        return letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
     private Letter getLetter(ReplyLetterCommand replyLetterCommand) {
@@ -114,7 +130,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     }
 
     private ReplyLetter findReplyLetter(Long id) {
-        return replyLetterPersistencePort.loadById(id)
+        return replyLetterPersistencePort.loadByIdAndStatus(id, OPEN)
                 .orElseThrow(() -> new LetterNotFoundException(REPLY_LETTER));
     }
 }

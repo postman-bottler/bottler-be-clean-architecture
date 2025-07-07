@@ -19,7 +19,7 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     private final ReplyLetterJpaRepository replyLetterJpaRepository;
 
     @Override
-    public boolean existsByUserIdAndLetterId(Long userId, Long letterId) {
+    public boolean existsBySenderIdAndLetterId(Long userId, Long letterId) {
         return replyLetterJpaRepository.existsBySenderIdAndLetterId(userId, letterId);
     }
 
@@ -29,14 +29,14 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public Page<ReplyLetter> loadSummariesByLetterIdAndReceiverId(Long letterId, Long receiverId, Pageable pageable) {
-        return replyLetterJpaRepository.findAllByLetterIdAndReceiverId(letterId, receiverId, pageable, LetterStatus.OPEN)
+    public Page<ReplyLetter> loadAllByReceiverIdAndLetterIdAndStatus(Long receiverId, Long letterId, LetterStatus status, Pageable pageable) {
+        return replyLetterJpaRepository.findAllByReceiverIdAndLetterIdAndStatus(receiverId, letterId, status, pageable)
                 .map(ReplyLetterEntity::toDomain);
     }
 
     @Override
-    public Optional<ReplyLetter> loadById(Long id) {
-        return replyLetterJpaRepository.findById(id).map(ReplyLetterEntity::toDomain);
+    public Optional<ReplyLetter> loadByIdAndStatus(Long id, LetterStatus status) {
+        return replyLetterJpaRepository.findByIdAndStatus(id, status).map(ReplyLetterEntity::toDomain);
     }
 
     @Override
