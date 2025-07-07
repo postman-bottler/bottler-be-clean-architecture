@@ -28,9 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class LetterBoxFacade {
 
     private final LetterBoxUseCase letterBoxUseCase;
-    private final Map<LetterBoxType, LetterDeleteStrategy> letterDeleteStrategyMap;
     private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
     private final ReplyLetterUseCase replyLetterUseCase;
+
+    private final Map<LetterBoxType, LetterDeleteStrategy> letterDeleteStrategyMap;
 
     @Transactional(readOnly = true)
     public Page<LetterSummaryResponse> getLetters(Long userId, String boxType, CommonPageCommand commonPageCommand) {

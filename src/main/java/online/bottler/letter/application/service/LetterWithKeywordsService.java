@@ -32,13 +32,13 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
 
     @Transactional
     @Override
-    public Letter create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
+    public Letter write(LetterWithKeywordsCommand letterWithKeywordsCommand) {
         return createLetterWithKeywords(letterWithKeywordsCommand);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public LetterWithKeywords getOne(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
+    public LetterWithKeywords getLetterWithKeywords(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
         validateUserAccess(letterWithKeywordsDetailQuery.userId(), letterWithKeywordsDetailQuery.letterId());
 
         Letter letter = loadLetterById(letterWithKeywordsDetailQuery.letterId());
@@ -64,12 +64,6 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         }
 
         deleteLetterWithKeywords(letterWithKeywordsDeleteCommand);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Letter getLetter(Long letterId) {
-        return loadLetterById(letterId);
     }
 
     @Transactional(readOnly = true)

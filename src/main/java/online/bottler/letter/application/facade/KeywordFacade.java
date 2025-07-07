@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class KeywordFacade {
 
-    private final UserKeywordUseCase userKeywordUseCase;
     private final KeywordUseCase keywordUseCase;
+    private final UserKeywordUseCase userKeywordUseCase;
     private final LetterKeywordUseCase letterKeywordUseCase;
     private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
 
@@ -40,6 +40,7 @@ public class KeywordFacade {
     @Transactional(readOnly = true)
     public FrequentKeywordsResponse getTopFrequentKeywords(Long userId) {
         List<Long> letterIds = letterWithKeywordsUseCase.getLetterIdsByUserId(userId);
+
         return FrequentKeywordsResponse.from(letterKeywordUseCase.getTopFrequent(letterIds, userId));
     }
 }

@@ -27,28 +27,31 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LetterWithKeywordsFacade {
 
-    private final UserUseCase userUseCase;
     private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
     private final ReplyLetterUseCase replyLetterUseCase;
     private final LetterBoxUseCase letterBoxUseCase;
     private final RecommendUseCase recommendUseCase;
+    private final UserUseCase userUseCase;
 
     @Transactional
     public LetterWithKeywordsResponse create(LetterWithKeywordsCommand letterWithKeywordsCommand) {
-        Letter letter = letterWithKeywordsUseCase.create(letterWithKeywordsCommand);
+        Letter letter = letterWithKeywordsUseCase.write(letterWithKeywordsCommand);
+
         letterBoxUseCase.archiveLetter(letter);
+
         return LetterWithKeywordsResponse.from(LetterWithKeywords.create(letter, letterWithKeywordsCommand.keywords()));
     }
 
     @Transactional(readOnly = true)
     public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
-        LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.getOne(letterWithKeywordsDetailQuery);
+        LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.getLetterWithKeywords(letterWithKeywordsDetailQuery);
 
         String profile = userUseCase.findById(letterWithKeywords.getUserId()).getImageUrl();
 
         boolean isOwner = letterWithKeywords.isOwner(letterWithKeywordsDetailQuery.userId());
 
-        boolean isReplied = replyLetterUseCase.isReplied(letterWithKeywordsDetailQuery.userId(), letterWithKeywordsDetailQuery.letterId());
+        boolean isReplied = replyLetterUseCase.isReplied(letterWithKeywordsDetailQuery.userId(),
+                letterWithKeywordsDetailQuery.letterId());
 
         return LetterWithKeywordsDetailResponse.of(letterWithKeywords, profile, isOwner, isReplied);
     }
@@ -65,6 +68,8 @@ public class LetterWithKeywordsFacade {
     @Transactional
     public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
         letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteCommand);
-        letterBoxUseCase.removeLetterFromBox(letterWithKeywordsDeleteCommand.letterId(), LetterBoxType.of(LETTER, null));
+
+        letterBoxUseCase.removeLetterFromBox(letterWithKeywordsDeleteCommand.letterId(),
+                LetterBoxType.of(LETTER, null));
     }
 }
