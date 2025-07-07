@@ -45,7 +45,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Transactional(readOnly = true)
     @Override
-    public Page<ReplyLetter> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
+    public Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
         validateUserAccess(replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.letterId());
 
         return replyLetterPersistencePort.loadSummariesByLetterIdAndReceiverId(replyLetterSummariesQuery.letterId(),
@@ -54,7 +54,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Transactional(readOnly = true)
     @Override
-    public ReplyLetter get(Long userId, Long id) {
+    public ReplyLetter getReplyLetter(Long userId, Long id) {
         validateUserAccess(userId, id);
 
         return findReplyLetter(id);

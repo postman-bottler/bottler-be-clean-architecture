@@ -45,13 +45,15 @@ public class ReplyLetterFacade {
 
     @Transactional(readOnly = true)
     public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
-        return replyLetterUseCase.getSummaries(replyLetterSummariesQuery).map(ReplyLetterSummaryResponse::from);
+        return replyLetterUseCase.getPagedReplyLetters(replyLetterSummariesQuery).map(ReplyLetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
     public ReplyLetterDetailResponse getDetail(Long id, Long userId) {
-        ReplyLetter replyLetter = replyLetterUseCase.get(userId, id);
+        ReplyLetter replyLetter = replyLetterUseCase.getReplyLetter(userId, id);
+
         boolean isReplied = replyLetterUseCase.isReplied(userId, id);
+
         return ReplyLetterDetailResponse.from(replyLetter, isReplied);
     }
 

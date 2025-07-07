@@ -10,9 +10,9 @@ import org.springframework.data.domain.Page;
 public interface ReplyLetterUseCase {
     ReplyLetter write(ReplyLetterCommand replyLetterCommand);
 
-    Page<ReplyLetter> getSummaries(ReplyLetterSummariesQuery query);
+    Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery query);
 
-    ReplyLetter get(Long userId, Long id);
+    ReplyLetter getReplyLetter(Long userId, Long id);
 
     ReplyLetter softDelete(ReplyLetterDeleteCommand command);
 
