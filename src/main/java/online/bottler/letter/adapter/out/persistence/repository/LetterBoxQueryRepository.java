@@ -31,14 +31,16 @@ public class LetterBoxQueryRepository {
         QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
 
         QLetterEntity letter = QLetterEntity.letterEntity;
+        QLetterContentEntity letterContent = letter.letterContentEntity;
 
         QReplyLetterEntity replyLetter = QReplyLetterEntity.replyLetterEntity;
+        QLetterContentEntity replyLetterContent = replyLetter.letterContentEntity;
 
 
-        StringExpression letterTitle = getLetterTitle(letterBox, letter, replyLetter);
-        StringExpression letterLabel = getLetterLabel(letterBox, letter, replyLetter);
+        StringExpression letterTitle = getLetterTitle(letterBoxType, letterContent, replyLetterContent);
+        StringExpression letterLabel = getLetterLabel(letterBoxType, letterContent, replyLetterContent);
 
-        BooleanBuilder condition = buildFetchCondition(userId, boxType);
+        BooleanBuilder condition = buildFetchCondition(userId, letterBox, letterBoxType, boxType);
 
         List<LetterSummaryProjection> letterSummaryProjections = queryFactory
                 .select(Projections.constructor(
@@ -61,20 +63,20 @@ public class LetterBoxQueryRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = countLetters(userId, boxType);
+        long total = countLetters(condition);
 
         return new PageImpl<>(letterSummaryProjections, pageable, total);
     }
 
-    public long countLetters(Long userId, BoxType boxType) {
+    private long countLetters(BooleanBuilder condition) {
         QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        BooleanBuilder condition = buildFetchCondition(userId, boxType);
 
         Long count = queryFactory
                 .select(letterBox.id.count())
                 .from(letterBox)
                 .where(condition)
                 .fetchOne();
+
         return count != null ? count : 0L;
     }
 
@@ -88,31 +90,23 @@ public class LetterBoxQueryRepository {
                 .execute();
     }
 
-    private StringExpression getLetterTitle(QLetterBoxEntity letterBox, QLetterEntity letter,
-                                            QReplyLetterEntity replyLetter) {
-        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
-        QLetterContentEntity letterContent = letter.letterContentEntity;
-        QLetterContentEntity replyLetterContent = replyLetter.letterContentEntity;
+    private StringExpression getLetterTitle(QLetterBoxTypeEntity letterBoxType, QLetterContentEntity letterContent,
+                                            QLetterContentEntity replyLetterContent) {
         return new CaseBuilder()
                 .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letterContent.title)
                 .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetterContent.title)
                 .otherwise("Unknown Title");
     }
 
-    private StringExpression getLetterLabel(QLetterBoxEntity letterBox, QLetterEntity letter,
-                                            QReplyLetterEntity replyLetter) {
-        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
-        QLetterContentEntity letterContent = letter.letterContentEntity;
-        QLetterContentEntity replyLetterContent = replyLetter.letterContentEntity;
+    private StringExpression getLetterLabel(QLetterBoxTypeEntity letterBoxType, QLetterContentEntity letterContent,
+                                            QLetterContentEntity replyLetterContent) {
         return new CaseBuilder()
                 .when(letterBoxType.letterType.eq(LetterType.LETTER)).then(letterContent.label)
                 .when(letterBoxType.letterType.eq(LetterType.REPLY_LETTER)).then(replyLetterContent.label)
                 .otherwise("Unknown Label");
     }
 
-    private BooleanBuilder buildFetchCondition(Long userId, BoxType boxType) {
-        QLetterBoxEntity letterBox = QLetterBoxEntity.letterBoxEntity;
-        QLetterBoxTypeEntity letterBoxType = letterBox.letterBoxTypeEntity;
+    private BooleanBuilder buildFetchCondition(Long userId, QLetterBoxEntity letterBox, QLetterBoxTypeEntity letterBoxType, BoxType boxType) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(letterBox.userId.eq(userId));
 

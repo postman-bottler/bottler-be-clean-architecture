@@ -50,7 +50,7 @@ public class LetterBoxPersistenceAdapter implements LetterBoxPersistencePort {
     }
 
     @Override
-    public Page<LetterSummary> loadLetterBoxSummaries(Long userId, Pageable pageable, BoxType boxType) {
+    public Page<LetterSummary> loadLetterBoxSummaries(Long userId, BoxType boxType, Pageable pageable) {
         Page<LetterSummaryProjection> letterSummaryProjections = letterBoxQueryRepository.fetchLetterSummariesByUserIdAndBoxType(
                 userId, boxType, pageable);
         return letterSummaryProjections.map(LetterSummaryProjection::toDomain);
