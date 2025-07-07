@@ -48,8 +48,8 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     public Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
         validateUserAccess(replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.letterId());
 
-        return replyLetterPersistencePort.loadSummariesByLetterIdAndReceiverId(replyLetterSummariesQuery.letterId(),
-                replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.commonPageCommand().toPageable());
+        return replyLetterPersistencePort.loadAllByReceiverIdAndLetterIdAndStatus(replyLetterSummariesQuery.userId(),
+                replyLetterSummariesQuery.letterId(), OPEN, replyLetterSummariesQuery.commonPageCommand().toPageable());
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +75,6 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     public boolean isReplied(Long userId, Long letterId) {
         return hasReplyLetter(userId, letterId);
     }
-
 
     @Transactional(readOnly = true)
     @Override
@@ -112,7 +111,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     }
 
     private boolean hasReplyLetter(Long userId, Long letterId) {
-        return replyLetterPersistencePort.existsByUserIdAndLetterId(userId, letterId);
+        return replyLetterPersistencePort.existsBySenderIdAndLetterId(userId, letterId);
     }
 
     private void validateUserAccess(Long userId, Long letterId) {
@@ -131,7 +130,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     }
 
     private ReplyLetter findReplyLetter(Long id) {
-        return replyLetterPersistencePort.loadById(id)
+        return replyLetterPersistencePort.loadByIdAndStatus(id, OPEN)
                 .orElseThrow(() -> new LetterNotFoundException(REPLY_LETTER));
     }
 }
