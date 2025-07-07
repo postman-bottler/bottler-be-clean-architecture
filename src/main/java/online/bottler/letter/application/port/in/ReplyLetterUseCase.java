@@ -8,7 +8,7 @@ import online.bottler.letter.domain.ReplyLetter;
 import org.springframework.data.domain.Page;
 
 public interface ReplyLetterUseCase {
-    ReplyLetter create(ReplyLetterCommand replyLetterCommand, Long userId, String title);
+    ReplyLetter write(ReplyLetterCommand replyLetterCommand);
 
     Page<ReplyLetter> getSummaries(ReplyLetterSummariesQuery query);
 

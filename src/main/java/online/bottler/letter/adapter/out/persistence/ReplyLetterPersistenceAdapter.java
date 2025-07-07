@@ -24,7 +24,7 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public ReplyLetter create(ReplyLetter replyLetter) {
+    public ReplyLetter save(ReplyLetter replyLetter) {
         return replyLetterJpaRepository.save(ReplyLetterEntity.from(replyLetter)).toDomain();
     }
 

@@ -10,8 +10,12 @@ import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
 import online.bottler.letter.application.command.ReplyLetterSummariesQuery;
 import online.bottler.letter.application.port.in.BlockReplyLetterUseCase;
 import online.bottler.letter.application.port.in.ReplyLetterUseCase;
+import online.bottler.letter.application.port.out.LetterPersistencePort;
 import online.bottler.letter.application.port.out.ReplyLetterPersistencePort;
+import online.bottler.letter.domain.Letter;
+import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.ReplyLetter;
+import online.bottler.letter.exception.DuplicateReplyLetterException;
 import online.bottler.letter.exception.LetterNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -22,13 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterUseCase {
 
     private final ReplyLetterPersistencePort replyLetterPersistencePort;
+    private final LetterPersistencePort letterPersistencePort;
 
     @Transactional
     @Override
-    public ReplyLetter create(ReplyLetterCommand replyLetterCommand, Long userId, String title) {
-        return replyLetterPersistencePort.create(
-                ReplyLetter.create(replyLetterCommand.userId(), userId, replyLetterCommand.letterId(),
-                        replyLetterCommand.letterContent(), title));
+    public ReplyLetter write(ReplyLetterCommand replyLetterCommand) {
+        validateReplyLetterNotExists(replyLetterCommand.userId(), replyLetterCommand.letterId());
+
+        Letter letter = getLetter(replyLetterCommand);
+
+        return replyLetterPersistencePort.save(
+                ReplyLetter.create(replyLetterCommand.userId(), letter.getUserId(), replyLetterCommand.letterId(),
+                        replyLetterCommand.letterContent(), letter.getTitle()));
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +58,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     public ReplyLetter softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
         ReplyLetter replyLetter = findReplyLetter(replyLetterDeleteCommand.id());
         replyLetter.delete();
-        replyLetterPersistencePort.create(replyLetter);
+        replyLetterPersistencePort.save(replyLetter);
 
         return replyLetter;
     }
@@ -58,10 +67,6 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     public boolean isReplied(Long userId, Long letterId) {
         return hasReplyLetter(userId, letterId);
-    }
-
-    private boolean hasReplyLetter(Long userId, Long letterId) {
-        return replyLetterPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
 
@@ -88,9 +93,24 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     public Long softBlock(Long id) {
         ReplyLetter replyLetter = findReplyLetter(id);
         replyLetter.block();
-        replyLetterPersistencePort.create(replyLetter);
+        replyLetterPersistencePort.save(replyLetter);
 
         return replyLetter.getSenderId();
+    }
+
+    private void validateReplyLetterNotExists(Long userId, Long letterId) {
+        if (hasReplyLetter(userId, letterId)) {
+            throw new DuplicateReplyLetterException();
+        }
+    }
+
+    private boolean hasReplyLetter(Long userId, Long letterId) {
+        return replyLetterPersistencePort.existsByUserIdAndLetterId(userId, letterId);
+    }
+
+    private Letter getLetter(ReplyLetterCommand replyLetterCommand) {
+        return letterPersistencePort.loadByIdAndStatus(replyLetterCommand.letterId(), LetterStatus.OPEN)
+                .orElseThrow(LetterNotFoundException::new);
     }
 
     private ReplyLetter findReplyLetter(Long id) {

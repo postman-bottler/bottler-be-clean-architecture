@@ -22,7 +22,7 @@ import java.util.List;
 public class NotificationService implements NotificationUseCase {
     private final NotificationPersistencePort notificationPersistencePort;
     private final SubscriptionPersistencePort subscriptionPersistencePort;
-    private final PushNotificationPort pushNotificationPort;
+//    private final PushNotificationPort pushNotificationPort;
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void sendBanNotification(Long userId) {
@@ -89,7 +89,7 @@ public class NotificationService implements NotificationUseCase {
 
     private void pushMessage(NotificationType type, Subscriptions subscriptions) {
         PushMessages pushMessages = subscriptions.makeMessages(type);
-        pushNotificationPort.pushAll(pushMessages);
+//        pushNotificationPort.pushAll(pushMessages);
     }
 
 }
