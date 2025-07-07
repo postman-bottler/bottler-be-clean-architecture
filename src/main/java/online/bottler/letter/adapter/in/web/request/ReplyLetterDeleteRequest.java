@@ -1,11 +1,11 @@
 package online.bottler.letter.adapter.in.web.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import online.bottler.letter.application.command.ReplyLetterDeleteCommand;
 
-public record ReplyLetterDeleteRequest(@NotNull(message = "Letter ID는 필수입니다.") Long letterId,
-                                       @NotNull(message = "Box Type은 필수입니다.") String boxType) {
+public record ReplyLetterDeleteRequest(@NotBlank(message = "Letter ID는 필수입니다.") Long letterId,
+                                       @NotBlank(message = "Box Type은 필수입니다.") String boxType) {
     public ReplyLetterDeleteCommand toCommand(Long userId) {
-        return ReplyLetterDeleteCommand.of(letterId, userId, boxType);
+        return ReplyLetterDeleteCommand.of(userId, letterId, boxType);
     }
 }
