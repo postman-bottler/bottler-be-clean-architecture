@@ -73,7 +73,7 @@ public class ReplyLetterController {
     @DeleteMapping
     public ApiResponse<String> deleteReplyLetter(@RequestBody @Valid ReplyLetterDeleteRequest replyLetterDeleteRequest,
                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        replyLetterFacade.softDelete(replyLetterDeleteRequest.toCommand(userDetails.getUserId()));
+        replyLetterFacade.delete(replyLetterDeleteRequest.toCommand(userDetails.getUserId()));
         return ApiResponse.onSuccess("답장 편지가 성공적으로 삭제되었습니다.");
     }
 }

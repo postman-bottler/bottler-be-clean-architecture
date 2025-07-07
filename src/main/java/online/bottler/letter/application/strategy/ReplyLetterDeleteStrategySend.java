@@ -21,7 +21,7 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
     private final ReplyLetterUseCase replyLetterUseCase;
 
     @Override
-    public void deleteLetters(List<Long> letterIds, Long userId) {
+    public void deleteLetters(Long userId, List<Long> letterIds) {
         List<ReplyLetter> replyLetters = replyLetterUseCase.getAllByIds(letterIds);
         validateReplyLetterOwnerShip(userId, replyLetters);
 

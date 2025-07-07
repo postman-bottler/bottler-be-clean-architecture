@@ -33,28 +33,38 @@ public class LetterBoxFacade {
     private final ReplyLetterUseCase replyLetterUseCase;
 
     @Transactional(readOnly = true)
-    public Page<LetterSummaryResponse> getLetters(Long userId, BoxType boxType, CommonPageCommand commonPageCommand) {
-        return letterBoxUseCase.getLetterBoxSummaries(userId, boxType, commonPageCommand)
+    public Page<LetterSummaryResponse> getLetters(Long userId, String boxType, CommonPageCommand commonPageCommand) {
+        return letterBoxUseCase.getLetterBoxSummaries(userId, getBoxType(boxType), commonPageCommand)
                 .map(LetterSummaryResponse::from);
     }
 
     @Transactional
-    public void deleteLetters(List<LetterDeleteCommand> letterDeleteCommands, Long userId) {
+    public void deleteLetters(Long userId, List<LetterDeleteCommand> letterDeleteCommands) {
         Map<LetterBoxType, LetterDeletion> letterDeleteMap = LetterDeleteCommand.toLetterDeleteMap(
                 letterDeleteCommands);
 
-        letterDeleteMap.forEach((key, value) -> getDeleteStrategy(key).deleteLetters(value.letterIds(), userId));
+        letterDeleteMap.forEach((key, value) -> getDeleteStrategy(key).deleteLetters(userId, value.letterIds()));
     }
 
     @Transactional
-    public void deleteAllLetters(Long userId, BoxType boxType) {
-        if (boxType == null || boxType == SEND) {
-            deleteLettersForType(userId, LetterBoxType.of(LETTER, boxType));
-            deleteLettersForType(userId, LetterBoxType.of(REPLY_LETTER, boxType));
+    public void deleteAllLetters(Long userId, String boxType) {
+        BoxType boxTypeEnum = getBoxType(boxType);
+
+        if (boxTypeEnum == null || boxTypeEnum == SEND) {
+            deleteLettersForType(userId, LetterBoxType.of(LETTER, boxTypeEnum));
+            deleteLettersForType(userId, LetterBoxType.of(REPLY_LETTER, boxTypeEnum));
         }
 
-        if (boxType == null || boxType == RECEIVE) {
-            letterBoxUseCase.removeLettersFromBox(userId, LetterBoxType.of(null, RECEIVE));
+        if (boxTypeEnum == null || boxTypeEnum == RECEIVE) {
+            letterBoxUseCase.removeLettersFromBox(userId, LetterBoxType.of(null, boxTypeEnum));
+        }
+    }
+
+    private BoxType getBoxType(String boxType) {
+        try {
+            return (boxType != null) ? BoxType.valueOf(boxType.toUpperCase()) : null;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid box type: " + boxType);
         }
     }
 
@@ -62,7 +72,7 @@ public class LetterBoxFacade {
         List<Long> letterIds = getLetterIdsByLetterType(userId, letterBoxType.getLetterType());
 
         if (!letterIds.isEmpty()) {
-            getDeleteStrategy(letterBoxType).deleteLetters(letterIds, userId);
+            getDeleteStrategy(letterBoxType).deleteLetters(userId, letterIds);
         }
     }
 

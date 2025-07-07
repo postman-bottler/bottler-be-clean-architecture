@@ -58,10 +58,12 @@ public class ReplyLetterFacade {
     }
 
     @Transactional
-    public void softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
-        ReplyLetter replyLetter = replyLetterUseCase.softDelete(replyLetterDeleteCommand);
+    public void delete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
+        ReplyLetter replyLetter = replyLetterUseCase.delete(replyLetterDeleteCommand);
+
         letterBoxUseCase.removeLetterFromBox(replyLetterDeleteCommand.id(), LetterBoxType.of(REPLY_LETTER,
                 replyLetterDeleteCommand.boxType()));
+
         recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
     }
 }
