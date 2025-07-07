@@ -8,19 +8,17 @@ import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterWithKeywords;
 
 public interface LetterWithKeywordsUseCase {
-    Letter create(LetterWithKeywordsCommand command);
+    Letter write(LetterWithKeywordsCommand command);
 
-    LetterWithKeywords getOne(LetterWithKeywordsDetailQuery query);
+    LetterWithKeywords getLetterWithKeywords(LetterWithKeywordsDetailQuery query);
 
     String getLabel(Long letterId);
-
-    void delete(LetterWithKeywordsDeleteCommand command);
-
-    Letter getLetter(Long letterId);
 
     List<Long> getLetterIdsByUserId(Long userId);
 
     List<Letter> getLettersIncludingAllStatusByIdIn(List<Long> recommendedLetterIds);
+
+    void delete(LetterWithKeywordsDeleteCommand command);
 
     void softDeleteByIds(List<Long> ids);
 }
