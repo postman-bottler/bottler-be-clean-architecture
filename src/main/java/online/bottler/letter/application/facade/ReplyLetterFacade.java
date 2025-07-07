@@ -35,7 +35,7 @@ public class ReplyLetterFacade {
     private final RecentReplyForLetterUseCase recentReplyForLetterUseCase;
 
     @Transactional
-    public ReplyLetterResponse create(ReplyLetterCommand replyLetterCommand) {
+    public ReplyLetterResponse write(ReplyLetterCommand replyLetterCommand) {
         if (replyLetterUseCase.isReplied(replyLetterCommand.letterId(), replyLetterCommand.userId())) {
             throw new DuplicateReplyLetterException();
         }
