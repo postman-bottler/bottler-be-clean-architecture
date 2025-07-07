@@ -15,7 +15,6 @@ import online.bottler.letter.application.response.ReplyLetterResponse;
 import online.bottler.letter.application.response.ReplyLetterSummaryResponse;
 import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.ReplyLetter;
-import online.bottler.letter.exception.UnauthorizedLetterAccessException;
 import online.bottler.notification.application.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -46,14 +45,12 @@ public class ReplyLetterFacade {
 
     @Transactional(readOnly = true)
     public Page<ReplyLetterSummaryResponse> getSummaries(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
-        validateUserAccess(replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.letterId());
         return replyLetterUseCase.getSummaries(replyLetterSummariesQuery).map(ReplyLetterSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
     public ReplyLetterDetailResponse getDetail(Long id, Long userId) {
-        validateUserAccess(userId, id);
-        ReplyLetter replyLetter = replyLetterUseCase.get(id);
+        ReplyLetter replyLetter = replyLetterUseCase.get(userId, id);
         boolean isReplied = replyLetterUseCase.isReplied(userId, id);
         return ReplyLetterDetailResponse.from(replyLetter, isReplied);
     }
@@ -64,11 +61,5 @@ public class ReplyLetterFacade {
         letterBoxUseCase.removeLetterFromBox(replyLetterDeleteCommand.id(), LetterBoxType.of(REPLY_LETTER,
                 replyLetterDeleteCommand.boxType()));
         recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
-    }
-
-    private void validateUserAccess(Long userId, Long letterId) {
-        if (letterBoxUseCase.isAccessDenied(userId, letterId)) {
-            throw new UnauthorizedLetterAccessException();
-        }
     }
 }

@@ -12,7 +12,7 @@ public interface ReplyLetterUseCase {
 
     Page<ReplyLetter> getSummaries(ReplyLetterSummariesQuery query);
 
-    ReplyLetter get(Long id);
+    ReplyLetter get(Long userId, Long id);
 
     ReplyLetter softDelete(ReplyLetterDeleteCommand command);
 
