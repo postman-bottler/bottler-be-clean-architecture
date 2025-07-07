@@ -62,7 +62,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Transactional
     @Override
-    public ReplyLetter softDelete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
+    public ReplyLetter delete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
         ReplyLetter replyLetter = findReplyLetter(replyLetterDeleteCommand.id());
         replyLetter.delete();
         replyLetterPersistencePort.save(replyLetter);

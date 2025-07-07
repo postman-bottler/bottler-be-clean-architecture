@@ -14,7 +14,7 @@ public interface ReplyLetterUseCase {
 
     ReplyLetter getReplyLetter(Long userId, Long id);
 
-    ReplyLetter softDelete(ReplyLetterDeleteCommand command);
+    ReplyLetter delete(ReplyLetterDeleteCommand command);
 
     boolean isReplied(Long userId, Long letterId);
 
