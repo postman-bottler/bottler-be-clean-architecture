@@ -5,7 +5,6 @@ import static online.bottler.letter.domain.BoxType.SEND;
 import static online.bottler.letter.domain.LetterType.LETTER;
 import static online.bottler.letter.domain.LetterType.REPLY_LETTER;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.CommonPageCommand;
@@ -44,24 +43,6 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional
     public void archiveLetters(List<Long> letterIds, Long userId) {
         letterIds.forEach(letterId -> archiveLetterToBox(userId, letterId, LetterBoxType.of(LETTER, RECEIVE)));
-    }
-
-    @Transactional
-    @Override
-    public void save(List<Long> letterIds, Long userId) {
-        letterBoxPersistencePort.createForDeveloperLetter(letterIds, userId);
-    }
-
-    @Transactional
-    @Override
-    public void createForLetter(Long letterId, Long userId, LocalDateTime localDateTime) {
-        letterBoxPersistencePort.createForLetter(letterId, userId, localDateTime);
-    }
-
-    @Transactional
-    @Override
-    public void createForReplyLetter(Long letterId, Long userId, Long receiverId, LocalDateTime createdAt) {
-        letterBoxPersistencePort.createForReplyLetter(letterId, userId, receiverId, createdAt);
     }
 
     @Override
