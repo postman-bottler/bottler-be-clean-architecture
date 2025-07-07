@@ -21,15 +21,15 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
     private final ReplyLetterUseCase replyLetterUseCase;
 
     @Override
-    public void deleteLetters(List<Long> ids, Long userId) {
-        List<ReplyLetter> replyLetters = replyLetterUseCase.getAllByIds(ids);
+    public void deleteLetters(List<Long> letterIds, Long userId) {
+        List<ReplyLetter> replyLetters = replyLetterUseCase.getAllByIds(letterIds);
         validateReplyLetterOwnerShip(userId, replyLetters);
 
         replyLetters.forEach(replyLetter -> recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(),
                 replyLetter.getId(), replyLetter.getLabel()));
 
-        replyLetterUseCase.softDeleteByIds(ids);
-        letterBoxUseCase.removeLettersFromBox(ids, LetterBoxType.of(REPLY_LETTER, null));
+        replyLetterUseCase.softDeleteByIds(letterIds);
+        letterBoxUseCase.removeLettersFromBox(letterIds, LetterBoxType.of(REPLY_LETTER, null));
     }
 
     private void validateReplyLetterOwnerShip(Long userId, List<ReplyLetter> replyLetters) {
