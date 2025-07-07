@@ -25,7 +25,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Transactional
     @Override
-    public ReplyLetter create(ReplyLetterCommand replyLetterCommand, Long userId, String title) {
+    public ReplyLetter write(ReplyLetterCommand replyLetterCommand, Long userId, String title) {
         return replyLetterPersistencePort.create(
                 ReplyLetter.create(replyLetterCommand.userId(), userId, replyLetterCommand.letterId(),
                         replyLetterCommand.letterContent(), title));

@@ -41,7 +41,7 @@ public class ReplyLetterFacade {
         }
 
         Letter letter = letterWithKeywordsUseCase.getLetter(replyLetterCommand.letterId());
-        ReplyLetter replyLetter = replyLetterUseCase.create(replyLetterCommand, letter.getUserId(), letter.getTitle());
+        ReplyLetter replyLetter = replyLetterUseCase.write(replyLetterCommand, letter.getUserId(), letter.getTitle());
         letterBoxUseCase.archiveLetter(replyLetter);
 
         recentReplyForLetterUseCase.push(replyLetter.getId(), replyLetter.getLabel(), replyLetter.getReceiverId());
