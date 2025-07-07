@@ -16,7 +16,7 @@ public class LetterDeleteStrategyReceive implements LetterDeleteStrategy {
     private final LetterBoxUseCase letterBoxUseCase;
 
     @Override
-    public void deleteLetters(List<Long> letterIds, Long userId) {
+    public void deleteLetters(Long userId, List<Long> letterIds) {
         letterBoxUseCase.removeLettersFromBox(userId, letterIds, LetterBoxType.of(LETTER, RECEIVE));
     }
 }
