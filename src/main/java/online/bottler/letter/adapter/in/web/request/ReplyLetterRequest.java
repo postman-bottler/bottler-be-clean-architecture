@@ -7,7 +7,7 @@ public record ReplyLetterRequest(@NotBlank(message = "편지 내용은 필수입
                                  @NotBlank(message = "글씨체는 필수입니다.") String font,
                                  @NotBlank(message = "편지지는 필수입니다.") String paper,
                                  @NotBlank(message = "라벨은 필수입니다.") String label) {
-    public ReplyLetterCommand toCommand(Long letterId, Long userId) {
-        return ReplyLetterCommand.of(letterId, userId, content, font, paper, label);
+    public ReplyLetterCommand toCommand(Long userId, Long letterId) {
+        return ReplyLetterCommand.of(userId, letterId, content, font, paper, label);
     }
 }

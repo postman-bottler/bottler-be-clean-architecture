@@ -46,7 +46,7 @@ public class ReplyLetterController {
                                                               BindingResult bindingResult,
                                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onCreateSuccess(
-                replyLetterFacade.write(replyLetterRequest.toCommand(letterId, userDetails.getUserId())));
+                replyLetterFacade.write(replyLetterRequest.toCommand(userDetails.getUserId(), letterId)));
     }
 
     @Operation(summary = "특정 키워드 편지에 대한 답장 목록 조회", description = "지정된 편지 ID에 대한 답장들의 제목, 라벨이미지, 작성날짜를 페이지네이션 형태로 반환합니다."
