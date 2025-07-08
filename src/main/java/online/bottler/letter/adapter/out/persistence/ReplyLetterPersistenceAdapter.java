@@ -50,7 +50,7 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public void createAll(List<ReplyLetter> replyLetters) {
+    public void saveAll(List<ReplyLetter> replyLetters) {
         replyLetterJpaRepository.saveAll(ReplyLetterEntity.fromList(replyLetters));
     }
 

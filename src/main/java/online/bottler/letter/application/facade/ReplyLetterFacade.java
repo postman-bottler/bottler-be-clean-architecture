@@ -35,7 +35,7 @@ public class ReplyLetterFacade {
 
         letterBoxUseCase.archiveLetter(replyLetter);
 
-        recentReplyForLetterUseCase.push(replyLetter.getId(), replyLetter.getLabel(), replyLetter.getReceiverId());
+        recentReplyForLetterUseCase.push(replyLetter.getReceiverId(), replyLetter.getId(), replyLetter.getLabel());
 
         notificationService.sendLetterNotification(KEYWORD_REPLY, replyLetter.getReceiverId(), replyLetter.getId(),
                 replyLetter.getLabel());
@@ -59,7 +59,7 @@ public class ReplyLetterFacade {
 
     @Transactional
     public void delete(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
-        ReplyLetter replyLetter = replyLetterUseCase.delete(replyLetterDeleteCommand);
+        ReplyLetter replyLetter = replyLetterUseCase.removeReplyLetter(replyLetterDeleteCommand);
 
         letterBoxUseCase.removeLetterFromBox(replyLetterDeleteCommand.id(), LetterBoxType.of(REPLY_LETTER,
                 replyLetterDeleteCommand.boxType()));

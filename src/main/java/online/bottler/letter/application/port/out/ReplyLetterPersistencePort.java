@@ -20,7 +20,7 @@ public interface ReplyLetterPersistencePort {
 
     List<ReplyLetter> loadAllByIds(List<Long> ids);
 
-    void createAll(List<ReplyLetter> replyLetters);
+    void saveAll(List<ReplyLetter> replyLetters);
 
     List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status);
 }

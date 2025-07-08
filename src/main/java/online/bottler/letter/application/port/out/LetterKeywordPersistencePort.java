@@ -5,7 +5,7 @@ import online.bottler.letter.domain.LetterKeyword;
 import online.bottler.letter.domain.LetterStatus;
 
 public interface LetterKeywordPersistencePort {
-    void createAll(List<LetterKeyword> letterKeywords);
+    void saveAll(List<LetterKeyword> letterKeywords);
 
     List<String> loadFrequentKeywords(List<Long> letterIds);
 

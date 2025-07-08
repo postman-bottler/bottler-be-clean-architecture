@@ -6,11 +6,9 @@ import online.bottler.letter.domain.Letter;
 import online.bottler.letter.domain.LetterStatus;
 
 public interface LetterPersistencePort {
-    Letter create(Letter letter);
+    Letter save(Letter letter);
 
     Optional<Letter> loadByIdAndStatus(Long letterId, LetterStatus status);
-
-    List<Long> loadIdsByUserId(Long userId);
 
     List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds);
 
@@ -20,5 +18,7 @@ public interface LetterPersistencePort {
 
     List<Letter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus letterStatus);
 
-    void createAll(List<Letter> letters);
+    List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status);
+
+    void saveAll(List<Letter> letters);
 }

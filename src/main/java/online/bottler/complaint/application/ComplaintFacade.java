@@ -41,8 +41,8 @@ public class ComplaintFacade {
         return switch (type) {
             case MAP_LETTER -> mapLetterUseCase.letterBlock(BlockMapLetterType.MAP_LETTER, letterId);
             case MAP_REPLY_LETTER -> mapLetterUseCase.letterBlock(BlockMapLetterType.REPLY, letterId);
-            case KEYWORD_LETTER -> blockLetterUseCase.softBlock(letterId);
-            case KEYWORD_REPLY_LETTER -> blockReplyLetterUseCase.softBlock(letterId);
+            case KEYWORD_LETTER -> blockLetterUseCase.blockLetter(letterId);
+            case KEYWORD_REPLY_LETTER -> blockReplyLetterUseCase.blockReplyLetter(letterId);
         };
     }
 
