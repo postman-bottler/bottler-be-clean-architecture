@@ -10,17 +10,17 @@ import org.springframework.data.domain.Page;
 public interface ReplyLetterUseCase {
     ReplyLetter write(ReplyLetterCommand replyLetterCommand);
 
-    Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery query);
-
     ReplyLetter getReplyLetter(Long userId, Long id);
 
-    ReplyLetter removeReplyLetter(ReplyLetterDeleteCommand command);
-
-    boolean isReplied(Long userId, Long letterId);
+    List<ReplyLetter> getReplyLetters(List<Long> ids);
 
     List<Long> getReplyLetterIds(Long userId);
 
-    void removeReplyLetters(List<Long> ids);
+    Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery query);
 
-    List<ReplyLetter> getReplyLetters(List<Long> ids);
+    boolean isReplied(Long userId, Long letterId);
+
+    ReplyLetter removeReplyLetter(ReplyLetterDeleteCommand command);
+
+    void removeReplyLetters(List<Long> ids);
 }
