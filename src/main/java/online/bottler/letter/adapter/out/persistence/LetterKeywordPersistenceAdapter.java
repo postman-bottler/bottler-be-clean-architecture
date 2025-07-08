@@ -19,8 +19,7 @@ public class LetterKeywordPersistenceAdapter implements LetterKeywordPersistence
 
     @Override
     public void saveAll(List<LetterKeyword> letterKeywords) {
-        LetterKeywordEntity.toDomainList(
-                letterKeywordJpaRepository.saveAll(LetterKeywordEntity.fromList(letterKeywords)));
+        letterKeywordJpaRepository.saveAll(LetterKeywordEntity.fromList(letterKeywords));
     }
 
     @Override
