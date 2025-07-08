@@ -14,8 +14,8 @@ public class RecentReplyForLetterService implements RecentReplyForLetterUseCase 
     private final DeleteRecentReplyCachePort deleteRecentReplyCachePort;
 
     @Override
-    public void push(Long id, String label, Long receiverId) {
-        pushRecentReplyCachePort.push(id, label, receiverId);
+    public void push(Long receiverId, Long id, String label) {
+        pushRecentReplyCachePort.push(receiverId, id, label);
     }
 
     @Override
