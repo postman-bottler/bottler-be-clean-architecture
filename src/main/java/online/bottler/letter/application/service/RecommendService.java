@@ -16,6 +16,7 @@ import online.bottler.letter.application.port.out.UserKeywordPersistencePort;
 import online.bottler.letter.domain.BoxType;
 import online.bottler.letter.domain.LetterBox;
 import online.bottler.letter.domain.LetterBoxType;
+import online.bottler.letter.domain.LetterStatus;
 import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.RecommendedLetter;
 import org.springframework.beans.factory.annotation.Value;
@@ -113,7 +114,7 @@ public class RecommendService implements RecommendUseCase {
         List<Long> recommendedLetters = letterKeywordPersistencePort.loadMatchedLetters(userKeywords, letterIds, limit);
 
         if (recommendedLetters.size() < limit) {
-            recommendedLetters.addAll(getRandomLetterIds(limit - recommendedLetters.size(), letterIds));
+            recommendedLetters.addAll(getRandomLetterIds(letterIds, limit - recommendedLetters.size()));
         }
 
         if (recommendedLetters.isEmpty()) {
@@ -123,8 +124,8 @@ public class RecommendService implements RecommendUseCase {
         return recommendedLetters;
     }
 
-    private List<Long> getRandomLetterIds(int remaining, List<Long> letterIds) {
-        return letterPersistencePort.fetchRandomLetterIdsExcluding(remaining, letterIds);
+    private List<Long> getRandomLetterIds(List<Long> excludedLetterIds, int remaining) {
+        return letterPersistencePort.loadRandomLetterIdsByIdNotInAndStatus(excludedLetterIds, LetterStatus.OPEN, remaining);
     }
 
     private Optional<Long> findFirstValidLetter(List<Long> recommendations) {
@@ -133,7 +134,7 @@ public class RecommendService implements RecommendUseCase {
     }
 
     private boolean isValidLetter(Long letterId) {
-        return letterPersistencePort.existsById(letterId);
+        return letterPersistencePort.existsByIdAndStatus(letterId, LetterStatus.OPEN);
     }
 
     private void updateRecommendation(Long userId, Long recommendId) {

@@ -10,9 +10,9 @@ public interface LetterPersistencePort {
 
     Optional<Letter> loadByIdAndStatus(Long letterId, LetterStatus status);
 
-    List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds);
+    List<Long> loadRandomLetterIdsByIdNotInAndStatus(List<Long> excludedIds, LetterStatus status, int count);
 
-    boolean existsById(Long letterId);
+    boolean existsByIdAndStatus(Long letterId, LetterStatus status);
 
     List<Letter> loadAllByIdIn(List<Long> letterIds);
 
