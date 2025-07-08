@@ -11,13 +11,13 @@ import online.bottler.letter.adapter.out.persistence.entity.ReplyLetterEntity;
 
 public interface ReplyLetterJpaRepository extends JpaRepository<ReplyLetterEntity, Long> {
 
-    Page<ReplyLetterEntity> findAllByReceiverIdAndLetterIdAndStatus(Long receiverId, Long letterId, LetterStatus status, Pageable pageable);
-
     Optional<ReplyLetterEntity> findByIdAndStatus(Long id, LetterStatus status);
 
-    List<Long> findIdsBySenderIdAndStatus(Long senderId, LetterStatus status);
-
     List<ReplyLetterEntity> findAllByIdInAndStatus(Collection<Long> ids, LetterStatus status);
+
+    Page<ReplyLetterEntity> findAllByReceiverIdAndLetterIdAndStatus(Long receiverId, Long letterId, LetterStatus status, Pageable pageable);
+
+    List<Long> findIdsBySenderIdAndStatus(Long senderId, LetterStatus status);
 
     boolean existsBySenderIdAndLetterId(Long senderId, Long letterId);
 }
