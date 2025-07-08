@@ -52,7 +52,7 @@ public class RecommendService implements RecommendUseCase {
         try {
             List<String> userKeywords = loadUserKeywords(userId);
 
-            List<Long> letterIds = findRecommendationLettersByUserId(userId);
+            List<Long> letterIds = findRecommendationLetters(userId);
 
             List<Long> recommendedLetters = getRecommendedLetters(userKeywords, letterIds, recommendationCandidateLimit);
 
@@ -103,7 +103,7 @@ public class RecommendService implements RecommendUseCase {
         return userKeywordPersistencePort.loadKeywordsByUserId(userId);
     }
 
-    private List<Long> findRecommendationLettersByUserId(Long userId) {
+    private List<Long> findRecommendationLetters(Long userId) {
         return recommendedLetterPersistencePort.findRecommendedLettersByUserId(userId);
     }
 
