@@ -2,14 +2,13 @@ package online.bottler.notification.application.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import online.bottler.notification.domain.LetterNotification;
 import online.bottler.notification.domain.Notification;
 import online.bottler.notification.domain.NotificationType;
 import online.bottler.notification.domain.Notifications;
 
 public record NotificationResponse(
-        UUID id,
+        Long id,
         NotificationType type,
         Long receiver,
         LocalDateTime createdAt,
@@ -21,11 +20,11 @@ public record NotificationResponse(
         return new NotificationResponse(
                 notification.getId(),
                 notification.getType(),
-                notification.getReceiver(),
+                notification.getReceiverId(),
                 notification.getCreatedAt(),
                 notification instanceof LetterNotification ? ((LetterNotification) notification).getLetterId() : null,
                 notification.getIsRead(),
-                notification instanceof LetterNotification ? ((LetterNotification) notification).getLabel() : null);
+                notification instanceof LetterNotification ? ((LetterNotification) notification).getLabelUrl() : null);
     }
 
     public static List<NotificationResponse> from(final Notifications notifications) {
