@@ -20,6 +20,7 @@ import online.bottler.letter.domain.LetterType;
 import online.bottler.letter.domain.RecommendedLetter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -44,18 +45,24 @@ public class RecommendService implements RecommendUseCase {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String generate(Long userId) {
         log.info("사용자 [{}]의 추천 작업을 시작합니다.", userId);
 
         try {
             List<String> userKeywords = loadUserKeywords(userId);
+
             List<Long> letterIds = findRecommendationLettersByUserId(userId);
+
             List<Long> recommendedLetters = getRecommendedLetters(userKeywords, letterIds, recommendationCandidateLimit);
+
             recommendationCachePort.saveTempRecommendations(userId, recommendedLetters);
+
             log.info("사용자 [{}]의 추천 작업이 성공적으로 완료되었습니다.", userId);
             return "Success: 사용자 [" + userId + "] 작업 완료";
         } catch (Exception e) {
             log.error("사용자 [{}]의 추천 작업 중 예기치 못한 예외 발생: {}", userId, e.getMessage(), e);
+
             return "Error: 사용자 [" + userId + "] 예외 발생";
         }
     }
@@ -63,6 +70,7 @@ public class RecommendService implements RecommendUseCase {
     @Override
     public List<Long> getRecommended(Long userId) {
         List<Long> letterIds = letterCachePort.fetchActiveByUserId(userId);
+
         return letterIds == null ? Collections.emptyList() : letterIds;
     }
 
@@ -76,21 +84,23 @@ public class RecommendService implements RecommendUseCase {
         return recommendationCachePort.fetchTempRecommendations(userId);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public Optional<Long> updateRecommendationsFromTemp(Long userId) {
         Optional<Long> recommendId = findFirstValidLetter(fetchTempRecommendations(userId));
+
         if (recommendId.isEmpty()) {
             log.info("userId={}에 대한 유효한 추천이 없음. 추천을 건너뜁니다.", userId);
             return Optional.empty();
         }
 
         updateRecommendation(userId, recommendId.get());
+
         return recommendId;
     }
 
     private List<String> loadUserKeywords(Long userId) {
-        return userKeywordPersistencePort.loadKeywords(userId);
+        return userKeywordPersistencePort.loadKeywordsByUserId(userId);
     }
 
     private List<Long> findRecommendationLettersByUserId(Long userId) {
@@ -101,6 +111,7 @@ public class RecommendService implements RecommendUseCase {
         log.debug("추천 편지 조회 요청: userKeywords={}, 제외할 letterIds={}, 추천 개수 limit={}", userKeywords, letterIds, limit);
 
         List<Long> recommendedLetters = letterKeywordPersistencePort.loadMatchedLetters(userKeywords, letterIds, limit);
+
         if (recommendedLetters.size() < limit) {
             recommendedLetters.addAll(getRandomLetterIds(limit - recommendedLetters.size(), letterIds));
         }
@@ -127,8 +138,11 @@ public class RecommendService implements RecommendUseCase {
 
     private void updateRecommendation(Long userId, Long recommendId) {
         recommendationCachePort.updateActiveRecommendations(userId, recommendId);
+
         letterBoxPersistencePort.save(
-                LetterBox.create(userId, recommendId, LetterBoxType.of(LetterType.LETTER, BoxType.RECEIVE)));
+                LetterBox.create(userId, recommendId, LetterBoxType.of(LetterType.LETTER, BoxType.RECEIVE))
+        );
+
         recommendedLetterPersistencePort.create(RecommendedLetter.create(userId, recommendId));
     }
 }
