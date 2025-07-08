@@ -116,12 +116,12 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
                 .orElseThrow(() -> new LetterNotFoundException(LETTER));
     }
 
-    private List<Letter> loadLetterByIds(List<Long> ids) {
+    private List<Letter> loadLetterByIdIn(List<Long> ids) {
         return letterPersistencePort.loadAllByIdInAndStatus(ids, LetterStatus.OPEN);
     }
 
     private void deleteLetterWithKeywords(Long userId, List<Long> letterIds) {
-        List<Letter> letters = loadLetterByIds(letterIds);
+        List<Letter> letters = loadLetterByIdIn(letterIds);
 
         validateOwnerShip(userId, letters);
 
