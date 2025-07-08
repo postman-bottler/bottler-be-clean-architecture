@@ -68,7 +68,7 @@ public class RecommendationController {
     public ResponseEntity<Map<Long, List<Long>>> getRecommendRecommended() {
         Map<Long, List<Long>> result = new HashMap<>();
         userService.getAllUserIds().forEach(userId -> result.put(userId,
-                recommendedLetterUseCase.findRecommendedLetterIdsByUserId(userId)));
+                recommendedLetterUseCase.getRecommendedLetterIds(userId)));
         return ResponseEntity.ok(result);
     }
 }
