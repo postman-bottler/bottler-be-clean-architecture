@@ -19,13 +19,23 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     private final ReplyLetterJpaRepository replyLetterJpaRepository;
 
     @Override
-    public boolean existsBySenderIdAndLetterId(Long userId, Long letterId) {
-        return replyLetterJpaRepository.existsBySenderIdAndLetterId(userId, letterId);
+    public ReplyLetter save(ReplyLetter replyLetter) {
+        return replyLetterJpaRepository.save(ReplyLetterEntity.from(replyLetter)).toDomain();
     }
 
     @Override
-    public ReplyLetter save(ReplyLetter replyLetter) {
-        return replyLetterJpaRepository.save(ReplyLetterEntity.from(replyLetter)).toDomain();
+    public void saveAll(List<ReplyLetter> replyLetters) {
+        replyLetterJpaRepository.saveAll(ReplyLetterEntity.fromList(replyLetters));
+    }
+
+    @Override
+    public Optional<ReplyLetter> loadByIdAndStatus(Long id, LetterStatus status) {
+        return replyLetterJpaRepository.findByIdAndStatus(id, status).map(ReplyLetterEntity::toDomain);
+    }
+
+    @Override
+    public List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status) {
+        return ReplyLetterEntity.toDomainList(replyLetterJpaRepository.findAllByIdInAndStatus(ids, status));
     }
 
     @Override
@@ -35,27 +45,12 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public Optional<ReplyLetter> loadByIdAndStatus(Long id, LetterStatus status) {
-        return replyLetterJpaRepository.findByIdAndStatus(id, status).map(ReplyLetterEntity::toDomain);
-    }
-
-    @Override
     public List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status) {
         return replyLetterJpaRepository.findIdsBySenderIdAndStatus(userId, status);
     }
 
     @Override
-    public List<ReplyLetter> loadAllByIds(List<Long> ids) {
-        return ReplyLetterEntity.toDomainList(replyLetterJpaRepository.findAllByIds(ids));
-    }
-
-    @Override
-    public void saveAll(List<ReplyLetter> replyLetters) {
-        replyLetterJpaRepository.saveAll(ReplyLetterEntity.fromList(replyLetters));
-    }
-
-    @Override
-    public List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status) {
-        return ReplyLetterEntity.toDomainList(replyLetterJpaRepository.findAllByIdInAndStatus(ids, status));
+    public boolean existsBySenderIdAndLetterId(Long userId, Long letterId) {
+        return replyLetterJpaRepository.existsBySenderIdAndLetterId(userId, letterId);
     }
 }
