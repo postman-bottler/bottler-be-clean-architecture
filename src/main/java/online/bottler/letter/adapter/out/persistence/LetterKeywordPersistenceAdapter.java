@@ -23,8 +23,13 @@ public class LetterKeywordPersistenceAdapter implements LetterKeywordPersistence
     }
 
     @Override
-    public List<String> loadFrequentKeywords(List<Long> letterIds) {
-        return queryDslRepository.getFrequentKeywords(letterIds);
+    public List<LetterKeyword> loadAllByLetterId(Long letterId) {
+        return LetterKeywordEntity.toDomainList(queryDslRepository.findKeywordsByLetterId(letterId));
+    }
+
+    @Override
+    public List<LetterKeyword> loadAllByLetterIdInAndStatus(List<Long> letterIds, LetterStatus status) {
+        return LetterKeywordEntity.toDomainList(letterKeywordJpaRepository.findAllByLetterIdInAndStatus(letterIds, status));
     }
 
     @Override
@@ -33,17 +38,12 @@ public class LetterKeywordPersistenceAdapter implements LetterKeywordPersistence
     }
 
     @Override
+    public List<String> loadFrequentKeywords(List<Long> letterIds) {
+        return queryDslRepository.getFrequentKeywords(letterIds);
+    }
+
+    @Override
     public List<Long> loadMatchedLetters(List<String> userKeywords, List<Long> letterIds, int limit) {
         return queryDslRepository.getMatchedLetters(userKeywords, letterIds, limit);
-    }
-
-    @Override
-    public List<LetterKeyword> loadAllByLetterId(Long letterId) {
-        return LetterKeywordEntity.toDomainList(queryDslRepository.findKeywordsByLetterId(letterId));
-    }
-
-    @Override
-    public List<LetterKeyword> loadAllByLetterIdInAndStatus(List<Long> letterIds, LetterStatus status) {
-        return LetterKeywordEntity.toDomainList(letterKeywordJpaRepository.findAllByLetterIdInAndStatus(letterIds, status));
     }
 }

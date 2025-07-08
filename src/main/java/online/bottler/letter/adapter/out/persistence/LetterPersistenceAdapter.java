@@ -25,35 +25,13 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
+    public void saveAll(List<Letter> letters) {
+        letterJpaRepository.saveAll(LetterEntity.fromList(letters));
+    }
+
+    @Override
     public Optional<Letter> loadByIdAndStatus(Long id, LetterStatus status) {
         return letterJpaRepository.findByIdAndStatus(id, status).map(LetterEntity::toDomain);
-    }
-
-    @Override
-    public List<Long> fetchRandomLetterIdsExcluding(int count, List<Long> excludedIds) {
-        Long maxId = letterJpaRepository.findMaxId(LetterStatus.OPEN);
-
-        if (maxId == null || maxId == 0) {
-            return new ArrayList<>();
-        }
-
-        List<Long> result = new ArrayList<>();
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        int tryCount = 0;
-
-        while (result.size() < count && tryCount < 5) {
-            long randomId = random.nextLong(1L, maxId + 1);
-            result.addAll(letterJpaRepository.getRandomIds(count, randomId, excludedIds, LetterStatus.OPEN));
-            tryCount++;
-        }
-
-        return result;
-    }
-
-    @Override
-    public boolean existsById(Long id) {
-        return letterJpaRepository.existsById(id);
     }
 
     @Override
@@ -75,7 +53,29 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public void saveAll(List<Letter> letters) {
-        letterJpaRepository.saveAll(LetterEntity.fromList(letters));
+    public List<Long> loadRandomLetterIdsByIdNotInAndStatus(List<Long> excludedIds, LetterStatus status,  int count) {
+        Optional<Long> maxId = letterJpaRepository.findMaxIdByStatus(status);
+
+        if (maxId.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> result = new ArrayList<>();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        int tryCount = 0;
+
+        while (result.size() < count && tryCount < 5) {
+            long randomId = random.nextLong(1L, maxId.get() + 1);
+            result.addAll(letterJpaRepository.findIdsByIdNotInAndStatus(count, randomId, excludedIds, status));
+            tryCount++;
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean existsByIdAndStatus(Long id, LetterStatus status) {
+        return letterJpaRepository.existsByIdAndStatus(id, status);
     }
 }

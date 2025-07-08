@@ -18,8 +18,6 @@ public interface ReplyLetterPersistencePort {
 
     List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status);
 
-    List<ReplyLetter> loadAllByIds(List<Long> ids);
-
     void saveAll(List<ReplyLetter> replyLetters);
 
     List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status);

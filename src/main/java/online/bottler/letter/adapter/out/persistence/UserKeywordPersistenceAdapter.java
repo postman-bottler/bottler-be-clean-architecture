@@ -22,6 +22,6 @@ public class UserKeywordPersistenceAdapter implements UserKeywordPersistencePort
 
     @Override
     public List<String> loadKeywordsByUserId(Long userId) {
-        return jpaRepository.findUserKeywordsByUserId(userId);
+        return jpaRepository.findKeywordsByUserId(userId);
     }
 }

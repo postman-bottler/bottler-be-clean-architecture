@@ -16,6 +16,6 @@ public class RecommendedLetterService implements RecommendedLetterUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getRecommendedLetterIds(Long userId) {
-        return recommendedLetterPersistencePort.findRecommendedLettersByUserId(userId);
+        return recommendedLetterPersistencePort.loadIdsByUserId(userId);
     }
 }
