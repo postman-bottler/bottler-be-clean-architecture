@@ -6,6 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import online.bottler.letter.adapter.out.persistence.entity.RecommendedLetterEntity;
 
 public interface RecommendedLetterJpaRepository extends JpaRepository<RecommendedLetterEntity, Long> {
-    @Query("SELECT rl.letterId FROM RecommendedLetterEntity rl WHERE rl.userId = :userId")
-    List<Long> findRecommendedLetterIdsByUserId(Long userId);
+    @Query(
+            """
+                SELECT rl.letterId
+                FROM RecommendedLetterEntity rl
+                WHERE rl.userId = :userId
+            """
+    )
+    List<Long> findIdsByUserId(Long userId);
 }

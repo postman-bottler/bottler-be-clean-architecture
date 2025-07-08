@@ -20,7 +20,7 @@ public class RecommendedLetterPersistenceAdapter implements RecommendedLetterPer
     }
 
     @Override
-    public List<Long> findRecommendedLettersByUserId(Long userId) {
-        return recommendedLetterJpaRepository.findRecommendedLetterIdsByUserId(userId);
+    public List<Long> loadIdsByUserId(Long userId) {
+        return recommendedLetterJpaRepository.findIdsByUserId(userId);
     }
 }

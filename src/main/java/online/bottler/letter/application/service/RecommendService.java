@@ -105,7 +105,7 @@ public class RecommendService implements RecommendUseCase {
     }
 
     private List<Long> findRecommendationLetters(Long userId) {
-        return recommendedLetterPersistencePort.findRecommendedLettersByUserId(userId);
+        return recommendedLetterPersistencePort.loadIdsByUserId(userId);
     }
 
     private List<Long> getRecommendedLetters(List<String> userKeywords, List<Long> letterIds, int limit) {
