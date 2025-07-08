@@ -20,7 +20,7 @@ public interface ReplyLetterUseCase {
 
     List<Long> getReplyLetterIds(Long userId);
 
-    void removeReplyLettersByIdIn(List<Long> ids);
+    void removeReplyLetters(List<Long> ids);
 
-    List<ReplyLetter> getReplyLettersByIdIn(List<Long> ids);
+    List<ReplyLetter> getReplyLetters(List<Long> ids);
 }

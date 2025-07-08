@@ -13,9 +13,9 @@ public interface LetterWithKeywordsUseCase {
 
     String getLabel(Long letterId);
 
-    List<Long> getLetterIdsByUserId(Long userId);
+    List<Long> getLetterIds(Long userId);
 
-    List<Letter> getLettersIncludingAllStatusByIdIn(List<Long> recommendedLetterIds);
+    List<Letter> getLettersIncludingAllStatus(List<Long> recommendedLetterIds);
 
     void deleteLetter(Long userId, Long letterId);
 

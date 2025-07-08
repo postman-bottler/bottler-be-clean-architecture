@@ -26,7 +26,7 @@ public class KeywordFacade {
 
     @Transactional(readOnly = true)
     public KeywordResponse getKeywordList() {
-        return KeywordResponse.from(keywordUseCase.getAll());
+        return KeywordResponse.from(keywordUseCase.getKeywords());
     }
 
     @Transactional(readOnly = true)
