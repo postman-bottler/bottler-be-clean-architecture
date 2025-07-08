@@ -14,9 +14,9 @@ public class KeywordService implements KeywordUseCase {
 
     private final KeywordPersistencePort keywordPersistencePort;
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<Keyword> getAll() {
-        return keywordPersistencePort.getKeywords();
+        return keywordPersistencePort.loadAll();
     }
 }

@@ -6,7 +6,5 @@ import online.bottler.letter.domain.UserKeyword;
 public interface UserKeywordPersistencePort {
     void replaceKeywordsByUserId(List<UserKeyword> userKeywords, Long userId);
 
-    List<String> loadKeywords(Long userId);
-
-    List<UserKeyword> loadUserKeywords(Long userId);
+    List<String> loadKeywordsByUserId(Long userId);
 }

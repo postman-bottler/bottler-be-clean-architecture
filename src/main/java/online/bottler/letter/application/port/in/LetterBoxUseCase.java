@@ -26,6 +26,4 @@ public interface LetterBoxUseCase {
     void removeLettersFromBox(Long userId, LetterBoxType letterBoxType);
 
     void removeLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType);
-
-    boolean isAccessDenied(Long letterId, Long userId);
 }

@@ -19,8 +19,7 @@ public interface ReplyLetterJpaRepository extends JpaRepository<ReplyLetterEntit
     @Query("SELECT r FROM ReplyLetterEntity r WHERE r.id IN :ids AND r.status = :status")
     List<ReplyLetterEntity> findAllByIds(List<Long> ids);
 
-    @Query("SELECT r.id FROM ReplyLetterEntity r WHERE r.senderId = :senderId AND r.status = :status")
-    List<Long> findIdsBySenderId(Long senderId);
+    List<Long> findIdsBySenderIdAndStatus(Long senderId, LetterStatus status);
 
     List<ReplyLetterEntity> findAllByIdInAndStatus(Collection<Long> ids, LetterStatus status);
 

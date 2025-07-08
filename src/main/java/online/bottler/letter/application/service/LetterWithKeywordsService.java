@@ -5,7 +5,6 @@ import static online.bottler.letter.domain.LetterType.LETTER;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.LetterWithKeywordsCommand;
-import online.bottler.letter.application.command.LetterWithKeywordsDeleteCommand;
 import online.bottler.letter.application.command.LetterWithKeywordsDetailQuery;
 import online.bottler.letter.application.port.in.BlockLetterUseCase;
 import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
@@ -27,17 +26,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, BlockLetterUseCase {
 
     private final LetterPersistencePort letterPersistencePort;
-    private final LetterBoxPersistencePort letterBoxPersistencePort;
     private final LetterKeywordPersistencePort letterKeywordPersistencePort;
+    private final LetterBoxPersistencePort letterBoxPersistencePort;
 
-    @Transactional
     @Override
+    @Transactional
     public Letter write(LetterWithKeywordsCommand letterWithKeywordsCommand) {
         return createLetterWithKeywords(letterWithKeywordsCommand);
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public LetterWithKeywords getLetterWithKeywords(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
         validateUserAccess(letterWithKeywordsDetailQuery.userId(), letterWithKeywordsDetailQuery.letterId());
 
@@ -48,77 +47,59 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         return LetterWithKeywords.create(letter, letterKeywords);
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public String getLabel(Long letterId) {
         return loadLetterById(letterId).getLabel();
     }
 
-    @Transactional
     @Override
-    public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
-        Letter letter = loadLetterById(letterWithKeywordsDeleteCommand.letterId());
-
-        if (!letter.isOwner(letterWithKeywordsDeleteCommand.userId())) {
-            throw new LetterAuthorMismatchException();
-        }
-
-        deleteLetterWithKeywords(letterWithKeywordsDeleteCommand);
-    }
-
     @Transactional(readOnly = true)
-    @Override
     public List<Long> getLetterIdsByUserId(Long userId) {
-        return letterPersistencePort.loadIdsByUserId(userId);
+        return letterPersistencePort.loadIdsByUserIdAndStatus(userId, LetterStatus.OPEN);
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<Letter> getLettersIncludingAllStatusByIdIn(List<Long> letterIds) {
         return letterPersistencePort.loadAllByIdIn(letterIds);
     }
 
     @Override
-    public void softDeleteByIds(List<Long> ids) {
-        List<Letter> letters = loadLetterByIds(ids);
-        letters.forEach(Letter::delete);
-        letterPersistencePort.createAll(letters);
-
-        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadAllByLetterIdInAndStatus(ids, LetterStatus.OPEN);
-        letterKeywords.forEach(LetterKeyword::delete);
-        letterKeywordPersistencePort.createAll(letterKeywords);
+    @Transactional
+    public void deleteLetter(Long userId, Long letterId) {
+        deleteLetterWithKeywords(userId, List.of(letterId));
     }
 
-    @Transactional
     @Override
-    public Long softBlock(Long letterId) {
+    @Transactional
+    public void deleteLetters(Long userId, List<Long> letterIds) {
+        deleteLetterWithKeywords(userId, letterIds);
+    }
+
+    @Override
+    @Transactional
+    public Long blockLetter(Long letterId) {
         Letter letter = loadLetterById(letterId);
         letter.block();
-        letterPersistencePort.create(letter);
+        letterPersistencePort.save(letter);
 
-        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadAllByLetterId(letter.getId());
-        letterKeywords.forEach(LetterKeyword::delete);
-        letterKeywordPersistencePort.createAll(letterKeywords);
+        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadAllByLetterId(letterId);
+        letterKeywords.forEach(LetterKeyword::block);
+        letterKeywordPersistencePort.saveAll(letterKeywords);
 
         return letter.getUserId();
     }
 
     private Letter createLetterWithKeywords(LetterWithKeywordsCommand letterWithKeywordsCommand) {
-        Letter letter = letterPersistencePort.create(letterWithKeywordsCommand.toLetter());
-        letterKeywordPersistencePort.createAll(
-                LetterKeyword.createList(letter.getId(), letterWithKeywordsCommand.toKeywords()));
+        Letter letter = letterPersistencePort.save(letterWithKeywordsCommand.toLetter());
+
+        letterKeywordPersistencePort.saveAll(
+                LetterKeyword.createList(letter.getId(), letterWithKeywordsCommand.toKeywords())
+        );
+
         return letter;
     }
-
-    private Letter loadLetterById(Long letterId) {
-        return letterPersistencePort.loadByIdAndStatus(letterId, LetterStatus.OPEN)
-                .orElseThrow(() -> new LetterNotFoundException(LETTER));
-    }
-
-    private List<Letter> loadLetterByIds(List<Long> ids) {
-        return letterPersistencePort.loadAllByIdInAndStatus(ids, LetterStatus.OPEN);
-    }
-
 
     private void validateUserAccess(Long userId, Long letterId) {
         if (!isLetterInBox(userId, letterId)) {
@@ -130,13 +111,31 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         return letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
-    private void deleteLetterWithKeywords(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
-        Letter letter = loadLetterById(letterWithKeywordsDeleteCommand.letterId());
-        letter.delete();
-        letterPersistencePort.create(letter);
+    private Letter loadLetterById(Long letterId) {
+        return letterPersistencePort.loadByIdAndStatus(letterId, LetterStatus.OPEN)
+                .orElseThrow(() -> new LetterNotFoundException(LETTER));
+    }
 
-        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadAllByLetterId(letter.getId());
+    private List<Letter> loadLetterByIdIn(List<Long> ids) {
+        return letterPersistencePort.loadAllByIdInAndStatus(ids, LetterStatus.OPEN);
+    }
+
+    private void deleteLetterWithKeywords(Long userId, List<Long> letterIds) {
+        List<Letter> letters = loadLetterByIdIn(letterIds);
+
+        validateOwnerShip(userId, letters);
+
+        letters.forEach(Letter::delete);
+        letterPersistencePort.saveAll(letters);
+
+        List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadAllByLetterIdInAndStatus(letterIds, LetterStatus.OPEN);
         letterKeywords.forEach(LetterKeyword::delete);
-        letterKeywordPersistencePort.createAll(letterKeywords);
+        letterKeywordPersistencePort.saveAll(letterKeywords);
+    }
+
+    private void validateOwnerShip(Long userId, List<Letter> letters) {
+        if (!letters.stream().allMatch(letter -> letter.isOwner(userId))) {
+            throw new LetterAuthorMismatchException();
+        }
     }
 }

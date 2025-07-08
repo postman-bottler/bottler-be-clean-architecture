@@ -16,11 +16,11 @@ public interface ReplyLetterPersistencePort {
 
     Optional<ReplyLetter> loadByIdAndStatus(Long id, LetterStatus status);
 
-    List<Long> loadIdsByUserId(Long userId);
+    List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status);
 
     List<ReplyLetter> loadAllByIds(List<Long> ids);
 
-    void createAll(List<ReplyLetter> replyLetters);
+    void saveAll(List<ReplyLetter> replyLetters);
 
     List<ReplyLetter> loadAllByIdInAndStatus(List<Long> ids, LetterStatus status);
 }

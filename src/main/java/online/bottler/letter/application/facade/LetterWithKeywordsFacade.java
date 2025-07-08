@@ -67,7 +67,7 @@ public class LetterWithKeywordsFacade {
 
     @Transactional
     public void delete(LetterWithKeywordsDeleteCommand letterWithKeywordsDeleteCommand) {
-        letterWithKeywordsUseCase.delete(letterWithKeywordsDeleteCommand);
+        letterWithKeywordsUseCase.deleteLetter(letterWithKeywordsDeleteCommand.userId(), letterWithKeywordsDeleteCommand.letterId());
 
         letterBoxUseCase.removeLetterFromBox(letterWithKeywordsDeleteCommand.letterId(),
                 LetterBoxType.of(LETTER, null));

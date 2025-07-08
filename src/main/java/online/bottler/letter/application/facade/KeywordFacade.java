@@ -1,11 +1,9 @@
 package online.bottler.letter.application.facade;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.UserKeywordCommand;
 import online.bottler.letter.application.port.in.KeywordUseCase;
 import online.bottler.letter.application.port.in.LetterKeywordUseCase;
-import online.bottler.letter.application.port.in.LetterWithKeywordsUseCase;
 import online.bottler.letter.application.port.in.UserKeywordUseCase;
 import online.bottler.letter.application.response.FrequentKeywordsResponse;
 import online.bottler.letter.application.response.KeywordResponse;
@@ -20,7 +18,6 @@ public class KeywordFacade {
     private final KeywordUseCase keywordUseCase;
     private final UserKeywordUseCase userKeywordUseCase;
     private final LetterKeywordUseCase letterKeywordUseCase;
-    private final LetterWithKeywordsUseCase letterWithKeywordsUseCase;
 
     @Transactional
     public void createUserKeywords(UserKeywordCommand userKeywordCommand) {
@@ -39,8 +36,6 @@ public class KeywordFacade {
 
     @Transactional(readOnly = true)
     public FrequentKeywordsResponse getTopFrequentKeywords(Long userId) {
-        List<Long> letterIds = letterWithKeywordsUseCase.getLetterIdsByUserId(userId);
-
-        return FrequentKeywordsResponse.from(letterKeywordUseCase.getTopFrequent(letterIds, userId));
+        return FrequentKeywordsResponse.from(letterKeywordUseCase.getMostFrequentKeywords(userId));
     }
 }

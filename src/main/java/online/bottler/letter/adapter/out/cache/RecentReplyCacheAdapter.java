@@ -12,8 +12,8 @@ public class RecentReplyCacheAdapter implements PushRecentReplyCachePort, Delete
     private final RecentReplyRedisRepository recentReplyRedisRepository;
 
     @Override
-    public void push(Long id, String label, Long receiverId) {
-        recentReplyRedisRepository.push(id, label, receiverId);
+    public void push(Long receiverId, Long id, String label) {
+        recentReplyRedisRepository.push(receiverId, id, label);
     }
 
     @Override

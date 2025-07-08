@@ -13,8 +13,8 @@ public class RecommendedLetterService implements RecommendedLetterUseCase {
 
     private final RecommendedLetterPersistencePort recommendedLetterPersistencePort;
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<Long> findRecommendedLetterIdsByUserId(Long userId) {
         return recommendedLetterPersistencePort.findRecommendedLettersByUserId(userId);
     }

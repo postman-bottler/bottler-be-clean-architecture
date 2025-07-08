@@ -17,7 +17,7 @@ public class RecentReplyRedisRepository {
     @Value("${recommendation.saved-replies}")
     private int redisSavedReply;
 
-    public void push(Long id, String label, Long receiverId) {
+    public void push(Long receiverId, Long id, String label) {
         String replyKey = getReplyKey(receiverId);
         String replyValue = getReplyValue(id, label);
 

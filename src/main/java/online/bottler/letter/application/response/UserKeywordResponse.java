@@ -1,10 +1,9 @@
 package online.bottler.letter.application.response;
 
 import java.util.List;
-import online.bottler.letter.domain.UserKeyword;
 
 public record UserKeywordResponse(List<String> keywords) {
-    public static UserKeywordResponse from(List<UserKeyword> userKeywords) {
-        return new UserKeywordResponse(userKeywords.stream().map(UserKeyword::getKeyword).toList());
+    public static UserKeywordResponse from(List<String> keywords) {
+        return new UserKeywordResponse(keywords);
     }
 }

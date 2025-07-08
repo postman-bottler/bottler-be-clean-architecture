@@ -18,7 +18,7 @@ public class LetterDeleteStrategySend implements LetterDeleteStrategy {
 
     @Override
     public void deleteLetters(Long userId, List<Long> letterIds) {
-        letterWithKeywordsUseCase.softDeleteByIds(letterIds);
+        letterWithKeywordsUseCase.deleteLetters(userId, letterIds);
         letterBoxUseCase.removeLettersFromBox(letterIds, LetterBoxType.of(LETTER, null));
     }
 }

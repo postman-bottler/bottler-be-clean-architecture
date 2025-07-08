@@ -14,13 +14,13 @@ public interface ReplyLetterUseCase {
 
     ReplyLetter getReplyLetter(Long userId, Long id);
 
-    ReplyLetter delete(ReplyLetterDeleteCommand command);
+    ReplyLetter removeReplyLetter(ReplyLetterDeleteCommand command);
 
     boolean isReplied(Long userId, Long letterId);
 
-    List<Long> getIdsByUserId(Long userId);
+    List<Long> getReplyLetterIds(Long userId);
 
-    void softDeleteByIds(List<Long> ids);
+    void removeReplyLettersByIdIn(List<Long> ids);
 
-    List<ReplyLetter> getAllByIds(List<Long> ids);
+    List<ReplyLetter> getReplyLettersByIdIn(List<Long> ids);
 }

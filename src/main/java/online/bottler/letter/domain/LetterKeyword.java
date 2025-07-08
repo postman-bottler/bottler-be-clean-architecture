@@ -18,7 +18,8 @@ public class LetterKeyword extends BaseDomain {
         this.status = status;
     }
 
-    public static LetterKeyword of(Long id, Long letterId, String keyword, LetterStatus status, LocalDateTime createdAt) {
+    public static LetterKeyword of(Long id, Long letterId, String keyword, LetterStatus status,
+                                   LocalDateTime createdAt) {
         return new LetterKeyword(id, letterId, keyword, status, createdAt);
     }
 
@@ -28,6 +29,10 @@ public class LetterKeyword extends BaseDomain {
 
     public static List<LetterKeyword> createList(Long letterId, List<String> keywords) {
         return keywords.stream().map(keyword -> create(letterId, keyword)).collect(Collectors.toList());
+    }
+
+    public void block() {
+        this.status = LetterStatus.BLOCKED;
     }
 
     public void delete() {

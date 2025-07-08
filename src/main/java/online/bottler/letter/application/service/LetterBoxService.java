@@ -47,8 +47,7 @@ public class LetterBoxService implements LetterBoxUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<LetterSummary> getLetterBoxSummaries(Long userId, BoxType boxType,
-                                                     CommonPageCommand commonPageCommand) {
+    public Page<LetterSummary> getLetterBoxSummaries(Long userId, BoxType boxType, CommonPageCommand commonPageCommand) {
         return letterBoxPersistencePort.loadLetterBoxSummaries(userId, boxType, commonPageCommand.toPageable());
     }
 
@@ -74,12 +73,6 @@ public class LetterBoxService implements LetterBoxUseCase {
     @Transactional
     public void removeLettersFromBox(Long userId, List<Long> letterIds, LetterBoxType letterBoxType) {
         deleteLettersFromBox(userId, letterIds, letterBoxType);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public boolean isAccessDenied(Long letterId, Long userId) {
-        return !letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
     private void archiveLetterToBox(Long userId, Long letterId, LetterBoxType letterBoxType) {

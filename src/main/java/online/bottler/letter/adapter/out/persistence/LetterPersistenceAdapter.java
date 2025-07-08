@@ -20,18 +20,13 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     private final LetterJpaRepository letterJpaRepository;
 
     @Override
-    public Letter create(Letter letter) {
+    public Letter save(Letter letter) {
         return letterJpaRepository.save(LetterEntity.from(letter)).toDomain();
     }
 
     @Override
     public Optional<Letter> loadByIdAndStatus(Long id, LetterStatus status) {
         return letterJpaRepository.findByIdAndStatus(id, status).map(LetterEntity::toDomain);
-    }
-
-    @Override
-    public List<Long> loadIdsByUserId(Long userId) {
-        return letterJpaRepository.findIdsByUserId(userId, LetterStatus.OPEN);
     }
 
     @Override
@@ -75,7 +70,12 @@ public class LetterPersistenceAdapter implements LetterPersistencePort {
     }
 
     @Override
-    public void createAll(List<Letter> letters) {
+    public List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status) {
+        return letterJpaRepository.findIdsByUserIdAndStatus(userId, status);
+    }
+
+    @Override
+    public void saveAll(List<Letter> letters) {
         letterJpaRepository.saveAll(LetterEntity.fromList(letters));
     }
 }

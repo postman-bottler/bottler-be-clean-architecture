@@ -80,7 +80,7 @@ public class LetterBoxFacade {
     private List<Long> getLetterIdsByLetterType(Long userId, LetterType letterType) {
         return switch (letterType) {
             case LETTER -> letterWithKeywordsUseCase.getLetterIdsByUserId(userId);
-            case REPLY_LETTER -> replyLetterUseCase.getIdsByUserId(userId);
+            case REPLY_LETTER -> replyLetterUseCase.getReplyLetterIds(userId);
         };
     }
 
