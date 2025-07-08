@@ -60,7 +60,7 @@ public class LetterWithKeywordsFacade {
     public List<LetterRecommendSummaryResponse> getRecommended(Long userId) {
         List<Long> recommendedLetterIds = recommendUseCase.getRecommended(userId);
 
-        List<Letter> letters = letterWithKeywordsUseCase.getLettersIncludingAllStatusByIdIn(recommendedLetterIds);
+        List<Letter> letters = letterWithKeywordsUseCase.getLettersIncludingAllStatus(recommendedLetterIds);
 
         return LetterRecommendSummaryResponse.fromList(letters);
     }

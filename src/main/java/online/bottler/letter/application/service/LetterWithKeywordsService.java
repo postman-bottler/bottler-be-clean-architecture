@@ -40,7 +40,7 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     public LetterWithKeywords getLetterWithKeywords(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
         validateUserAccess(letterWithKeywordsDetailQuery.userId(), letterWithKeywordsDetailQuery.letterId());
 
-        Letter letter = loadLetterById(letterWithKeywordsDetailQuery.letterId());
+        Letter letter = getLetter(letterWithKeywordsDetailQuery.letterId());
 
         List<String> letterKeywords = letterKeywordPersistencePort.loadKeywordsByLetterIdAndStatus(letter.getId(), LetterStatus.OPEN);
 
@@ -50,18 +50,18 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     @Override
     @Transactional(readOnly = true)
     public String getLabel(Long letterId) {
-        return loadLetterById(letterId).getLabel();
+        return getLetter(letterId).getLabel();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Long> getLetterIdsByUserId(Long userId) {
+    public List<Long> getLetterIds(Long userId) {
         return letterPersistencePort.loadIdsByUserIdAndStatus(userId, LetterStatus.OPEN);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Letter> getLettersIncludingAllStatusByIdIn(List<Long> letterIds) {
+    public List<Letter> getLettersIncludingAllStatus(List<Long> letterIds) {
         return letterPersistencePort.loadAllByIdIn(letterIds);
     }
 
@@ -80,7 +80,7 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
     @Override
     @Transactional
     public Long blockLetter(Long letterId) {
-        Letter letter = loadLetterById(letterId);
+        Letter letter = getLetter(letterId);
         letter.block();
         letterPersistencePort.save(letter);
 
@@ -111,17 +111,13 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         return letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
-    private Letter loadLetterById(Long letterId) {
+    private Letter getLetter(Long letterId) {
         return letterPersistencePort.loadByIdAndStatus(letterId, LetterStatus.OPEN)
                 .orElseThrow(() -> new LetterNotFoundException(LETTER));
     }
 
-    private List<Letter> loadLetterByIdIn(List<Long> ids) {
-        return letterPersistencePort.loadAllByIdInAndStatus(ids, LetterStatus.OPEN);
-    }
-
     private void deleteLetterWithKeywords(Long userId, List<Long> letterIds) {
-        List<Letter> letters = loadLetterByIdIn(letterIds);
+        List<Letter> letters = getLetters(letterIds);
 
         validateOwnerShip(userId, letters);
 
@@ -131,6 +127,10 @@ public class LetterWithKeywordsService implements LetterWithKeywordsUseCase, Blo
         List<LetterKeyword> letterKeywords = letterKeywordPersistencePort.loadAllByLetterIdInAndStatus(letterIds, LetterStatus.OPEN);
         letterKeywords.forEach(LetterKeyword::delete);
         letterKeywordPersistencePort.saveAll(letterKeywords);
+    }
+
+    private List<Letter> getLetters(List<Long> ids) {
+        return letterPersistencePort.loadAllByIdInAndStatus(ids, LetterStatus.OPEN);
     }
 
     private void validateOwnerShip(Long userId, List<Letter> letters) {
