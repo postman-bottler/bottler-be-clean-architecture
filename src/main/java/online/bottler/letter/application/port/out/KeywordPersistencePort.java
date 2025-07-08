@@ -4,5 +4,5 @@ import java.util.List;
 import online.bottler.letter.domain.Keyword;
 
 public interface KeywordPersistencePort {
-    List<Keyword> getKeywords();
+    List<Keyword> loadAll();
 }
