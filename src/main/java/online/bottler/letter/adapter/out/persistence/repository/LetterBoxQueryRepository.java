@@ -36,7 +36,6 @@ public class LetterBoxQueryRepository {
         QReplyLetterEntity replyLetter = QReplyLetterEntity.replyLetterEntity;
         QLetterContentEntity replyLetterContent = replyLetter.letterContentEntity;
 
-
         StringExpression letterTitle = getLetterTitle(letterBoxType, letterContent, replyLetterContent);
         StringExpression letterLabel = getLetterLabel(letterBoxType, letterContent, replyLetterContent);
 
