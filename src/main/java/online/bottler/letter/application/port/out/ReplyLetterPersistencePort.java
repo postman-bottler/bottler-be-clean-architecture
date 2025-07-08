@@ -16,7 +16,7 @@ public interface ReplyLetterPersistencePort {
 
     Optional<ReplyLetter> loadByIdAndStatus(Long id, LetterStatus status);
 
-    List<Long> loadIdsByUserId(Long userId);
+    List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status);
 
     List<ReplyLetter> loadAllByIds(List<Long> ids);
 

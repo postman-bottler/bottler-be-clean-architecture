@@ -78,8 +78,8 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Override
     @Transactional(readOnly = true)
-    public List<Long> getIdsByUserId(Long userId) {
-        return replyLetterPersistencePort.loadIdsByUserId(userId);
+    public List<Long> getReplyLetterIds(Long userId) {
+        return replyLetterPersistencePort.loadIdsByUserIdAndStatus(userId, LetterStatus.OPEN);
     }
 
     @Override

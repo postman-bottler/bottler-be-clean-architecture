@@ -18,7 +18,7 @@ public interface ReplyLetterUseCase {
 
     boolean isReplied(Long userId, Long letterId);
 
-    List<Long> getIdsByUserId(Long userId);
+    List<Long> getReplyLetterIds(Long userId);
 
     void removeReplyLettersByIdIn(List<Long> ids);
 

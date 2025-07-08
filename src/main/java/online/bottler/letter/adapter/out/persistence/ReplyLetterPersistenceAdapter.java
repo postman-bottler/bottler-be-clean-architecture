@@ -40,8 +40,8 @@ public class ReplyLetterPersistenceAdapter implements ReplyLetterPersistencePort
     }
 
     @Override
-    public List<Long> loadIdsByUserId(Long userId) {
-        return replyLetterJpaRepository.findIdsBySenderId(userId);
+    public List<Long> loadIdsByUserIdAndStatus(Long userId, LetterStatus status) {
+        return replyLetterJpaRepository.findIdsBySenderIdAndStatus(userId, status);
     }
 
     @Override
