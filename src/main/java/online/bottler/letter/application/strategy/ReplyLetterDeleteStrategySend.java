@@ -22,13 +22,13 @@ public class ReplyLetterDeleteStrategySend implements LetterDeleteStrategy {
 
     @Override
     public void deleteLetters(Long userId, List<Long> letterIds) {
-        List<ReplyLetter> replyLetters = replyLetterUseCase.getReplyLettersByIdIn(letterIds);
+        List<ReplyLetter> replyLetters = replyLetterUseCase.getReplyLetters(letterIds);
         validateReplyLetterOwnerShip(userId, replyLetters);
 
         replyLetters.forEach(replyLetter -> recentReplyForLetterUseCase.delete(replyLetter.getReceiverId(),
                 replyLetter.getId(), replyLetter.getLabel()));
 
-        replyLetterUseCase.removeReplyLettersByIdIn(letterIds);
+        replyLetterUseCase.removeReplyLetters(letterIds);
         letterBoxUseCase.removeLettersFromBox(letterIds, LetterBoxType.of(REPLY_LETTER, null));
     }
 

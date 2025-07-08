@@ -51,6 +51,26 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Override
     @Transactional(readOnly = true)
+    public ReplyLetter getReplyLetter(Long userId, Long id) {
+        validateUserAccess(userId, id);
+
+        return getReplyLetter(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReplyLetter> getReplyLetters(List<Long> ids) {
+        return replyLetterPersistencePort.loadAllByIds(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getReplyLetterIds(Long userId) {
+        return replyLetterPersistencePort.loadIdsByUserIdAndStatus(userId, LetterStatus.OPEN);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<ReplyLetter> getPagedReplyLetters(ReplyLetterSummariesQuery replyLetterSummariesQuery) {
         validateUserAccess(replyLetterSummariesQuery.userId(), replyLetterSummariesQuery.letterId());
 
@@ -64,26 +84,6 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Override
     @Transactional(readOnly = true)
-    public ReplyLetter getReplyLetter(Long userId, Long id) {
-        validateUserAccess(userId, id);
-
-        return findReplyLetter(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ReplyLetter> getReplyLettersByIdIn(List<Long> ids) {
-        return replyLetterPersistencePort.loadAllByIds(ids);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Long> getReplyLetterIds(Long userId) {
-        return replyLetterPersistencePort.loadIdsByUserIdAndStatus(userId, LetterStatus.OPEN);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public boolean isReplied(Long userId, Long letterId) {
         return hasReplyLetter(userId, letterId);
     }
@@ -91,7 +91,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     @Transactional
     public ReplyLetter removeReplyLetter(ReplyLetterDeleteCommand replyLetterDeleteCommand) {
-        ReplyLetter replyLetter = findReplyLetter(replyLetterDeleteCommand.id());
+        ReplyLetter replyLetter = getReplyLetter(replyLetterDeleteCommand.id());
         replyLetter.delete();
         replyLetterPersistencePort.save(replyLetter);
 
@@ -100,7 +100,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
 
     @Override
     @Transactional
-    public void removeReplyLettersByIdIn(List<Long> ids) {
+    public void removeReplyLetters(List<Long> ids) {
         List<ReplyLetter> replyLetters = replyLetterPersistencePort.loadAllByIdInAndStatus(ids, OPEN);
         replyLetters.forEach(ReplyLetter::delete);
         replyLetterPersistencePort.saveAll(replyLetters);
@@ -109,7 +109,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
     @Override
     @Transactional
     public Long blockReplyLetter(Long id) {
-        ReplyLetter replyLetter = findReplyLetter(id);
+        ReplyLetter replyLetter = getReplyLetter(id);
         replyLetter.block();
         replyLetterPersistencePort.save(replyLetter);
 
@@ -126,6 +126,11 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
         return replyLetterPersistencePort.existsBySenderIdAndLetterId(userId, letterId);
     }
 
+    private Letter getLetter(ReplyLetterCommand replyLetterCommand) {
+        return letterPersistencePort.loadByIdAndStatus(replyLetterCommand.letterId(), LetterStatus.OPEN)
+                .orElseThrow(LetterNotFoundException::new);
+    }
+
     private void validateUserAccess(Long userId, Long letterId) {
         if (!isLetterInBox(userId, letterId)) {
             throw new UnauthorizedLetterAccessException();
@@ -136,12 +141,7 @@ public class ReplyLetterService implements ReplyLetterUseCase, BlockReplyLetterU
         return letterBoxPersistencePort.existsByUserIdAndLetterId(userId, letterId);
     }
 
-    private Letter getLetter(ReplyLetterCommand replyLetterCommand) {
-        return letterPersistencePort.loadByIdAndStatus(replyLetterCommand.letterId(), LetterStatus.OPEN)
-                .orElseThrow(LetterNotFoundException::new);
-    }
-
-    private ReplyLetter findReplyLetter(Long id) {
+    private ReplyLetter getReplyLetter(Long id) {
         return replyLetterPersistencePort.loadByIdAndStatus(id, OPEN)
                 .orElseThrow(() -> new LetterNotFoundException(REPLY_LETTER));
     }
