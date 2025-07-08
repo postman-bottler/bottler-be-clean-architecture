@@ -6,6 +6,7 @@ import lombok.Getter;
 public class LetterBoxType {
 
     private final LetterType letterType;
+
     private final BoxType boxType;
 
     private LetterBoxType(LetterType letterType, BoxType boxType) {

@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 
+@Getter
 public class LetterWithKeywords {
+
     private final Letter letter;
-    @Getter
+
     private final List<String> keywords;
 
     private LetterWithKeywords(Letter letter, List<String> keywords) {

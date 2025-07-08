@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class ReplyLetter extends BaseLetter {
+
     private final Long senderId;
 
     private final Long receiverId;

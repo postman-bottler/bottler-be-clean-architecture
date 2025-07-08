@@ -6,7 +6,9 @@ import lombok.Getter;
 public class UserKeyword {
 
     private final Long id;
+
     private final Long userId;
+
     private final String keyword;
 
     private UserKeyword(Long id, Long userId, String keyword) {

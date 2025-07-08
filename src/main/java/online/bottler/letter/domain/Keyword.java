@@ -5,8 +5,10 @@ import lombok.Getter;
 @Getter
 public class Keyword {
 
-    private Long id;
+    private final Long id;
+
     private final String keyword;
+
     private final String category;
 
     public Keyword(Long id, String keyword, String category) {

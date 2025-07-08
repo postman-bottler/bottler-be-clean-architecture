@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class Letter extends BaseLetter {
+
     private final Long userId;
 
     private Letter(
@@ -25,11 +26,23 @@ public class Letter extends BaseLetter {
             LetterStatus status,
             LocalDateTime createdAt
     ) {
-        return new Letter(id, userId, letterContent, status, createdAt);
+        return new Letter(
+                id,
+                userId,
+                letterContent,
+                status,
+                createdAt
+        );
     }
 
     public static Letter create(Long userId, LetterContent letterContent) {
-        return new Letter(null, userId, letterContent, LetterStatus.OPEN, null);
+        return new Letter(
+                null,
+                userId,
+                letterContent,
+                LetterStatus.OPEN,
+                null
+        );
     }
 
     public boolean isOwner(Long userId) {

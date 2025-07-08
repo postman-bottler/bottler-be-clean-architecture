@@ -5,7 +5,9 @@ import lombok.Getter;
 
 @Getter
 abstract class BaseLetter extends BaseDomain {
+
     private final LetterContent letterContent;
+
     private LetterStatus status;
 
     BaseLetter(

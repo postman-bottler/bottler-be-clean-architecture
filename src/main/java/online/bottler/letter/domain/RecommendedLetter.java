@@ -4,8 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class RecommendedLetter {
-    private Long id;
+
+    private final Long id;
+
     private final Long userId;
+
     private final Long letterId;
 
     private RecommendedLetter(Long id, Long userId, Long letterId) {
