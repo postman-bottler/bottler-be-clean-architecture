@@ -10,7 +10,6 @@ import online.bottler.letter.domain.ReplyLetter;
 import org.springframework.data.domain.Page;
 
 public interface LetterBoxUseCase {
-
     void archiveLetter(Letter letter);
 
     void archiveLetter(ReplyLetter replyLetter);

@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface LetterBoxPersistencePort {
-
     void save(LetterBox letterBox);
 
     Page<LetterSummary> loadLetterBoxSummaries(Long userId, BoxType boxType, Pageable pageable);

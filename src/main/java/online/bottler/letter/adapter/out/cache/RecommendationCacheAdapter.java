@@ -13,13 +13,8 @@ public class RecommendationCacheAdapter implements RecommendationCachePort {
     private final RecommendationRedisRepository recommendationRedisRepository;
 
     @Override
-    public void updateActiveRecommendations(Long userId, Long letterId) {
-        recommendationRedisRepository.updateActiveRecommendations(userId, letterId);
-    }
-
-    @Override
-    public List<Long> fetchTempRecommendations(Long userId) {
-        return recommendationRedisRepository.fetchTempRecommendations(userId);
+    public void saveDeveloperLetter(Long userId, List<Long> recommendations) {
+        recommendationRedisRepository.saveDeveloperLetter(userId, recommendations);
     }
 
     @Override
@@ -28,12 +23,17 @@ public class RecommendationCacheAdapter implements RecommendationCachePort {
     }
 
     @Override
-    public void saveDeveloperLetter(Long userId, List<Long> recommendations) {
-        recommendationRedisRepository.saveDeveloperLetter(userId, recommendations);
+    public List<Long> fetchTempRecommendations(Long userId) {
+        return recommendationRedisRepository.fetchTempRecommendations(userId);
     }
 
     @Override
     public List<Long> fetchActiveRecommendations(Long userId) {
         return recommendationRedisRepository.fetchActiveRecommendations(userId);
+    }
+
+    @Override
+    public void updateActiveRecommendations(Long userId, Long letterId) {
+        recommendationRedisRepository.updateActiveRecommendations(userId, letterId);
     }
 }
