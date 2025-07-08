@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import online.bottler.letter.application.command.UserKeywordCommand;
 import online.bottler.letter.application.port.in.UserKeywordUseCase;
 import online.bottler.letter.application.port.out.UserKeywordPersistencePort;
-import online.bottler.letter.domain.UserKeyword;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +14,15 @@ public class UserKeywordService implements UserKeywordUseCase {
 
     private final UserKeywordPersistencePort userKeywordPersistencePort;
 
-    @Transactional
     @Override
+    @Transactional
     public void create(UserKeywordCommand command) {
         userKeywordPersistencePort.replaceKeywordsByUserId(command.toDomainList(), command.userId());
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public List<UserKeyword> getKeywords(Long userId) {
-        return userKeywordPersistencePort.loadUserKeywords(userId);
+    @Transactional(readOnly = true)
+    public List<String> getKeywords(Long userId) {
+        return userKeywordPersistencePort.loadKeywordsByUserId(userId);
     }
 }
