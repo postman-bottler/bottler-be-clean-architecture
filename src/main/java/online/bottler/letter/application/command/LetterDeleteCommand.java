@@ -1,9 +1,8 @@
 package online.bottler.letter.application.command;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import online.bottler.letter.domain.LetterBoxType;
 import online.bottler.letter.domain.LetterDeletion;
 
@@ -13,13 +12,17 @@ public record LetterDeleteCommand(Long letterId, LetterBoxType letterBoxType) {
     }
 
     public static Map<LetterBoxType, LetterDeletion> toLetterDeleteMap(List<LetterDeleteCommand> letterDeleteCommands) {
-        Map<LetterBoxType, LetterDeletion> groupedLetters = new HashMap<>();
-
-        letterDeleteCommands.stream()
-                .filter(command -> command.letterBoxType.isValid())
-                .forEach(command -> groupedLetters.computeIfAbsent(command.letterBoxType, k -> new LetterDeletion(new ArrayList<>()))
-                        .letterIds().add(command.letterId()));
-
-        return groupedLetters;
+        return letterDeleteCommands.stream()
+                .filter(cmd -> cmd.letterBoxType.isValid())
+                .collect(
+                        Collectors.toMap(
+                                cmd -> cmd.letterBoxType,
+                                cmd -> new LetterDeletion(List.of(cmd.letterId())),
+                                (existing, replacement) -> {
+                                    existing.letterIds().addAll(replacement.letterIds());
+                                    return existing;
+                                }
+                        )
+                );
     }
 }
