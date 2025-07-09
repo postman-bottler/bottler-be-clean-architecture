@@ -33,9 +33,9 @@ public class UserKeywordEntity extends BaseEntity {
 
     public static UserKeywordEntity from(UserKeyword userKeyword) {
         return UserKeywordEntity.builder()
-                .id(userKeyword.getId())
-                .userId(userKeyword.getUserId())
-                .keyword(userKeyword.getKeyword())
+                .id(userKeyword.id())
+                .userId(userKeyword.userId())
+                .keyword(userKeyword.keyword())
                 .build();
     }
 

@@ -42,22 +42,22 @@ abstract class BaseLetter extends BaseDomain {
     }
 
     public String getTitle() {
-        return letterContent.getTitle();
+        return letterContent.title();
     }
 
     public String getContent() {
-        return letterContent.getContent();
+        return letterContent.content();
     }
 
     public String getFont() {
-        return letterContent.getFont();
+        return letterContent.font();
     }
 
     public String getPaper() {
-        return letterContent.getPaper();
+        return letterContent.paper();
     }
 
     public String getLabel() {
-        return letterContent.getLabel();
+        return letterContent.label();
     }
 }

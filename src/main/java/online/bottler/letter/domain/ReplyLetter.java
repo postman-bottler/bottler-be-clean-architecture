@@ -1,6 +1,5 @@
 package online.bottler.letter.domain;
 
-
 import java.time.LocalDateTime;
 import lombok.Getter;
 
@@ -38,15 +37,25 @@ public class ReplyLetter extends BaseLetter {
         return new ReplyLetter(id, senderId, receiverId, letterId, letterContent, status, createdAt);
     }
 
-    public static ReplyLetter create(Long senderId, Long receiverId, Long letterId, LetterContent letterContent, String originalTitle) {
+    public static ReplyLetter create(
+            Long senderId, Long receiverId,
+            Long letterId,
+            LetterContent letterContent,
+            String originalTitle
+    ) {
         String formattedTitle = formatReplyTitle(originalTitle);
 
         return new ReplyLetter(
                 null,
                 senderId, receiverId,
                 letterId,
-                LetterContent.of(formattedTitle, letterContent.getContent(),
-                        letterContent.getFont(), letterContent.getPaper(), letterContent.getLabel()),
+                LetterContent.of(
+                        formattedTitle,
+                        letterContent.content(),
+                        letterContent.font(),
+                        letterContent.paper(),
+                        letterContent.label()
+                ),
                 LetterStatus.OPEN,
                 null
         );

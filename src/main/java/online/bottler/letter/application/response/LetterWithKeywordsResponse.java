@@ -16,14 +16,14 @@ public record LetterWithKeywordsResponse(
 ) {
     public static LetterWithKeywordsResponse from(LetterWithKeywords letterWithKeywords) {
         return new LetterWithKeywordsResponse(
-                letterWithKeywords.getLetterId(),
-                letterWithKeywords.getTitle(),
-                letterWithKeywords.getContent(),
-                letterWithKeywords.getKeywords(),
-                letterWithKeywords.getFont(),
-                letterWithKeywords.getPaper(),
-                letterWithKeywords.getLabel(),
-                letterWithKeywords.getCreatedAt()
+                letterWithKeywords.letterId(),
+                letterWithKeywords.title(),
+                letterWithKeywords.content(),
+                letterWithKeywords.keywords(),
+                letterWithKeywords.font(),
+                letterWithKeywords.paper(),
+                letterWithKeywords.label(),
+                letterWithKeywords.createdAt()
         );
     }
 }

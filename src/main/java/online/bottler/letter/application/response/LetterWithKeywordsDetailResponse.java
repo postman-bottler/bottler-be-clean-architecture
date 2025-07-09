@@ -19,17 +19,17 @@ public record LetterWithKeywordsDetailResponse(
 ) {
     public static LetterWithKeywordsDetailResponse of(LetterWithKeywords letterWithKeywords, String profile, boolean isOwner, boolean isReplied) {
         return new LetterWithKeywordsDetailResponse(
-                letterWithKeywords.getLetterId(),
-                letterWithKeywords.getTitle(),
-                letterWithKeywords.getContent(),
-                letterWithKeywords.getKeywords(),
-                letterWithKeywords.getFont(),
-                letterWithKeywords.getPaper(),
+                letterWithKeywords.letterId(),
+                letterWithKeywords.title(),
+                letterWithKeywords.content(),
+                letterWithKeywords.keywords(),
+                letterWithKeywords.font(),
+                letterWithKeywords.paper(),
                 profile,
-                letterWithKeywords.getLabel(),
+                letterWithKeywords.label(),
                 isOwner,
                 isReplied,
-                letterWithKeywords.getCreatedAt()
+                letterWithKeywords.createdAt()
         );
     }
 }

@@ -70,7 +70,7 @@ public class LetterBoxFacade {
     }
 
     private void deleteLettersForType(Long userId, LetterBoxType letterBoxType) {
-        List<Long> letterIds = getLetterIdsByLetterType(userId, letterBoxType.getLetterType());
+        List<Long> letterIds = getLetterIdsByLetterType(userId, letterBoxType.letterType());
 
         if (!letterIds.isEmpty()) {
             getDeleteStrategy(letterBoxType).deleteLetters(userId, letterIds);

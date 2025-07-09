@@ -30,9 +30,9 @@ public class RecommendedLetterEntity extends BaseEntity {
 
     public static RecommendedLetterEntity from(RecommendedLetter recommendedLetter) {
         return RecommendedLetterEntity.builder()
-                .id(recommendedLetter.getId())
-                .userId(recommendedLetter.getUserId())
-                .letterId(recommendedLetter.getLetterId())
+                .id(recommendedLetter.id())
+                .userId(recommendedLetter.userId())
+                .letterId(recommendedLetter.letterId())
                 .build();
     }
 

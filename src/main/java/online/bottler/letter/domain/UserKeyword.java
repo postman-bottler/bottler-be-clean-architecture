@@ -1,21 +1,6 @@
 package online.bottler.letter.domain;
 
-import lombok.Getter;
-
-@Getter
-public class UserKeyword {
-
-    private final Long id;
-
-    private final Long userId;
-
-    private final String keyword;
-
-    private UserKeyword(Long id, Long userId, String keyword) {
-        this.id = id;
-        this.userId = userId;
-        this.keyword = keyword;
-    }
+public record UserKeyword(Long id, Long userId, String keyword) {
 
     public static UserKeyword of(Long id, Long userId, String keyword) {
         return new UserKeyword(id, userId, keyword);

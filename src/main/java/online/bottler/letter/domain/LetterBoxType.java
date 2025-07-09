@@ -1,18 +1,6 @@
 package online.bottler.letter.domain;
 
-import lombok.Getter;
-
-@Getter
-public class LetterBoxType {
-
-    private final LetterType letterType;
-
-    private final BoxType boxType;
-
-    private LetterBoxType(LetterType letterType, BoxType boxType) {
-        this.letterType = letterType;
-        this.boxType = boxType;
-    }
+public record LetterBoxType(LetterType letterType, BoxType boxType) {
 
     public static LetterBoxType of(LetterType letterType, BoxType boxType) {
         return new LetterBoxType(letterType, boxType);
@@ -23,6 +11,6 @@ public class LetterBoxType {
     }
 
     public boolean isValid() {
-        return this.letterType != null && this.boxType != null;
+        return letterType != null && boxType != null;
     }
 }
