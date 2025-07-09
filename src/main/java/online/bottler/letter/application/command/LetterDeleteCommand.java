@@ -17,8 +17,14 @@ public record LetterDeleteCommand(Long letterId, LetterBoxType letterBoxType) {
 
         letterDeleteCommands.stream()
                 .filter(command -> command.letterBoxType.isValid())
-                .forEach(command -> groupedLetters.computeIfAbsent(command.letterBoxType, k -> new LetterDeletion(new ArrayList<>()))
-                        .letterIds().add(command.letterId()));
+                .forEach(command ->
+                        groupedLetters
+                        .computeIfAbsent(
+                                command.letterBoxType, k -> new LetterDeletion(new ArrayList<>())
+                        )
+                        .letterIds()
+                                .add(command.letterId())
+                );
 
         return groupedLetters;
     }

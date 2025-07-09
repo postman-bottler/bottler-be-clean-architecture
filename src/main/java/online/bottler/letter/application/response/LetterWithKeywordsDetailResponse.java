@@ -17,7 +17,12 @@ public record LetterWithKeywordsDetailResponse(
         boolean isReplied,
         LocalDateTime createdAt
 ) {
-    public static LetterWithKeywordsDetailResponse of(LetterWithKeywords letterWithKeywords, String profile, boolean isOwner, boolean isReplied) {
+    public static LetterWithKeywordsDetailResponse of(
+            LetterWithKeywords letterWithKeywords,
+            String profile,
+            boolean isOwner,
+            boolean isReplied
+    ) {
         return new LetterWithKeywordsDetailResponse(
                 letterWithKeywords.letterId(),
                 letterWithKeywords.title(),

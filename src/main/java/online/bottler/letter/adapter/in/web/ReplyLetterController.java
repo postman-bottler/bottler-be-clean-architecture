@@ -58,7 +58,7 @@ public class ReplyLetterController {
                                                                                      BindingResult bindingResult,
                                                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
         Page<ReplyLetterSummaryResponse> result = replyLetterFacade.getSummaries(
-                ReplyLetterSummariesQuery.of(letterId, commonPageRequest.toCommand(), userDetails.getUserId()));
+                ReplyLetterSummariesQuery.of(userDetails.getUserId(), letterId, commonPageRequest.toCommand()));
         return ApiResponse.onSuccess(PageResponse.from(result));
     }
 

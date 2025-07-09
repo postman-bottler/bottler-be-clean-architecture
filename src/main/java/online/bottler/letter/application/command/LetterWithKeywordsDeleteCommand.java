@@ -2,8 +2,8 @@ package online.bottler.letter.application.command;
 
 import online.bottler.letter.domain.BoxType;
 
-public record LetterWithKeywordsDeleteCommand(Long letterId, Long userId, BoxType boxType) {
-    public static LetterWithKeywordsDeleteCommand of(Long letterId, Long userId, String boxType) {
-        return new LetterWithKeywordsDeleteCommand(letterId, userId, BoxType.valueOf(boxType));
+public record LetterWithKeywordsDeleteCommand(Long userId, Long letterId, BoxType boxType) {
+    public static LetterWithKeywordsDeleteCommand of(Long userId, Long letterId, String boxType) {
+        return new LetterWithKeywordsDeleteCommand(userId, letterId, BoxType.valueOf(boxType));
     }
 }
