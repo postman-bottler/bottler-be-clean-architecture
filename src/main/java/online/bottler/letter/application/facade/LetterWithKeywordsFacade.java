@@ -46,7 +46,7 @@ public class LetterWithKeywordsFacade {
     public LetterWithKeywordsDetailResponse getDetail(LetterWithKeywordsDetailQuery letterWithKeywordsDetailQuery) {
         LetterWithKeywords letterWithKeywords = letterWithKeywordsUseCase.getLetterWithKeywords(letterWithKeywordsDetailQuery);
 
-        String profile = userUseCase.findById(letterWithKeywords.getUserId()).getImageUrl();
+        String profile = userUseCase.findById(letterWithKeywords.userId()).getImageUrl();
 
         boolean isOwner = letterWithKeywords.isOwner(letterWithKeywordsDetailQuery.userId());
 

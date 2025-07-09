@@ -7,8 +7,11 @@ import lombok.Getter;
 
 @Getter
 public class LetterKeyword extends BaseDomain {
+
     private final Long letterId;
+
     private final String keyword;
+
     private LetterStatus status;
 
     private LetterKeyword(Long id, Long letterId, String keyword, LetterStatus status, LocalDateTime createdAt) {

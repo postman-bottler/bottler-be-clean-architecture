@@ -31,8 +31,8 @@ public class LetterBoxTypeEntity {
 
     public static LetterBoxTypeEntity from(LetterBoxType letterBoxType) {
         return LetterBoxTypeEntity.builder()
-                .letterType(letterBoxType.getLetterType())
-                .boxType(letterBoxType.getBoxType())
+                .letterType(letterBoxType.letterType())
+                .boxType(letterBoxType.boxType())
                 .build();
     }
 

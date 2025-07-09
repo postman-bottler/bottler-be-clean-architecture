@@ -37,11 +37,11 @@ public class LetterContentEntity {
 
     public static LetterContentEntity from(LetterContent letterContent) {
         return LetterContentEntity.builder()
-                .title(letterContent.getTitle())
-                .content(letterContent.getContent())
-                .font(letterContent.getFont())
-                .paper(letterContent.getPaper())
-                .label(letterContent.getLabel())
+                .title(letterContent.title())
+                .content(letterContent.content())
+                .font(letterContent.font())
+                .paper(letterContent.paper())
+                .label(letterContent.label())
                 .build();
     }
 

@@ -5,7 +5,9 @@ import lombok.Getter;
 
 @Getter
 abstract class BaseDomain {
+
     private final Long id;
+
     private final LocalDateTime createdAt;
 
     BaseDomain(Long id, LocalDateTime createdAt) {

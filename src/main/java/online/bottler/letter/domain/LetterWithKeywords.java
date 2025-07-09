@@ -2,44 +2,34 @@ package online.bottler.letter.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import lombok.Getter;
 
-public class LetterWithKeywords {
-    private final Letter letter;
-    @Getter
-    private final List<String> keywords;
+public record LetterWithKeywords(Letter letter, List<String> keywords) {
 
-    private LetterWithKeywords(Letter letter, List<String> keywords) {
-        this.letter = letter;
-        this.keywords = List.copyOf(Objects.requireNonNull(keywords, "keywords must not be null"));
-    }
-
-    public Long getLetterId() {
+    public Long letterId() {
         return letter.getId();
     }
 
-    public Long getUserId() {
+    public Long userId() {
         return letter.getUserId();
     }
 
-    public String getTitle() {
+    public String title() {
         return letter.getTitle();
     }
 
-    public String getContent() {
+    public String content() {
         return letter.getContent();
     }
 
-    public String getFont() {
+    public String font() {
         return letter.getFont();
     }
 
-    public String getPaper() {
+    public String paper() {
         return letter.getPaper();
     }
 
-    public String getLabel() {
+    public String label() {
         return letter.getLabel();
     }
 
@@ -55,7 +45,7 @@ public class LetterWithKeywords {
         return letter.isBlocked();
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDateTime createdAt() {
         return letter.getCreatedAt();
     }
 

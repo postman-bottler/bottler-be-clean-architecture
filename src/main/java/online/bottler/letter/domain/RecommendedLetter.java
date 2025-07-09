@@ -1,18 +1,6 @@
 package online.bottler.letter.domain;
 
-import lombok.Getter;
-
-@Getter
-public class RecommendedLetter {
-    private Long id;
-    private final Long userId;
-    private final Long letterId;
-
-    private RecommendedLetter(Long id, Long userId, Long letterId) {
-        this.id = id;
-        this.userId = userId;
-        this.letterId = letterId;
-    }
+public record RecommendedLetter(Long id, Long userId, Long letterId) {
 
     public static RecommendedLetter of(Long id, Long userId, Long letterId) {
         return new RecommendedLetter(id, userId, letterId);
