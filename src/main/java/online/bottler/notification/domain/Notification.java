@@ -1,33 +1,31 @@
 package online.bottler.notification.domain;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.Getter;
 
 @Getter
 public class Notification {
-    private final UUID id;
+    private Long id;
 
     private final NotificationType type;
 
-    private final long receiver;
+    private final long receiverId;
 
     private final LocalDateTime createdAt;
 
     private final Boolean isRead;
 
-    protected Notification(NotificationType type, Long receiver, Boolean isRead) {
-        this.id = UUID.randomUUID();
+    protected Notification(NotificationType type, Long receiverId, Boolean isRead) {
         this.type = type;
-        this.receiver = receiver;
+        this.receiverId = receiverId;
         this.createdAt = LocalDateTime.now();
         this.isRead = isRead;
     }
 
-    protected Notification(UUID id, NotificationType type, Long receiver, LocalDateTime createdAt, Boolean isRead) {
+    protected Notification(Long id, NotificationType type, Long receiverId, LocalDateTime createdAt, Boolean isRead) {
         this.id = id;
         this.type = type;
-        this.receiver = receiver;
+        this.receiverId = receiverId;
         this.createdAt = createdAt;
         this.isRead = isRead;
     }
@@ -39,7 +37,7 @@ public class Notification {
         return new Notification(type, receiver, false);
     }
 
-    public static Notification of(UUID id, NotificationType type, Long receiver,
+    public static Notification of(Long id, NotificationType type, Long receiver,
                                   Long letterId, LocalDateTime createdAt, Boolean isRead, String label) {
         if (type.isLetterNotification()) {
             return new LetterNotification(id, type, receiver, letterId, createdAt, isRead, label);
@@ -52,8 +50,8 @@ public class Notification {
     }
 
     public Notification read() {
-        return Notification.of(id, type, receiver,
+        return Notification.of(id, type, receiverId,
                 isLetterNotification() ? ((LetterNotification) this).getLetterId() : null, createdAt, true,
-                isLetterNotification() ? ((LetterNotification) this).getLabel() : null);
+                isLetterNotification() ? ((LetterNotification) this).getLabelUrl() : null);
     }
 }
