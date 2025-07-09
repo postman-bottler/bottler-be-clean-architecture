@@ -1,30 +1,28 @@
 package online.bottler.notification.domain;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import online.bottler.global.exception.DomainException;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 public class LetterNotification extends Notification {
     private final long letterId;
 
-    private final String label;
+    private final String labelUrl;
 
-    protected LetterNotification(NotificationType type, long receiver, Long letterId, Boolean isRead, String label) {
+    protected LetterNotification(NotificationType type, long receiver, Long letterId, Boolean isRead, String labelUrl) {
         super(type, receiver, isRead);
         validateLetterId(letterId);
         this.letterId = letterId;
-        this.label = label;
+        this.labelUrl = labelUrl;
     }
 
-    protected LetterNotification(UUID id, NotificationType type, long receiver,
-                                 Long letterId, LocalDateTime createdAt, Boolean isRead, String label) {
+    protected LetterNotification(Long id, NotificationType type, long receiver,
+                                 Long letterId, LocalDateTime createdAt, Boolean isRead, String labelUrl) {
         super(id, type, receiver, createdAt, isRead);
         validateLetterId(letterId);
         this.letterId = letterId;
-        this.label = label;
+        this.labelUrl = labelUrl;
     }
 
     private void validateLetterId(Long letterId) {

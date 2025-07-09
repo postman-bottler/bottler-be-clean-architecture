@@ -29,7 +29,7 @@ public class NotificationTest {
 
             // THEN
             assertThat(notification).isInstanceOf(LetterNotification.class)
-                    .extracting("type", "receiver", "isRead", "letterId")
+                    .extracting("type", "receiverId", "isRead", "letterId")
                     .containsExactlyInAnyOrder(NEW_LETTER, 1L, false, 1L);
         }
 
@@ -62,7 +62,7 @@ public class NotificationTest {
 
             // THEN
             assertThat(notification).isInstanceOf(LetterNotification.class)
-                    .extracting("type", "receiver", "isRead", "letterId")
+                    .extracting("type", "receiverId", "isRead", "letterId")
                     .containsExactlyInAnyOrder(TARGET_LETTER, 1L, false, 1L);
         }
 
@@ -95,7 +95,7 @@ public class NotificationTest {
 
             // THEN
             assertThat(notification).isInstanceOf(LetterNotification.class)
-                    .extracting("type", "receiver", "isRead", "letterId")
+                    .extracting("type", "receiverId", "isRead", "letterId")
                     .containsExactlyInAnyOrder(MAP_REPLY, 1L, false, 1L);
         }
 
@@ -128,7 +128,7 @@ public class NotificationTest {
 
             // THEN
             assertThat(notification).isInstanceOf(LetterNotification.class)
-                    .extracting("type", "receiver", "isRead", "letterId")
+                    .extracting("type", "receiverId", "isRead", "letterId")
                     .containsExactlyInAnyOrder(KEYWORD_REPLY, 1L, false, 1L);
         }
 
@@ -162,7 +162,7 @@ public class NotificationTest {
             // THEN
             assertThat(notification).isInstanceOf(Notification.class)
                     .isNotInstanceOf(LetterNotification.class)
-                    .extracting("type", "receiver", "isRead")
+                    .extracting("type", "receiverId", "isRead")
                     .containsExactlyInAnyOrder(WARNING, 1L, false);
         }
 
@@ -181,7 +181,7 @@ public class NotificationTest {
             // THEN
             assertThat(notification).isInstanceOf(Notification.class)
                     .isNotInstanceOf(LetterNotification.class)
-                    .extracting("type", "receiver", "isRead")
+                    .extracting("type", "receiverId", "isRead")
                     .containsExactlyInAnyOrder(BAN, 1L, false);
         }
     }
@@ -197,8 +197,8 @@ public class NotificationTest {
 
         // THEN
         assertThat(read).isNotEqualTo(notification)
-                .extracting("type", "receiver", "createdAt", "letterId")
-                .containsExactlyInAnyOrder(notification.getType(), notification.getReceiver(),
+                .extracting("type", "receiverId", "createdAt", "letterId")
+                .containsExactlyInAnyOrder(notification.getType(), notification.getReceiverId(),
                         notification.getCreatedAt(), ((LetterNotification) notification).getLetterId());
         assertThat(read.getIsRead()).isTrue();
     }

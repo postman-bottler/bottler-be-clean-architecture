@@ -267,8 +267,8 @@ public class NotificationServiceTest {
         // given
         given(notificationRepository.findByReceiver(any()))
                 .willReturn(Notifications.from(Arrays.asList(
-                        Notification.of(UUID.randomUUID(), WARNING, 1L, null, LocalDateTime.now(), true, null),
-                        Notification.of(UUID.randomUUID(), BAN, 1L, null, LocalDateTime.now(), false, null))));
+                        Notification.of(1L, WARNING, 1L, null, LocalDateTime.now(), true, null),
+                        Notification.of(2L, BAN, 1L, null, LocalDateTime.now(), false, null))));
 
         // when
         UnreadNotificationResponse result = notificationService.getUnreadNotificationCount(1L);

@@ -40,7 +40,7 @@ class NotificationsTest {
     void markAsRead() {
         // given
         ArrayList<Notification> notificationList = new ArrayList<>();
-        Notification notification1 = Notification.of(UUID.randomUUID(), WARNING, 1L, null, LocalDateTime.now(), true,
+        Notification notification1 = Notification.of(1L, WARNING, 1L, null, LocalDateTime.now(), true,
                 "label");
         Notification notification2 = Notification.create(WARNING, 1L, null, null);
         Notification notification3 = Notification.create(WARNING, 1L, null, null);
@@ -62,9 +62,9 @@ class NotificationsTest {
     @Test
     void getUnreadCount() {
         // given
-        Notification n1 = Notification.of(UUID.randomUUID(), WARNING, 1L, null, LocalDateTime.now(), false, null);
-        Notification n2 = Notification.of(UUID.randomUUID(), WARNING, 1L, null, LocalDateTime.now(), false, null);
-        Notification n3 = Notification.of(UUID.randomUUID(), WARNING, 1L, null, LocalDateTime.now(), true, null);
+        Notification n1 = Notification.of(1L, WARNING, 1L, null, LocalDateTime.now(), false, null);
+        Notification n2 = Notification.of(2L, WARNING, 1L, null, LocalDateTime.now(), false, null);
+        Notification n3 = Notification.of(3L, WARNING, 1L, null, LocalDateTime.now(), true, null);
         Notifications notifications = Notifications.from(Arrays.asList(n1, n2, n3));
 
         // when
