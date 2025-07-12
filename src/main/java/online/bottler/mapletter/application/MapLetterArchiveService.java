@@ -48,14 +48,16 @@ public class MapLetterArchiveService implements MapLetterArchiveUseCase {
     @Transactional(readOnly = true)
     public Page<FindAllArchiveLettersResponse> findArchiveLetters(int page, int size, Long userId) {
         PageValidator.validMinPage(page);
+
         Page<FindAllArchiveLettersDTO> letters = mapLetterArchivePersistencePort.findAllById(userId,
                 PageRequest.of(page - 1, size));
 
-        if (letters.isEmpty()) {
+        if (letters.getTotalElements() == 0) {
             return new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
         }
 
         PageValidator.validMaxPage(letters.getTotalPages(), page);
+
         return letters.map(FindAllArchiveLettersDTO::toFindAllArchiveLettersResponse);
     }
 
