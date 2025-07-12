@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.util.Base64;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(name = "fcm.enabled", havingValue = "true")
 public class FcmConfig {
     @Value("${fcm.private-key}")
     private String privateKey;

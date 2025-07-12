@@ -6,6 +6,7 @@ import com.google.firebase.messaging.Message;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import online.bottler.notification.application.port.PushNotificationPort;
@@ -14,6 +15,7 @@ import online.bottler.notification.domain.PushMessages;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Primary
 public class FirebasePushAdapter implements PushNotificationPort {
     private final FirebaseMessageMapper messageMapper;
 
