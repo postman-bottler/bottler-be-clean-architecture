@@ -103,7 +103,8 @@ public interface MapLetterJpaRepository extends JpaRepository<MapLetterEntity, L
             + "r.label AS label, r.source_letter_id AS sourceLetterId, 'REPLY' AS type, r.created_at AS createdAt, r.create_user_id as senderId, false as isRead "
             +
             "FROM reply_map_letter r " +
-            "WHERE r.create_user_id = :userId AND r.is_deleted = false AND r.is_blocked = false AND r.is_recipient_deleted = false "
+            "JOIN map_letter ml ON r.source_letter_id = ml.map_letter_id " +
+            "WHERE ml.create_user_id = :userId AND r.is_deleted = false AND r.is_blocked = false AND r.is_recipient_deleted = false "
             +
             "ORDER BY createdAt DESC",
             countQuery = "SELECT COUNT(*) FROM (" +
