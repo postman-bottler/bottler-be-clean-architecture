@@ -54,13 +54,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(RedisTestContainersConfig.class)
 @Transactional
-class MapLetterCreateFacadeTest {
+class MapLetterCreateFacadeTest extends MapLetterApplicationTestHelper {
 
     @Autowired
     private MapLetterCreateFacade mapLetterCreateFacade;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
 
     @Autowired
     private MapLetterJpaRepository mapLetterJpaRepository;
@@ -69,12 +66,13 @@ class MapLetterCreateFacadeTest {
     @Test
     void createTargetMapLetterTest() {
         //given
-        Long userId = 1L;
+        UserEntity user = saveUser();
+        UserEntity targetUser = saveUser();
+        Long userId = user.getUserId();
+
         CreateTargetMapLetterCommand command = new CreateTargetMapLetterCommand(
                 "title", "content", "description", new BigDecimal("37.5665"),
-                new BigDecimal("126.9780"), "font", "paper", "label", "targetUserName");
-
-        userJpaRepository.save(createUserEntity());
+                new BigDecimal("126.9780"), "font", "paper", "label", targetUser.getNickname());
 
         //when
         MapLetter targetMapLetter = mapLetterCreateFacade.createTargetMapLetter(command, userId);
@@ -147,35 +145,5 @@ class MapLetterCreateFacadeTest {
         assertThatThrownBy(() -> mapLetterCreateFacade.createReplyMapLetter(command, userId))
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage("해당 지도 편지에 이미 답장을 했습니다.");
-    }
-
-    private UserEntity createUserEntity() {
-        return UserEntity.builder()
-                .email("target@example.com")
-                .nickname("targetUserName")
-                .password("pw")
-                .imageUrl("http://example.com/img.png")
-                .role(Role.USER)
-                .provider(Provider.LOCAL)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .isDeleted(false)
-                .warningCount(0)
-                .build();
-    }
-
-    private MapLetterEntity createMapLetterEntity() {
-        return MapLetterEntity.builder()
-                .title("title")
-                .content("content")
-                .latitude(new BigDecimal("37.5665"))
-                .longitude(new BigDecimal("126.9780"))
-                .font("font")
-                .paper("paper")
-                .label("label")
-                .description("description")
-                .type(MapLetterType.PUBLIC)
-                .createUserId(2L)
-                .build();
     }
 }

@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import online.bottler.RedisTestContainersConfig;
 import online.bottler.global.exception.ApplicationException;
@@ -38,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(MockitoExtension.class)
 @Import(RedisTestContainersConfig.class)
 @Transactional
-class MapLetterArchiveServiceTest {
+class MapLetterArchiveServiceTest extends MapLetterApplicationTestHelper {
 
     @MockBean
     private MapLetterPersistencePort mapLetterPersistencePort;
@@ -261,12 +259,12 @@ class MapLetterArchiveServiceTest {
                 List.of(
                         mapLetterArchive1.getMapLetterId(),
                         1000L,
-                        mapLetterArchive1.getMapLetterId()+1
+                        mapLetterArchive1.getMapLetterId() + 1
                 )
         );
 
         //when, then
-        assertThatThrownBy(()-> mapLetterArchiveService.deleteArchivedLetter(deleteArchivedLettersCommand, userId))
+        assertThatThrownBy(() -> mapLetterArchiveService.deleteArchivedLetter(deleteArchivedLettersCommand, userId))
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage("삭제할 지도 편지를 찾을 수 없습니다.");
     }
@@ -310,28 +308,6 @@ class MapLetterArchiveServiceTest {
         return MapLetterArchive.builder()
                 .mapLetterId(letterId)
                 .userId(userId)
-                .build();
-    }
-
-    private MapLetterEntity createMapLetterEntity() {
-        return MapLetterEntity.builder()
-                .title("title")
-                .content("content")
-                .latitude(new BigDecimal("37.5665"))
-                .longitude(new BigDecimal("126.9780"))
-                .font("font")
-                .paper("paper")
-                .label("label")
-                .description("description")
-                .type(MapLetterType.PUBLIC)
-                .targetUserId(null)
-                .createUserId(10L)
-                .createdAt(LocalDateTime.of(2025, 7, 11, 17, 20))
-                .updatedAt(LocalDateTime.of(2025, 7, 11, 17, 20))
-                .isDeleted(false)
-                .isBlocked(false)
-                .isRead(false)
-                .isRecipientDeleted(false)
                 .build();
     }
 }

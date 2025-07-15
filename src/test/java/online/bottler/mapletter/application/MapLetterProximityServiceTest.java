@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import online.bottler.RedisTestContainersConfig;
 import online.bottler.global.exception.CommonForbiddenException;
@@ -14,9 +13,7 @@ import online.bottler.mapletter.adaptor.out.persistence.repository.MapLetterJpaR
 import online.bottler.mapletter.application.dto.MapLetterAndDistance;
 import online.bottler.mapletter.domain.MapLetterType;
 import online.bottler.user.adapter.out.persistence.entity.UserEntity;
-import online.bottler.user.adapter.out.persistence.repository.UserJpaRepository;
-import online.bottler.user.domain.Provider;
-import online.bottler.user.domain.Role;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(RedisTestContainersConfig.class)
 @Transactional
-class MapLetterProximityServiceTest {
+class MapLetterProximityServiceTest extends MapLetterApplicationTestHelper {
 
     @Autowired
     private MapLetterProximityService mapLetterProximityService;
 
     @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
     private MapLetterJpaRepository mapLetterJpaRepository;
+
+    @AfterEach
+    void tearDown() {
+        mapLetterJpaRepository.deleteAllInBatch();
+    }
 
     @DisplayName("반경 500M 안에 있는 편지 조회시 PRIVATE 편지의 타겟이 조회를 요청한 유저이거나 PUBLIC 편지만 조회가 가능하다.")
     @Test
@@ -142,7 +141,7 @@ class MapLetterProximityServiceTest {
 
         MapLetterEntity mapLetter = mapLetterJpaRepository.save(createMapLetterEntity(
                 user.getUserId(), new BigDecimal("37.5666"), new BigDecimal("126.9781"),
-                MapLetterType.PUBLIC, true, false));
+                MapLetterType.PUBLIC, null, true, false));
 
         //when, then
         assertThatThrownBy(
@@ -162,7 +161,7 @@ class MapLetterProximityServiceTest {
 
         MapLetterEntity mapLetter = mapLetterJpaRepository.save(createMapLetterEntity(
                 user.getUserId(), new BigDecimal("37.5666"), new BigDecimal("126.9781"),
-                MapLetterType.PUBLIC, false, true));
+                MapLetterType.PUBLIC, null, false, true));
 
         //when, then
         assertThatThrownBy(
@@ -224,7 +223,7 @@ class MapLetterProximityServiceTest {
 
         MapLetterEntity mapLetter = mapLetterJpaRepository.save(createMapLetterEntity(
                 user.getUserId(), new BigDecimal("37.5666"), new BigDecimal("126.9781"),
-                MapLetterType.PUBLIC, true, false));
+                MapLetterType.PUBLIC, null, true, false));
 
         //when, then
         assertThatThrownBy(
@@ -245,7 +244,7 @@ class MapLetterProximityServiceTest {
 
         MapLetterEntity mapLetter = mapLetterJpaRepository.save(createMapLetterEntity(
                 user.getUserId(), new BigDecimal("37.5666"), new BigDecimal("126.9781"),
-                MapLetterType.PUBLIC, false, true));
+                MapLetterType.PUBLIC, null, false, true));
 
         //when, then
         assertThatThrownBy(
@@ -254,64 +253,5 @@ class MapLetterProximityServiceTest {
                         MapLetterEntity.toDomain(mapLetter), user.getUserId()))
                 .isInstanceOf(DomainException.class)
                 .hasMessage("해당 편지는 신고당한 편지입니다.");
-    }
-
-    private UserEntity saveUser() {
-        double random = Math.random();
-        return userJpaRepository.save(
-                UserEntity.builder()
-                        .email("target@example.com" + random)
-                        .nickname("targetUserName" + random)
-                        .password("pw" + random)
-                        .imageUrl("http://example.com/img.png" + random)
-                        .role(Role.USER)
-                        .provider(Provider.LOCAL)
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .isDeleted(false)
-                        .warningCount(0)
-                        .build()
-        );
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType, Long targetUserId, boolean isDeleted,
-                                                  boolean isBlocked) {
-        double random = Math.random();
-        return MapLetterEntity.builder()
-                .title("title" + random)
-                .content("content" + random)
-                .latitude(latitude)
-                .longitude(longitude)
-                .font("font")
-                .paper("paper")
-                .label("label")
-                .description("description")
-                .type(mapLetterType)
-                .targetUserId(targetUserId)
-                .createUserId(createUserId)
-                .createdAt(LocalDateTime.of(2025, 7, 11, 17, 20))
-                .updatedAt(LocalDateTime.of(2025, 7, 11, 17, 20))
-                .isDeleted(isDeleted)
-                .isBlocked(isBlocked)
-                .isRead(false)
-                .isRecipientDeleted(false)
-                .build();
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType, Long targetUserId) {
-        return createMapLetterEntity(createUserId, latitude, longitude, mapLetterType, targetUserId,
-                false, false);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType) {
-        return createMapLetterEntity(createUserId, latitude, longitude, mapLetterType, 1L);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType, boolean isDeleted, boolean isBlock) {
-        return createMapLetterEntity(createUserId, latitude, longitude, mapLetterType, 1L, isDeleted, isBlock);
     }
 }

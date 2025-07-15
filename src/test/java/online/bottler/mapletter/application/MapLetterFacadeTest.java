@@ -21,9 +21,6 @@ import online.bottler.mapletter.application.response.FindReceivedMapLetterRespon
 import online.bottler.mapletter.application.response.OneLetterResponse;
 import online.bottler.mapletter.domain.MapLetterType;
 import online.bottler.user.adapter.out.persistence.entity.UserEntity;
-import online.bottler.user.adapter.out.persistence.repository.UserJpaRepository;
-import online.bottler.user.domain.Provider;
-import online.bottler.user.domain.Role;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,13 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(RedisTestContainersConfig.class)
 @Transactional
-class MapLetterFacadeTest {
+class MapLetterFacadeTest extends MapLetterApplicationTestHelper {
 
     @Autowired
     private MapLetterFacade mapLetterFacade;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
 
     @Autowired
     private MapLetterJpaRepository mapLetterJpaRepository;
@@ -54,7 +48,6 @@ class MapLetterFacadeTest {
 
     @AfterEach
     void tearDown() {
-        userJpaRepository.deleteAllInBatch();
         mapLetterJpaRepository.deleteAllInBatch();
         replyMapLetterJpaRepository.deleteAllInBatch();
     }
@@ -455,81 +448,6 @@ class MapLetterFacadeTest {
 
         //then
         assertThat(responses.getContent()).hasSize(1);
-    }
-
-    private UserEntity saveUser() {
-        double random = Math.random();
-        return userJpaRepository.save(
-                UserEntity.builder()
-                        .email("target@example.com" + random)
-                        .nickname("targetUserName" + random)
-                        .password("pw" + random)
-                        .imageUrl("http://example.com/img.png" + random)
-                        .role(Role.USER)
-                        .provider(Provider.LOCAL)
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .isDeleted(false)
-                        .warningCount(0)
-                        .build()
-        );
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType, Long targetUserId, boolean isBlocked,
-                                                  boolean isDeleted) {
-        double random = Math.random();
-        return MapLetterEntity.builder()
-                .title("title" + random)
-                .content("content" + random)
-                .latitude(latitude)
-                .longitude(longitude)
-                .font("font")
-                .paper("paper")
-                .label("label")
-                .description("description")
-                .type(mapLetterType)
-                .targetUserId(targetUserId)
-                .createUserId(createUserId)
-                .createdAt(LocalDateTime.of(2025, 7, 11, 17, 20))
-                .updatedAt(LocalDateTime.of(2025, 7, 11, 17, 20))
-                .isDeleted(isDeleted)
-                .isBlocked(isBlocked)
-                .isRead(false)
-                .isRecipientDeleted(false)
-                .build();
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType, Long targetUserId) {
-        return createMapLetterEntity(createUserId, latitude, longitude, mapLetterType, targetUserId,
-                false, false);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, BigDecimal latitude, BigDecimal longitude,
-                                                  MapLetterType mapLetterType) {
-        return createMapLetterEntity(createUserId, latitude, longitude, mapLetterType, 1L);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId) {
-        return createMapLetterEntity(createUserId, new BigDecimal("37.5665"), new BigDecimal("126.9780"),
-                MapLetterType.PUBLIC);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, Long targetUserId) {
-        return createMapLetterEntity(createUserId, new BigDecimal("37.5665"), new BigDecimal("126.9780"),
-                MapLetterType.PRIVATE, targetUserId);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, boolean isBlocked, boolean isDeleted) {
-        return createMapLetterEntity(createUserId, new BigDecimal("37.5665"), new BigDecimal("126.9780"),
-                MapLetterType.PUBLIC, null, isBlocked, isDeleted);
-    }
-
-    private MapLetterEntity createMapLetterEntity(Long createUserId, Long targetUserId, boolean isBlocked,
-                                                  boolean isDeleted) {
-        return createMapLetterEntity(createUserId, new BigDecimal("37.5665"), new BigDecimal("126.9780"),
-                MapLetterType.PRIVATE, targetUserId, isBlocked, isDeleted);
     }
 
     private ReplyMapLetterEntity createReplyMapLetterEntity(Long createUserId, Long sourceLetterId) {
